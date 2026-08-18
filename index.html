@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>Rastreador de Rachas de Fútbol</title>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        <span class="live-indicator"></span>
+        Rastreador de Rachas
+      </h1>
+      <div id="global-counters" class="global-counters">
+        <div class="counter-badge counter-orange"><span id="count-orange">0</span> <span class="counter-label">Naranjas</span></div>
+        <div class="counter-badge counter-yellow"><span id="count-yellow">0</span> <span class="counter-label">Amarillos</span></div>
+        <div class="counter-badge counter-blue"><span id="count-blue">0</span> <span class="counter-label">Azules</span></div>
+        <div class="counter-badge counter-green"><span id="count-green">0</span> <span class="counter-label">Verdes</span></div>
+      </div>
+      <div>
+        <button id="league-btn" class="btn">Gestionar Ligas</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Modal League Manager (Hidden by default) -->
+      <dialog id="league-modal"
+        style="margin: auto; width: 90vw; max-width: 400px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); overscroll-behavior: contain;">
+        <h2 style="margin-bottom: 1rem;">Ligas Activas</h2>
+        <div style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+          <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; color: var(--text-accent);">
+            <span>Seleccionar Todas</span>
+            <input type="checkbox" id="select-all-leagues" style="cursor: pointer;">
+          </label>
+        </div>
+        <div id="league-toggles"
+          style="display: grid; gap: 0.5rem; margin-bottom: 1.5rem; max-height: 60vh; overflow-y: auto; padding-right: 0.5rem;">
+          <!-- Generated via JS -->
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+          <button id="close-modal" class="btn">Cerrar</button>
+        </div>
+      </dialog>
+
+      <!-- Dynamic Grid for Matches -->
+      <div id="dashboard" class="dashboard-grid">
+        <!-- Cards generated via JS -->
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
