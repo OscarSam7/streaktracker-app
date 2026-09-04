@@ -1,0 +1,32 @@
+{
+  "usr_default_01": {
+    "id": "usr_default_01",
+    "email": "trader@streaktracker.io",
+    "name": "Usuario StreakTracker",
+    "role": "VIP",
+    "subscription": {
+      "plan": "VIP",
+      "status": "ACTIVE",
+      "startedAt": "2026-09-04T01:24:43.555Z",
+      "expiresAt": "2026-10-04T01:24:43.555Z",
+      "autoRenew": true,
+      "accessLevel": "VIP",
+      "paymentGatewayReady": true
+    }
+  },
+  "admin_root": {
+    "id": "admin_root",
+    "email": "admin@streaktracker.io",
+    "name": "Administrador Global",
+    "role": "ADMIN",
+    "subscription": {
+      "plan": "VIP",
+      "status": "ACTIVE",
+      "startedAt": "2026-09-04T01:24:43.555Z",
+      "expiresAt": null,
+      "autoRenew": true,
+      "accessLevel": "ADMIN",
+      "paymentGatewayReady": true
+    }
+  }
+}

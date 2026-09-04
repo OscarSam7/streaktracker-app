@@ -3,7 +3,10 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0b1320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,29 +17,240 @@
 <body>
   <div class="container">
     <header>
-      <h1>
+      <h1 style="display: flex; align-items: center; gap: 0.65rem;">
+        <img src="/logo.png" alt="Streak Tracker" style="width: 38px; height: 38px; border-radius: 8px; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); border: 1px solid rgba(56, 189, 248, 0.3);" />
         <span class="live-indicator"></span>
-        Rastreador de Rachas
+        <span>Rastreador de Rachas</span>
       </h1>
       <div id="global-counters" class="global-counters">
+        <span class="indicators-header-label">Indicadores:</span>
         <div class="counter-badge counter-orange"><span id="count-orange">0</span> <span class="counter-label">Naranjas</span></div>
         <div class="counter-badge counter-yellow"><span id="count-yellow">0</span> <span class="counter-label">Amarillos</span></div>
         <div class="counter-badge counter-blue"><span id="count-blue">0</span> <span class="counter-label">Azules</span></div>
         <div class="counter-badge counter-green"><span id="count-green">0</span> <span class="counter-label">Verdes</span></div>
       </div>
-      <div>
+      <div id="header-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <div class="lang-selector-box">
+          <select id="lang-select" class="lang-select">
+            <option value="es" selected>🇪🇸 ES</option>
+            <option value="en">🇬🇧 EN</option>
+            <option value="pt">🇧🇷 PT</option>
+          </select>
+        </div>
+        <div class="plan-selector-box">
+          <label for="plan-select" id="plan-label" class="plan-selector-label">Plan:</label>
+          <select id="plan-select" class="plan-select" style="font-weight: 800;">
+            <option value="FREE">⚪ FREE (Básico)</option>
+            <option value="TRIAL">🧪 TRIAL (Prueba 3 Días)</option>
+            <option value="PRO">🔵 PRO (Cuantitativo)</option>
+            <option value="VIP" selected>🟢 VIP (Todo Incluido)</option>
+          </select>
+        </div>
+        
+        <button id="guide-btn" class="btn" title="Ver Guía de Mercados a Operar">📖 ¿Qué Mercado Operar?</button>
+        <button id="backtest-btn" class="btn" title="Ver Backtesting y Rendimiento Histórico">📈 Backtesting</button>
+        <button id="audit-btn" class="btn" title="Ver Auditoría Pública y Track Record">🛡️ Auditoría</button>
+        <button id="academy-btn" class="btn btn-academy" title="Aprender en la Academia Anti-Ruina">🎓 Academia</button>
+        <button id="bankroll-btn" class="btn btn-bankroll" title="Abrir Registro de Operaciones y Control de Banca">💼 Control de Banca</button>
+        <button id="export-csv-btn" class="btn" style="display: none;" title="Exportar resumen a Excel/CSV">📥 Exportar CSV</button>
+        <button id="telegram-btn" class="btn btn-telegram" title="Ver simulador de alertas de Telegram">🤖 Bot Telegram</button>
+        <button id="pricing-btn" class="btn btn-premium">💎 Ver Planes</button>
+        <button id="refresh-btn" class="btn" title="Actualizar datos de las ligas ahora">🔄</button>
         <button id="league-btn" class="btn">Gestionar Ligas</button>
+        <button id="daily-report-btn" class="btn" style="background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%); color: #fff; font-weight: 700; border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 0 15px rgba(14, 165, 233, 0.25);" title="Ver Informe y Balance de Jornada por Día, Semana y Mes">📊 Informe de Jornada</button>
+        <button id="transparency-btn" class="btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #fff; font-weight: 800; border: 1px solid rgba(74, 222, 128, 0.5); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);" title="Ver Métricas Oficiales de Rendimiento y Transparencia">🔍 Transparencia & Resultados</button>
+        <a href="/landing.html" class="btn" style="text-decoration: none; border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; display: inline-flex; align-items: center; gap: 0.3rem;" title="Ver Landing Page informativa">🌐 Portal Web</a>
+        <button id="admin-panel-btn" class="btn" style="background: linear-gradient(135deg, #475569 0%, #1e293b 100%); color: #facc15; font-weight: 800; border: 1px solid rgba(250, 204, 21, 0.4); box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
       </div>
     </header>
 
+    <!-- Permanent Trial Countdown Banner (Dynamically Controlled) -->
+    <div id="trial-active-banner" style="display: none; background: linear-gradient(135deg, rgba(250, 204, 21, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%); border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 0.75rem; padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span style="font-size: 1.4rem;">🧪</span>
+        <div>
+          <strong id="trial-banner-title" style="color: #facc15; font-size: 0.95rem; display: block;">Período de Prueba Gratuita Activo</strong>
+          <span id="trial-countdown-text" style="font-size: 0.8rem; color: #e2e8f0;">Tu prueba termina en 3 días.</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <button id="trial-upgrade-pro-btn" class="btn btn-tier-pro" style="padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 800; border-radius: 6px;">
+          ⚡ Actualizar a PRO ($19/m)
+        </button>
+        <button id="trial-upgrade-vip-btn" class="btn btn-tier-elite" style="padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 800; border-radius: 6px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+          👑 Actualizar a VIP ($39/m)
+        </button>
+      </div>
+    </div>
+
+    <!-- Search & Quick Filters Bar -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="🔍 Buscar liga o país..." />
+        <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Limpiar búsqueda">✕</button>
+        <button id="search-action-btn" class="btn-search-action" title="Buscar y desplazar a la liga">🔍 Buscar</button>
+      </div>
+      <div class="filter-pills" id="filter-pills">
+        <button class="filter-pill active" data-filter="all">🔘 Todas las Ligas</button>
+        <button class="filter-pill" data-filter="high_today" style="border-color: rgba(74, 222, 128, 0.6); background: rgba(74, 222, 128, 0.12); color: #4ade80; font-weight: 700;">🟢🔵 Alertas Verdes / Azules de Hoy</button>
+        <button class="filter-pill" data-filter="high_alerts">🟢 Alertas Verdes / Azules (Todas)</button>
+        <button class="filter-pill" data-filter="today" style="border-color: rgba(245, 158, 11, 0.5); font-weight: 700;">🔥 Partidos de Hoy</button>
+        <button class="filter-pill" data-filter="live">🔴 Solo En Vivo</button>
+        <button class="filter-pill" data-filter="upcoming">📅 Con Próximos Partidos</button>
+      </div>
+    </div>
+
     <main>
+      <!-- Modal Telegram Signals Distribution Engine -->
+      <dialog id="telegram-modal" class="custom-dialog" style="width: 90vw; max-width: 620px; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.3); color: var(--text-main); background: #0e1621; box-shadow: 0 0 45px rgba(36, 158, 235, 0.3); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);">
+              ✈️
+            </div>
+            <div>
+              <h3 id="telegram-modal-title" style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0;">Distribución de Señales a Telegram</h3>
+              <p id="telegram-modal-status" style="font-size: 0.7rem; color: #4ade80; margin-top: 0.15rem; margin-bottom: 0;">Motor de Difusión Activo • Pipeline Filtrado & Anti-Duplicados</p>
+            </div>
+          </div>
+          <button id="close-telegram-modal" class="btn" style="padding: 0.3rem 0.6rem;">✕</button>
+        </div>
+
+        <!-- Channel Selector Tabs: FREE, PRO, VIP -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.85rem; background: rgba(0,0,0,0.3); padding: 0.4rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); overflow-x: auto;">
+          <button class="filter-pill active" id="tg-chan-vip" data-tg-channel="VIP" style="flex: 1; text-align: center; color: #4ade80; border-color: rgba(74, 222, 128, 0.5);">
+            🟢 CANAL VIP (Completo)
+          </button>
+          <button class="filter-pill" id="tg-chan-pro" data-tg-channel="PRO" style="flex: 1; text-align: center; color: #38bdf8; border-color: rgba(56, 189, 248, 0.5);">
+            🔵 CANAL PRO (Avanzado)
+          </button>
+          <button class="filter-pill" id="tg-chan-free" data-tg-channel="FREE" style="flex: 1; text-align: center; color: #94a3b8; border-color: rgba(255, 255, 255, 0.2);">
+            ⚪ CANAL FREE (Público)
+          </button>
+        </div>
+
+        <!-- Architecture Flow Visual Pipeline -->
+        <div style="font-size: 0.62rem; color: #94a3b8; background: rgba(255,255,255,0.03); padding: 0.4rem 0.6rem; border-radius: 0.4rem; margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; border: 1px dashed rgba(255,255,255,0.08); flex-wrap: wrap; gap: 0.3rem;">
+          <span>⚡ Motor Señales</span> ➔ 
+          <span>🛡️ Filtro Calidad</span> ➔ 
+          <span>📊 Signal Score</span> ➔ 
+          <span>🎯 Confianza</span> ➔ 
+          <span>🔒 Permiso Canal</span> ➔ 
+          <span style="color: #38bdf8; font-weight: 700;">✈️ Telegram</span>
+        </div>
+
+        <!-- Telegram Message Bubble Preview -->
+        <div class="telegram-chat-window">
+          <div class="telegram-msg-box">
+            <div class="telegram-msg-header">
+              <span id="telegram-channel-name">🏆 StreakTracker VIP Signals</span>
+              <span class="telegram-msg-time" id="telegram-time">15:45</span>
+            </div>
+            <div class="telegram-msg-body" id="telegram-msg-content" style="white-space: pre-wrap; font-family: monospace; font-size: 0.76rem; line-height: 1.45;">
+              <!-- Content generated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: space-between; flex-wrap: wrap;">
+          <button id="generate-telegram-alert-btn" class="btn btn-telegram" style="flex: 1; justify-content: center;">
+            🔔 Transmitir Próxima Señal
+          </button>
+          <button id="copy-telegram-alert-btn" class="btn btn-premium" style="flex: 1; justify-content: center;">
+            📋 Copiar Formato Oficial
+          </button>
+        </div>
+        <div id="telegram-copy-notice" style="display: none; text-align: center; color: #4ade80; font-size: 0.75rem; margin-top: 0.5rem; font-weight: 600;">
+          ¡Copiado al portapapeles!
+        </div>
+      </dialog>
+
+      <!-- Modal Pricing & Subscriptions (Hidden by default) -->
+      <dialog id="pricing-modal" class="custom-dialog" style="width: 95vw; max-width: 1050px; padding: 2rem; border-radius: 1rem; border: 1px solid var(--border-glass); color: var(--text-main); background: var(--bg-dark);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem;">
+          <div>
+            <h2 style="font-size: 1.6rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+              Planes y Suscripciones
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Desbloquea el poder del análisis estadístico en tiempo real y maximiza tus oportunidades.
+            </p>
+          </div>
+          <button id="close-pricing-modal" class="btn">✕ Cerrar</button>
+        </div>
+
+        <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));">
+          <!-- Plan FREE -->
+          <div class="pricing-card">
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color: #94a3b8;">⚪ FREE</h3>
+              <div class="plan-price">$0 <span>/ mes</span></div>
+              <p class="plan-desc">Acceso introductorio para explorar la plataforma.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> <strong>Hasta 5 ligas activas</strong></li>
+              <li><span class="check">✓</span> <strong>Estadísticas y rachas básicas</strong></li>
+              <li><span class="check">✓</span> <strong>2 oportunidades diarias observables</strong></li>
+              <li><span class="check">✓</span> Calculadora de stake básica</li>
+              <li><span class="cross">✕</span> <span class="muted">Alertas PREMIUM y FUERTES bloqueadas</span></li>
+              <li><span class="cross">✕</span> <span class="muted">Sin Backtesting Histórico avanzado</span></li>
+              <li><span class="cross">✕</span> <span class="muted">Sin alertas de Telegram VIP</span></li>
+              <li><span class="cross">✕</span> <span class="muted">Sin informes diarios de jornada</span></li>
+            </ul>
+            <button class="btn btn-tier-action" data-tier="FREE">Activar Plan FREE</button>
+          </div>
+
+          <!-- Plan PRO -->
+          <div class="pricing-card pricing-card-pro">
+            <div class="badge-tag">POPULAR</div>
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color: #38bdf8;">🔵 PRO</h3>
+              <div class="plan-price">$19.00 <span>/ mes</span></div>
+              <p class="plan-desc">Para operadores cuantitativos que buscan mayor volumen de señales.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> <strong>Hasta 15 ligas activas simultáneas</strong></li>
+              <li><span class="check">✓</span> <strong>Alertas FUERTES desbloqueadas (🔵 Azul)</strong></li>
+              <li><span class="check">✓</span> <strong>Estadísticas avanzadas y telemetría</strong></li>
+              <li><span class="check">✓</span> <strong>Filtros adicionales y Centro de Oportunidades</strong></li>
+              <li><span class="check">✓</span> <strong>Módulo de Backtesting Ampliado (+3 Temp)</strong></li>
+              <li><span class="check">✓</span> <strong>Control de banca hasta 50 operaciones</strong></li>
+              <li><span class="check">✓</span> <strong>📥 Descarga de Planilla Excel Oficial (.xlsx)</strong></li>
+              <li><span class="cross">✕</span> <span class="muted">Sin Bot de Telegram VIP</span></li>
+            </ul>
+            <button class="btn btn-tier-action btn-tier-pro" data-tier="PRO">Activar Plan PRO</button>
+          </div>
+
+          <!-- Plan VIP -->
+          <div class="pricing-card pricing-card-elite" style="border-color: rgba(74, 222, 128, 0.4); box-shadow: 0 0 35px rgba(34, 197, 94, 0.25);">
+            <div class="badge-tag badge-elite" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">TODO INCLUIDO</div>
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color: #4ade80;">🟢 VIP</h3>
+              <div class="plan-price">$39.00 <span>/ mes</span></div>
+              <p class="plan-desc">La suite definitiva para traders profesionales y sindicatos.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> <strong>Todas las 45 ligas mundiales desbloqueadas</strong></li>
+              <li><span class="check">✓</span> <strong>100% Señales PREMIUM desbloqueadas (🟢 Verde)</strong></li>
+              <li><span class="check">✓</span> <strong>Alertas prioritarias instantáneas</strong></li>
+              <li><span class="check">✓</span> <strong>Información estadística e institucional completa</strong></li>
+              <li><span class="check">✓</span> <strong>🤖 Integración con Bot de Telegram VIP en tiempo real</strong></li>
+              <li><span class="check">✓</span> <strong>Historial completo y auditoría inmutable</strong></li>
+              <li><span class="check">✓</span> <strong>Herramientas avanzadas de banca ILIMITADAS</strong></li>
+              <li><span class="check">✓</span> <strong>📊 Balance e Informes de Jornada profesionales</strong></li>
+            </ul>
+            <button class="btn btn-tier-action btn-tier-elite" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" data-tier="VIP">Activar Plan VIP</button>
+          </div>
+        </div>
+      </dialog>
+
       <!-- Modal League Manager (Hidden by default) -->
       <dialog id="league-modal"
         style="margin: auto; width: 90vw; max-width: 400px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); overscroll-behavior: contain;">
-        <h2 style="margin-bottom: 1rem;">Ligas Activas</h2>
+        <h2 id="league-modal-title" style="margin-bottom: 1rem;">Ligas Activas</h2>
         <div style="margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
           <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: bold; color: var(--text-accent);">
-            <span>Seleccionar Todas</span>
+            <span id="select-all-label-text">Seleccionar Todas</span>
             <input type="checkbox" id="select-all-leagues" style="cursor: pointer;">
           </label>
         </div>
@@ -45,15 +259,1164 @@
           <!-- Generated via JS -->
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
-          <button id="close-modal" class="btn">Cerrar</button>
+          <button id="close-modal" class="btn btn-premium" style="padding: 0.45rem 1.2rem; font-weight: 700;">✓ Aceptar</button>
         </div>
       </dialog>
+
+      
+      
+      
+      
+      <!-- Modal INFORME Y BALANCE DE JORNADA -->
+      <dialog id="daily-report-modal" class="custom-dialog" style="width: 95vw; max-width: 960px; max-height: 90vh; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.3); color: var(--text-main); background: #0f172a; box-shadow: 0 0 45px rgba(15, 23, 42, 0.9); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              📊 INFORME Y BALANCE DE JORNADA (00:00hs - 23:59hs)
+            </h2>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Auditoría histórica de alertas vivas al inicio de jornada, alertas generadas en el día y alertas cortadas al cierre.
+            </p>
+          </div>
+          <button id="close-daily-report-modal" class="btn">✕</button>
+        </div>
+
+        <!-- Period Selector & Action Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem; background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 0.6rem; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;" class="filter-pills">
+            <button class="filter-pill active" id="dr-btn-day" data-period="day">📅 Hoy (Jornada Actual)</button>
+            <button class="filter-pill" id="dr-btn-week" data-period="week">🗓️ Últimos 7 Días (Semana)</button>
+            <button class="filter-pill" id="dr-btn-month" data-period="month">📈 Últimos 30 Días (Mes)</button>
+            <button class="filter-pill" id="dr-btn-custom" data-period="custom">🔍 Por Rango de Fechas</button>
+          </div>
+          <button id="dr-export-btn" class="btn btn-premium" style="padding: 0.35rem 0.8rem; font-size: 0.8rem;">📥 Exportar Informe Profesional (CSV)</button>
+        </div>
+
+        <!-- Custom Date Range Bar (Hidden by default) -->
+        <div id="dr-custom-date-bar" style="display: none; align-items: center; gap: 0.75rem; margin-bottom: 1rem; background: rgba(56, 189, 248, 0.08); padding: 0.65rem 1rem; border-radius: 0.5rem; border: 1px solid rgba(56, 189, 248, 0.25); flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">Desde:</label>
+            <input type="date" id="dr-date-start" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 0.25rem 0.5rem; border-radius: 0.3rem; font-size: 0.78rem;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">Hasta:</label>
+            <input type="date" id="dr-date-end" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 0.25rem 0.5rem; border-radius: 0.3rem; font-size: 0.78rem;" />
+          </div>
+          <button id="dr-date-apply-btn" class="btn btn-success" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">🔍 Filtrar</button>
+          <button id="dr-date-clear-btn" class="btn" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">✕ Limpiar</button>
+        </div>
+
+        <!-- 4 Snapshot Blocks (APERTURA, GENERADAS, RESUELTAS, CIERRE) -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.75rem;">
+            <span style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">🌅 APERTURA (00:00hs)</span>
+            <div id="dr-sum-open" style="font-size: 1.2rem; font-weight: 800; color: #38bdf8; margin-top: 0.2rem;">0 Alertas</div>
+            <span id="dr-sum-open-detail" style="font-size: 0.65rem; color: #64748b;">🟢 0 | 🔵 0 | 🟡 0 | 🟠 0</span>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.75rem;">
+            <span style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">⚡ GENERADAS (Nuevas)</span>
+            <div id="dr-sum-gen" style="font-size: 1.2rem; font-weight: 800; color: #f59e0b; margin-top: 0.2rem;">+0 Nuevas</div>
+            <span id="dr-sum-gen-detail" style="font-size: 0.65rem; color: #64748b;">🟢 0 | 🔵 0 | 🟡 0 | 🟠 0</span>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.75rem;">
+            <span style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">✂️ RESUELTAS (Gan/Pérd)</span>
+            <div id="dr-sum-cut" style="font-size: 1.2rem; font-weight: 800; color: #4ade80; margin-top: 0.2rem;">-0 Rupturas</div>
+            <span id="dr-sum-cut-detail" style="font-size: 0.65rem; color: #64748b;">🟢 0 | 🔵 0 | 🟡 0 | 🟠 0</span>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 0.75rem;">
+            <span style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">🌙 CIERRE (23:59hs Vivas)</span>
+            <div id="dr-sum-close" style="font-size: 1.2rem; font-weight: 800; color: #a855f7; margin-top: 0.2rem;">0 Vivas</div>
+            <span id="dr-sum-close-detail" style="font-size: 0.65rem; color: #64748b;">🟢 0 | 🔵 0 | 🟡 0 | 🟠 0</span>
+          </div>
+        </div>
+
+        <!-- 11 KPIs Quantitative Intelligence Deck -->
+        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 0.65rem; padding: 1rem; margin-bottom: 1.25rem;">
+          <h4 style="font-size: 0.85rem; font-weight: 800; color: #38bdf8; margin: 0 0 0.75rem 0; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <span>📈 Balance Cuantitativo del Período</span>
+            <span style="font-size: 0.68rem; color: #94a3b8; font-weight: normal;">*Basado en el Ledger Inmutable de Señales</span>
+          </h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; text-align: center;">
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">TOTAL SEÑALES</span>
+              <strong id="dr-kpi-total" style="font-size: 1.05rem; color: #fff;">0</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">GANADAS / PERDIDAS</span>
+              <strong id="dr-kpi-winloss" style="font-size: 0.95rem; color: #4ade80;">0 / 0</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">WIN RATE %</span>
+              <strong id="dr-kpi-winrate" style="font-size: 1.05rem; color: #38bdf8;">0.0%</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">ROI ESTIMADO</span>
+              <strong id="dr-kpi-roi" style="font-size: 1.05rem; color: #4ade80;">+0.0%</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">PROFIT / LOSS</span>
+              <strong id="dr-kpi-profit" style="font-size: 1.05rem; color: #4ade80;">+$0.00</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">PROFIT FACTOR</span>
+              <strong id="dr-kpi-pf" style="font-size: 1.05rem; color: #facc15;">0.00</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">MAX DRAWDOWN</span>
+              <strong id="dr-kpi-dd" style="font-size: 1.05rem; color: #f87171;">0.0%</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.45rem; border-radius: 0.4rem;">
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">SEÑALES PREMIUM</span>
+              <strong id="dr-kpi-premium" style="font-size: 1.05rem; color: #4ade80;">0</strong>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1rem; margin-top: 0.75rem; font-size: 0.72rem; color: #94a3b8; flex-wrap: wrap;">
+            <div style="flex: 1; background: rgba(0,0,0,0.25); padding: 0.45rem 0.6rem; border-radius: 0.35rem;">
+              <strong style="color: #38bdf8;">🏆 Distribución por Liga:</strong> <span id="dr-kpi-leagues-dist">Cargando...</span>
+            </div>
+            <div style="flex: 1; background: rgba(0,0,0,0.25); padding: 0.45rem 0.6rem; border-radius: 0.35rem;">
+              <strong style="color: #38bdf8;">🎯 Distribución por Mercado:</strong> <span id="dr-kpi-markets-dist">Cargando...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Table per Day and League -->
+        <h3 style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">📋 Desglose Detallado por Liga & Jornada</h3>
+        <div style="overflow-x: auto; background: rgba(0,0,0,0.25); border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.05); max-height: 45vh; overflow-y: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: left;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8;">
+                <th style="padding: 0.6rem 0.75rem;">Fecha / Día</th>
+                <th style="padding: 0.6rem 0.75rem;">Liga / País</th>
+                <th style="padding: 0.6rem 0.75rem; text-align: center;">Inicio (00:00)</th>
+                <th style="padding: 0.6rem 0.75rem; text-align: center;">Generadas</th>
+                <th style="padding: 0.6rem 0.75rem; text-align: center;">Cortadas (23:59)</th>
+                <th style="padding: 0.6rem 0.75rem; text-align: center;">Cierre Actual</th>
+              </tr>
+            </thead>
+            <tbody id="dr-table-body">
+              <!-- Injected dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </dialog>
+
+      <!-- Modal GUÍA DE MERCADOS A OPERAR -->
+      <dialog id="guide-modal" class="custom-dialog" style="width: 95vw; max-width: 780px; max-height: 88vh; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.3); color: var(--text-main); background: #0f172a; box-shadow: 0 0 45px rgba(15, 23, 42, 0.9); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              📖 GUÍA OFICIAL: MERCADOS A EJECUTAR
+            </h2>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Correspondencia directa entre la anomalía estadística detectada y la orden de mercado.
+            </p>
+          </div>
+          <button id="close-guide-modal" class="btn">✕</button>
+        </div>
+
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.6rem; padding: 0.85rem; margin-bottom: 1.25rem;">
+          <strong style="color: #38bdf8; font-size: 0.85rem;">📌 Principio Cuantitativo de Reversión a la Media:</strong>
+          <p style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.3rem; line-height: 1.4;">
+            El rastreador detecta ligas que acumulan anomalías de partidos consecutivos <em>sin que ocurra</em> un evento específico. Cuando la alerta llega a nivel <strong>Verde / Azul</strong>, la orden a ejecutar en tu casa de inversión es el <strong>evento de ruptura</strong>:
+          </p>
+        </div>
+
+        <div class="guide-step-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #fff; font-size: 0.9rem;">1. Racha: Sin Empate (FT)</strong>
+            <span class="badge-status badge-success" style="font-size: 0.75rem;">🎯 MERCADO A OPERAR: EMPATE (X)</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            La liga lleva muchos partidos sin finalizar en tablas. Se opera el <strong>Empate al Final del Partido</strong> (Cuota típica: 3.10 - 3.60).
+          </p>
+        </div>
+
+        <div class="guide-step-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #fff; font-size: 0.9rem;">2. Racha: Menos de 3.5 goles</strong>
+            <span class="badge-status badge-success" style="font-size: 0.75rem;">🎯 MERCADO A OPERAR: MÁS DE 3.5 GOLES (Over 3.5)</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            La liga lleva una sequía de partidos con $le 3$ goles. Se opera <strong>Más de 3.5 Goles Totales</strong> (Cuota típica: 2.60 - 3.40).
+          </p>
+        </div>
+
+        <div class="guide-step-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #fff; font-size: 0.9rem;">3. Racha: Sin Empate al Medio Tiempo (HT)</strong>
+            <span class="badge-status badge-success" style="font-size: 0.75rem;">🎯 MERCADO A OPERAR: EMPATE 1er TIEMPO (HT)</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            Se opera el <strong>Empate al llegar al descanso (0-0, 1-1, etc.)</strong> (Cuota típica: 2.00 - 2.40).
+          </p>
+        </div>
+
+        <div class="guide-step-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #fff; font-size: 0.9rem;">4. Racha: Sin BTTS + >2.5 Goles</strong>
+            <span class="badge-status badge-success" style="font-size: 0.75rem;">🎯 MERCADO A OPERAR: AMBOS MARCAN Y > 2.5 GOLES</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            Se opera el mercado combinado <strong>Ambos Equipos Anotan + Más de 2.5 Goles</strong> (Cuota típica: 2.10 - 2.80).
+          </p>
+        </div>
+
+        <div class="guide-step-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #fff; font-size: 0.9rem;">5. Racha: Sin BTTS en 1er Tiempo</strong>
+            <span class="badge-status badge-success" style="font-size: 0.75rem;">🎯 MERCADO A OPERAR: AMBOS MARCAN EN 1er TIEMPO</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">
+            Se opera que <strong>ambos equipos marcan antes del minuto 45</strong> (Cuota de alto valor: 4.00 - 5.50).
+          </p>
+        </div>
+
+        <div style="margin-top: 1.25rem; text-align: right;">
+          <button class="btn btn-premium" onclick="document.getElementById('guide-modal').close();">Entendido</button>
+        </div>
+      </dialog>
+
+      <!-- Modal BACKTESTING HISTÓRICO -->
+      <dialog id="backtest-modal" class="custom-dialog" style="width: 95vw; max-width: 1050px; max-height: 90vh; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.3); color: var(--text-main); background: #0f172a; box-shadow: 0 0 45px rgba(15, 23, 42, 0.9); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                📈 BACKTESTING & RENDIMIENTO HISTÓRICO
+              </h2>
+              <span style="font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                RESULTADO HISTÓRICO / BACKTEST
+              </span>
+            </div>
+            <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">
+              Simulación cuantitativa y validación empírica sobre más de 3 temporadas completas en las 45 ligas oficiales.
+            </p>
+          </div>
+          <button id="close-backtest-modal" class="btn" style="padding: 0.3rem 0.6rem;">✕</button>
+        </div>
+
+        <!-- 6 Multidimensional Filters Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; background: rgba(0,0,0,0.25); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06);">
+          <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.72rem; color: #94a3b8;">1. Liga</label>
+            <select id="bt-filter-league" style="width: 100%; font-size: 0.78rem; padding: 0.3rem 0.4rem; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem;">
+              <option value="all" selected>🌐 Todas las 45 Ligas</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.72rem; color: #94a3b8;">2. Mercado</label>
+            <select id="backtest-market-select" style="width: 100%; font-size: 0.78rem; padding: 0.3rem 0.4rem; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem;">
+              <option value="draw" selected>🎯 Empate (FT)</option>
+              <option value="over35">🎯 Más de 3.5 goles</option>
+              <option value="htDraw">🎯 Empate 1T (HT)</option>
+              <option value="bttsOver25">🎯 Ambos Marcan + >2.5</option>
+              <option value="btts1H">🎯 Ambos Marcan 1T</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.72rem; color: #94a3b8;">3. Temporada</label>
+            <select id="bt-filter-season" style="width: 100%; font-size: 0.78rem; padding: 0.3rem 0.4rem; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem;">
+              <option value="all" selected>📅 Todas (Últimas 3+ temp)</option>
+              <option value="2025-2026">2025 - 2026</option>
+              <option value="2024-2025">2024 - 2025</option>
+              <option value="2023-2024">2023 - 2024</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.72rem; color: #94a3b8;">4. Rango Cuotas</label>
+            <select id="bt-filter-odds" style="width: 100%; font-size: 0.78rem; padding: 0.3rem 0.4rem; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem;">
+              <option value="all" selected>🎲 Todas las cuotas</option>
+              <option value="low">Conservadoras (&lt; 2.00)</option>
+              <option value="mid">Equilibradas (2.00 - 3.50)</option>
+              <option value="high">Alto Valor (&gt; 3.50)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.72rem; color: #94a3b8;">5. Nivel Señal</label>
+            <select id="bt-filter-tier" style="width: 100%; font-size: 0.78rem; padding: 0.3rem 0.4rem; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem;">
+              <option value="all" selected>⚡ Todos los niveles</option>
+              <option value="PREMIUM">🟢 Solo PREMIUM (90-100)</option>
+              <option value="FUERTE">🔵 Solo FUERTE (75-89)</option>
+              <option value="OBSERVABLE">🟡 OBSERVABLE (60-74)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.72rem; color: #94a3b8;">6. Stake %</label>
+            <select id="backtest-stake-select" style="width: 100%; font-size: 0.78rem; padding: 0.3rem 0.4rem; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem;">
+              <option value="0.01">1.00% (Conservador)</option>
+              <option value="0.02" selected>2.00% (Moderado)</option>
+              <option value="0.03">3.00% (Agresivo)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 13 Comprehensive Backtest Metrics Cards -->
+        <div class="bankroll-kpi-grid" style="margin-bottom: 1.25rem;">
+          <div class="bankroll-kpi-card highlight-card">
+            <span class="kpi-label">Rendimiento Acumulado</span>
+            <span class="kpi-value positive" id="bt-yield">+41.20%</span>
+            <span class="kpi-sub" id="bt-signals-count">184 Señales Históricas</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">Tasa de Acierto (Win Rate)</span>
+            <span class="kpi-value" id="bt-winrate">77.17%</span>
+            <span class="kpi-sub" id="bt-win-loss">142 Ganadas / 42 Perdidas</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">Cuota Media Ponderada</span>
+            <span class="kpi-value" id="bt-odds">1.92</span>
+            <span class="kpi-sub">Multiplicador medio</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">ROI Total %</span>
+            <span class="kpi-value positive" id="bt-roi">+22.4%</span>
+            <span class="kpi-sub">Retorno sobre inversión</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">Profit Factor</span>
+            <span class="kpi-value positive" id="bt-pf">3.12</span>
+            <span class="kpi-sub">Ganancia / Pérdida bruta</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">Expectativa por Operación</span>
+            <span class="kpi-value positive" id="bt-ev">+$15.80</span>
+            <span class="kpi-sub">Valor esperado medio ($ EV)</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">Máximo Drawdown</span>
+            <span class="kpi-value" id="bt-drawdown">5.80%</span>
+            <span class="kpi-sub">Bajo control (&lt; 15%)</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">Rachas Consecutivas</span>
+            <span class="kpi-value" id="bt-streaks-max">🟢 9W / 🔴 3L</span>
+            <span class="kpi-sub" id="bt-streaks-sub">Máx. Victorias / Pérdidas</span>
+          </div>
+          <div class="bankroll-kpi-card">
+            <span class="kpi-label">Capital Inicial ➔ Final</span>
+            <span class="kpi-value" id="bt-cap-flow">$1,000 ➔ $1,412</span>
+            <span class="kpi-sub">Simulación de crecimiento</span>
+          </div>
+        </div>
+
+        <!-- Strategy Robustness Evaluation Card -->
+        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.6rem; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.1rem;">🛡️</span>
+              <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin: 0;">ROBUSTEZ DE ESTRATEGIA</h4>
+            </div>
+            <div id="bt-robustness-badge" style="font-size: 0.78rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 6px; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3);">
+              ROBUSTA (88/100)
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; font-size: 0.76rem; margin-bottom: 0.6rem;">
+            <div style="background: rgba(0,0,0,0.25); padding: 0.5rem 0.75rem; border-radius: 0.4rem; border: 1px solid rgba(255,255,255,0.05);">
+              <span style="color: #94a3b8; display: block; font-size: 0.68rem;">TAMAÑO DE MUESTRA VINCULADA</span>
+              <strong id="bt-rob-sample" style="color: #fff; font-size: 0.85rem;">427 señales</strong>
+              <span style="font-size: 0.65rem; color: #38bdf8; display: block;" id="bt-rob-adequacy">Muestra Amplia</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 0.5rem 0.75rem; border-radius: 0.4rem; border: 1px solid rgba(255,255,255,0.05);">
+              <span style="color: #94a3b8; display: block; font-size: 0.68rem;">ESTABILIDAD POR TEMPORADA</span>
+              <strong id="bt-rob-season" style="color: #4ade80; font-size: 0.85rem;">94.2%</strong>
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">Consistencia interanual</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 0.5rem 0.75rem; border-radius: 0.4rem; border: 1px solid rgba(255,255,255,0.05);">
+              <span style="color: #94a3b8; display: block; font-size: 0.68rem;">ESTABILIDAD POR LIGA</span>
+              <strong id="bt-rob-league" style="color: #4ade80; font-size: 0.85rem;">91.8%</strong>
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">Generalización multiligas</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 0.5rem 0.75rem; border-radius: 0.4rem; border: 1px solid rgba(255,255,255,0.05);">
+              <span style="color: #94a3b8; display: block; font-size: 0.68rem;">ESTABILIDAD POR CUOTAS</span>
+              <strong id="bt-rob-odds" style="color: #4ade80; font-size: 0.85rem;">92.5%</strong>
+              <span style="font-size: 0.65rem; color: #94a3b8; display: block;">Resistencia al sesgo</span>
+            </div>
+          </div>
+          
+          <p id="bt-rob-summary" style="font-size: 0.72rem; color: #cbd5e1; margin: 0; background: rgba(0,0,0,0.2); padding: 0.45rem 0.65rem; border-radius: 0.35rem; border-left: 3px solid #38bdf8;">
+            Diagnóstico: Alta significancia estadística con excelente consistencia interanual y estricto control de drawdown.
+          </p>
+        </div>
+
+        <!-- Visual Equity Simulation Bar Chart -->
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.25rem;">
+          <h4 style="font-size: 0.88rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <span>Simulación de Evolución de Capital (Banca Inicial: $1,000)</span>
+            <span style="font-size: 0.65rem; color: #38bdf8; font-weight: normal;">*Ejecución cuantitativa estricta sin martingala</span>
+          </h4>
+          <div id="bt-equity-bars" style="display: flex; align-items: flex-end; gap: 0.3rem; height: 120px; padding-top: 1rem; overflow-x: auto;">
+            <!-- Generated via JS -->
+          </div>
+          <p style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.75rem; text-align: center; font-style: italic;">
+            *Aviso Metodológico: Los resultados mostrados provienen de un BACKTESTING HISTÓRICO cuantitativo. El rendimiento pasado no constituye una garantía de resultados futuros.
+          </p>
+        </div>
+      </dialog>
+
+
+      <!-- Modal AUDITORÍA PÚBLICA VERIFICADA -->
+      <dialog id="audit-modal" class="custom-dialog" style="width: 95vw; max-width: 950px; max-height: 90vh; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(74, 222, 128, 0.3); color: var(--text-main); background: #0b1320; box-shadow: 0 0 45px rgba(16, 185, 129, 0.2); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              🛡️ AUDITORÍA PÚBLICA & TRACK RECORD VERIFICADO
+            </h2>
+            <p style="font-size: 0.75rem; color: #4ade80; margin-top: 0.2rem;">
+              Registro transparente, cronológico e inmutable de señales emitidas por el algoritmo.
+            </p>
+          </div>
+          <button id="close-audit-modal" class="btn" style="padding: 0.3rem 0.6rem;">✕</button>
+        </div>
+
+        <!-- Audit Summary Banner -->
+        <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.6) 100%); border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <span style="font-size: 0.72rem; color: #94a3b8; display: block; font-weight: 700;">SEÑALES AUDITADAS</span>
+            <strong id="audit-stat-total" style="font-size: 1.3rem; color: #fff;">0</strong>
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #94a3b8; display: block; font-weight: 700;">SEÑALES ACERTADAS</span>
+            <strong id="audit-stat-won" style="font-size: 1.3rem; color: #4ade80;">0 (0.0%)</strong>
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #94a3b8; display: block; font-weight: 700;">SEÑALES FALLADAS</span>
+            <strong id="audit-stat-lost" style="font-size: 1.3rem; color: #f87171;">0</strong>
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #94a3b8; display: block; font-weight: 700;">YIELD / RETORNO NETO</span>
+            <strong id="audit-stat-yield" style="font-size: 1.3rem; color: #38bdf8;">+0.0%</strong>
+          </div>
+        </div>
+
+        <!-- Audit Filter Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+          <div class="filter-pills" style="margin: 0;">
+            <button class="filter-pill active" id="audit-filter-all" data-audit-filter="all">🔘 Todas (<span id="audit-count-all">0</span>)</button>
+            <button class="filter-pill" id="audit-filter-won" data-audit-filter="won">✅ Acertadas (<span id="audit-count-won">0</span>)</button>
+            <button class="filter-pill" id="audit-filter-lost" data-audit-filter="lost">❌ Falladas (<span id="audit-count-lost">0</span>)</button>
+          </div>
+          <span style="font-size: 0.75rem; color: #94a3b8;">*Verificación auditada con cuotas reales de mercado</span>
+        </div>
+
+        <!-- Verified Signals Table -->
+        <div class="table-responsive-box" style="max-height: 50vh; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem;">
+          <table class="bankroll-table" id="audit-table">
+            <thead>
+              <tr>
+                <th>signal_id</th>
+                <th>timestamp</th>
+                <th>liga</th>
+                <th>temporada</th>
+                <th>partido</th>
+                <th>mercado</th>
+                <th>racha</th>
+                <th>score</th>
+                <th>nivel_confianza</th>
+                <th>cuota_momento</th>
+                <th>prob_implícita</th>
+                <th>resultado_final</th>
+                <th>resultado_señal</th>
+                <th>ROI</th>
+                <th>estado</th>
+              </tr>
+            </thead>
+            <tbody id="audit-table-body">
+              <!-- Dynamic JS rows -->
+            </tbody>
+          </table>
+        </div>
+      </dialog>
+
+
+      <!-- Modal ACADEMIA ANTI-RUINA -->
+      <dialog id="academy-modal" class="custom-dialog" style="width: 95vw; max-width: 900px; max-height: 90vh; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(234, 179, 8, 0.3); color: var(--text-main); background: #0f172a; box-shadow: 0 0 45px rgba(234, 179, 8, 0.2); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              🎓 ACADEMIA ANTI-RUINA & GESTIÓN CUANTITATIVA
+            </h2>
+            <p style="font-size: 0.75rem; color: #eab308; margin-top: 0.2rem;">
+              4 Masterclasses esenciales para preservar tu capital y maximizar tu rentabilidad a largo plazo.
+            </p>
+          </div>
+          <button id="close-academy-modal" class="btn" style="padding: 0.3rem 0.6rem;">✕</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;" id="academy-lessons-grid">
+          <!-- Lessons injected via JS -->
+        </div>
+      </dialog>
+
+      <!-- Modal REGISTRO DE OPERACIONES Y CONTROL DE BANCA -->
+      <dialog id="bankroll-modal" class="custom-dialog bankroll-dialog" style="width: 95vw; max-width: 1200px; max-height: 90vh; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.3); color: var(--text-main); background: #0f172a; box-shadow: 0 0 45px rgba(15, 23, 42, 0.9); overflow-y: auto;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h2 id="bankroll-modal-title" style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              💼 REGISTRO DE OPERACIONES — CONTROL DE BANCA
+            </h2>
+            <p id="bankroll-modal-subtitle" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Sistema profesional de gestión de capital, análisis estadístico y control estricto de riesgo.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button id="bankroll-new-op-btn" class="btn btn-success" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">➕ Nueva Operación</button>
+            <button id="bankroll-download-xlsx-btn" class="btn btn-bankroll" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📥 Descargar Excel (.xlsx)</button>
+            <button id="bankroll-export-csv-btn" class="btn" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">📄 Exportar CSV</button>
+            <button id="close-bankroll-modal" class="btn" style="padding: 0.4rem 0.7rem;">✕</button>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="bankroll-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; overflow-x: auto;">
+          <button class="bankroll-tab-btn active" data-tab="tab-dashboard">📊 Dashboard Financiero</button>
+          <button class="bankroll-tab-btn" data-tab="tab-operations">📝 Registro de Operaciones</button>
+          <button class="bankroll-tab-btn" data-tab="tab-calculator">🧮 Calculadora de Stake</button>
+          <button class="bankroll-tab-btn" data-tab="tab-config">⚙️ Parámetros de Banca</button>
+        </div>
+
+        <!-- TAB 1: DASHBOARD FINANCIERO -->
+        <div id="tab-dashboard" class="bankroll-tab-content active">
+          <div class="bankroll-kpi-grid">
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">Capital Inicial</span>
+              <span class="kpi-value" id="kpi-initial-cap">$1,000.00</span>
+              <span class="kpi-sub">Banca de partida</span>
+            </div>
+            <div class="bankroll-kpi-card highlight-card">
+              <span class="kpi-label">Capital Actual</span>
+              <span class="kpi-value" id="kpi-current-cap">$1,093.00</span>
+              <span class="kpi-sub" id="kpi-yield">+9.30% Yield Total</span>
+            </div>
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">Resultado Neto (P&L)</span>
+              <span class="kpi-value positive" id="kpi-total-pnl">+$93.00</span>
+              <span class="kpi-sub" id="kpi-pnl-breakdown">Gan: $133.00 | Pérd: -$40.00</span>
+            </div>
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">ROI Global %</span>
+              <span class="kpi-value positive" id="kpi-roi">+56.36%</span>
+              <span class="kpi-sub">Sobre monto operado</span>
+            </div>
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">Tasa de Acierto (Win%)</span>
+              <span class="kpi-value" id="kpi-winrate">75.00%</span>
+              <span class="kpi-sub" id="kpi-ops-count">6 Ganadas / 2 Perdidas / 1 Pend.</span>
+            </div>
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">Exposición en Juego</span>
+              <span class="kpi-value" id="kpi-exposure">1.83%</span>
+              <span class="kpi-sub" id="kpi-exposure-sub">Comprometido: $20.00</span>
+            </div>
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">Drawdown Máximo</span>
+              <span class="kpi-value" id="kpi-drawdown">1.87%</span>
+              <span class="kpi-sub">Bajo control (&lt; 20%)</span>
+            </div>
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">Profit Factor</span>
+              <span class="kpi-value" id="kpi-profit-factor">3.33</span>
+              <span class="kpi-sub">Ganancia / Pérdida</span>
+            </div>
+            <div class="bankroll-kpi-card">
+              <span class="kpi-label">Expectativa Matemática (EV)</span>
+              <span class="kpi-value positive" id="kpi-ev">+$11.63</span>
+              <span class="kpi-sub">Valor esperado / trade</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: REGISTRO DE OPERACIONES -->
+        <div id="tab-operations" class="bankroll-tab-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Total operaciones: <strong id="ops-total-counter">9</strong></span>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button id="clear-all-ops-btn" class="btn" style="font-size: 0.8rem; padding: 0.3rem 0.6rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35);" title="Borrar todas las operaciones y reiniciar el registro desde cero">🗑️ Borrar Todo (Reiniciar)</button>
+              <button id="add-op-row-btn" class="btn btn-success" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">➕ Añadir Registro</button>
+            </div>
+          </div>
+          <div class="table-responsive-box" style="max-height: 55vh; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem;">
+            <table class="bankroll-table" id="bankroll-operations-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Descripción</th>
+                  <th>Mercado</th>
+                  <th>Estado</th>
+                  <th>Cap. Antes</th>
+                  <th>Stake ($)</th>
+                  <th>% Cap</th>
+                  <th>Cuota</th>
+                  <th>Gan/Pérd ($)</th>
+                  <th>Cap. Después</th>
+                  <th>ROI %</th>
+                  <th>Disciplina</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="bankroll-table-body">
+                <!-- Rows injected dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: CALCULADORA DE STAKE -->
+        <div id="tab-calculator" class="bankroll-tab-content">
+          <div style="max-width: 650px; margin: 0 auto; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">🧮 Calculadora de Gestión de Riesgo y Stake</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              Dimensionamiento matemático de posición. Nunca aumenta el monto tras una pérdida (Regla Anti-Martingala).
+            </p>
+            <div class="calc-form-grid">
+              <div class="form-group">
+                <label>Capital Disponible ($)</label>
+                <input type="number" id="calc-cap-input" value="1000" step="10" />
+              </div>
+              <div class="form-group">
+                <label>Perfil de Riesgo</label>
+                <select id="calc-profile-select">
+                  <option value="0.02" selected>Conservador (2.00%)</option>
+                  <option value="0.01">Ultra Conservador (1.00%)</option>
+                  <option value="0.03">Moderado (3.00%)</option>
+                  <option value="0.04">Moderado Alto (4.00%)</option>
+                  <option value="custom">Personalizado (%)</option>
+                </select>
+              </div>
+              <div class="form-group" id="calc-custom-risk-group" style="display: none;">
+                <label>% Personalizado</label>
+                <input type="number" id="calc-custom-risk-input" value="2.0" step="0.1" min="0.1" max="10" />
+              </div>
+              <div class="form-group">
+                <label>Cuota / Multiplicador</label>
+                <input type="number" id="calc-odds-input" value="1.95" step="0.05" min="1.01" />
+              </div>
+            </div>
+
+            <!-- Calculated Results -->
+            <div class="calc-results-box" style="margin-top: 1.25rem; background: rgba(0,0,0,0.3); border-radius: 0.5rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.05);">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; text-align: center;">
+                <div>
+                  <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">Monto Sugerido (Stake)</span>
+                  <strong id="calc-out-stake" style="font-size: 1.2rem; color: #38bdf8;">$20.00</strong>
+                </div>
+                <div>
+                  <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">Retorno Potencial</span>
+                  <strong id="calc-out-return" style="font-size: 1.2rem; color: #fff;">$39.00</strong>
+                </div>
+                <div>
+                  <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">Ganancia Neta</span>
+                  <strong id="calc-out-profit" style="font-size: 1.2rem; color: #4ade80;">+$19.00</strong>
+                </div>
+                <div>
+                  <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">Pérdida Máxima</span>
+                  <strong id="calc-out-loss" style="font-size: 1.2rem; color: #f87171;">-$20.00</strong>
+                </div>
+              </div>
+              <div style="margin-top: 0.75rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem;">
+                <span id="calc-out-validation" class="badge-status badge-success">🟢 APROBADO: Gestión de riesgo correcta</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: PARÁMETROS DE BANCA -->
+        <div id="tab-config" class="bankroll-tab-content">
+          <div style="max-width: 650px; margin: 0 auto; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">⚙️ Parámetros de Gestión de Banca y Riesgo</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              Establece las reglas de control de capital y los límites de pérdida que dispararán alertas preventivas.
+            </p>
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label style="font-weight: 700; color: #38bdf8; font-size: 0.85rem;">🌎 Moneda / Divisa Principal</label>
+                <select id="cfg-currency-select" style="width: 100%; padding: 0.6rem; font-size: 0.88rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 0.4rem; color: #fff;">
+                  <option value="USD" selected>🇺🇸 USD ($) - Dólar Estadounidense</option>
+                  <option value="EUR">🇪🇺 EUR (€) - Euro</option>
+                  <option value="BRL">🇧🇷 BRL (R$) - Real Brasileño</option>
+                  <option value="PYG">🇵🇾 PYG (₲) - Guaraní Paraguayo</option>
+                  <option value="ARS">🇦🇷 ARS ($) - Peso Argentino</option>
+                  <option value="MXN">🇲🇽 MXN ($) - Peso Mexicano</option>
+                  <option value="COP">🇨🇴 COP ($) - Peso Colombiano</option>
+                  <option value="CLP">🇨🇱 CLP ($) - Peso Chileno</option>
+                  <option value="PEN">🇵🇪 PEN (S/.) - Sol Peruano</option>
+                  <option value="GBP">🇬🇧 GBP (£) - Libra Esterlina</option>
+                  <option value="UYU">🇺🇾 UYU ($U) - Peso Uruguayo</option>
+                </select>
+              </div>
+              <div class="calc-form-grid">
+                <div class="form-group">
+                  <label id="lbl-cfg-initial-cap">Capital Inicial</label>
+                  <input type="number" id="cfg-initial-cap" value="1000" step="50" />
+                </div>
+                <div class="form-group">
+                  <label id="lbl-cfg-security-cap">Capital Mínimo Stop-Bank</label>
+                  <input type="number" id="cfg-security-cap" value="700" step="50" />
+                </div>
+              <div class="form-group">
+                <label>% Máximo Permitido por Operación</label>
+                <input type="number" id="cfg-max-stake" value="5.0" step="0.5" />
+              </div>
+              <div class="form-group">
+                <label>% Recomendado por Operación</label>
+                <input type="number" id="cfg-rec-stake" value="2.0" step="0.5" />
+              </div>
+              <div class="form-group">
+                <label>Límite de Pérdida Diaria ($)</label>
+                <input type="number" id="cfg-daily-limit" value="-50" step="10" />
+              </div>
+              <div class="form-group">
+                <label>Límite de Pérdida Semanal ($)</label>
+                <input type="number" id="cfg-weekly-limit" value="-150" step="10" />
+              </div>
+            </div>
+            <div style="margin-top: 1.25rem; text-align: right;">
+              <button id="save-bankroll-cfg-btn" class="btn btn-premium" style="padding: 0.4rem 1rem;">💾 Guardar Parámetros</button>
+            </div>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- Sub-Modal: Formulario Nueva Operación -->
+      <dialog id="new-op-modal" class="custom-dialog" style="width: 90vw; max-width: 500px; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.3); color: var(--text-main); background: #0e1621; box-shadow: 0 0 35px rgba(36, 158, 235, 0.25);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+          <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff;">➕ Registrar Nueva Operación</h3>
+          <button id="close-new-op-modal" class="btn" style="padding: 0.2rem 0.5rem;">✕</button>
+        </div>
+        <form id="new-op-form" class="new-op-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Fecha</label>
+              <input type="date" id="op-form-date" required />
+            </div>
+            <div class="form-group">
+              <label>Hora</label>
+              <input type="time" id="op-form-time" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Categoría</label>
+              <select id="op-form-category">
+                <option value="Fútbol" selected>Fútbol</option>
+                <option value="Baloncesto">Baloncesto</option>
+                <option value="Tenis">Tenis</option>
+                <option value="Financiero/Trading">Financiero/Trading</option>
+                <option value="Otros">Otros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tipo Operación</label>
+              <select id="op-form-type">
+                <option value="Pre-partido" selected>Pre-partido</option>
+                <option value="En vivo (Live)">En vivo (Live)</option>
+                <option value="Trading Cuotas">Trading Cuotas</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción / Evento</label>
+            <input type="text" id="op-form-desc" placeholder="Ej. Real Madrid vs Barcelona" required />
+          </div>
+          <div class="form-group">
+            <label>Mercado / Segmento</label>
+            <input type="text" id="op-form-market" placeholder="Ej. Empate (FT)" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Monto Utilizado ($)</label>
+              <input type="number" id="op-form-stake" value="20" step="1" min="1" required />
+            </div>
+            <div class="form-group">
+              <label>Cuota / Multiplicador</label>
+              <input type="number" id="op-form-odds" value="1.90" step="0.01" min="1.01" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Estado Inicial</label>
+            <select id="op-form-status">
+              <option value="Pendiente" selected>⏳ Pendiente</option>
+              <option value="Ganada">🟢 Ganada</option>
+              <option value="Perdida">🔴 Perdida</option>
+              <option value="Cancelada">⚪ Cancelada</option>
+              <option value="Reembolsada">🟡 Reembolsada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Observaciones (Opcional)</label>
+            <input type="text" id="op-form-notes" placeholder="Ej. Entrada en racha madura" />
+          </div>
+          <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+            <button type="button" id="cancel-new-op-btn" class="btn">Cancelar</button>
+            <button type="submit" class="btn btn-success">💾 Guardar Operación</button>
+          </div>
+        </form>
+      </dialog>
+
+
+      <!-- Modal TRANSPARENCIA Y RESULTADOS -->
+      <dialog id="transparency-modal" class="custom-dialog" style="width: 95vw; max-width: 1050px; max-height: 92vh; padding: 1.75rem; border-radius: 1rem; border: 1px solid rgba(74, 222, 128, 0.4); color: var(--text-main); background: #0b1320; box-shadow: 0 0 50px rgba(16, 185, 129, 0.25); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              🔍 TRANSPARENCIA Y RESULTADOS VERIFICADOS
+            </h2>
+            <p style="font-size: 0.75rem; color: #4ade80; margin-top: 0.25rem; margin-bottom: 0;">
+              Rendimiento auditado de StreakTracker segregado estrictamente por categoría metodológica.
+            </p>
+          </div>
+          <button id="close-transparency-modal" class="btn" style="padding: 0.35rem 0.75rem;">✕</button>
+        </div>
+
+        <!-- 3 Distinct Segregated Tracks Switcher -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 0.6rem; border: 1px solid rgba(255,255,255,0.08); overflow-x: auto;" class="filter-pills">
+          <button class="filter-pill active" id="tr-track-real" data-tr-track="REAL_RESULTS" style="flex: 1; text-align: center; color: #4ade80; border-color: rgba(74, 222, 128, 0.5);">
+            🛡️ RESULTADOS REALES (Ledger Inmutable)
+          </button>
+          <button class="filter-pill" id="tr-track-paper" data-tr-track="PAPER_TRADING" style="flex: 1; text-align: center; color: #facc15; border-color: rgba(250, 204, 21, 0.5);">
+            🧪 PAPER TRADING (Forward Test)
+          </button>
+          <button class="filter-pill" id="tr-track-backtest" data-tr-track="BACKTEST" style="flex: 1; text-align: center; color: #38bdf8; border-color: rgba(56, 189, 248, 0.5);">
+            📈 BACKTEST (Histórico 3 Temp)
+          </button>
+        </div>
+
+        <!-- Track Header Banner & Sample Size Gate -->
+        <div id="tr-banner-box" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%); border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <span id="tr-track-badge" class="badge-status badge-success" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; font-weight: 800;">🛡️ RESULTADOS REALES VERIFICADOS</span>
+            <p id="tr-track-desc" style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.4rem; margin-bottom: 0;">
+              Señales auditadas y liquidadas directamente en el Ledger Inmutable oficial de StreakTracker.
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 0.68rem; color: #94a3b8; display: block;">ÚLTIMA ACTUALIZACIÓN</span>
+            <strong id="tr-last-updated" style="font-size: 0.85rem; color: #fff;">03/09/2026 07:25</strong>
+          </div>
+        </div>
+
+        <!-- 6 Main KPI Indicators Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); text-align: center;">
+            <span style="font-size: 0.68rem; color: #94a3b8; display: block; font-weight: 700;">NÚMERO TOTAL SEÑALES</span>
+            <strong id="tr-kpi-total" style="font-size: 1.3rem; color: #fff;">0</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); text-align: center;">
+            <span style="font-size: 0.68rem; color: #94a3b8; display: block; font-weight: 700;">SEÑALES RESUELTAS</span>
+            <strong id="tr-kpi-resolved" style="font-size: 1.3rem; color: #38bdf8;">0 (0W / 0L)</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); text-align: center;">
+            <span style="font-size: 0.68rem; color: #94a3b8; display: block; font-weight: 700;">WIN RATE GLOBAL</span>
+            <strong id="tr-kpi-winrate" style="font-size: 1.3rem; color: #4ade80;">0.0%</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); text-align: center;">
+            <span style="font-size: 0.68rem; color: #94a3b8; display: block; font-weight: 700;">ROI HISTÓRICO</span>
+            <strong id="tr-kpi-roi" style="font-size: 1.3rem; color: #4ade80;">+0.0%</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); text-align: center;">
+            <span style="font-size: 0.68rem; color: #94a3b8; display: block; font-weight: 700;">DRAWDOWN MÁXIMO</span>
+            <strong id="tr-kpi-dd" style="font-size: 1.3rem; color: #f87171;">-0.0%</strong>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); text-align: center;">
+            <span style="font-size: 0.68rem; color: #94a3b8; display: block; font-weight: 700;">TAMAÑO DE MUESTRA</span>
+            <strong id="tr-kpi-sample" style="font-size: 1.3rem; color: #facc15;">0 casos</strong>
+          </div>
+        </div>
+
+        <!-- 3 Breakdown Tables: Por Liga, Por Mercado, Mensual -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+          <!-- Rendimiento por Liga -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.6rem; padding: 0.85rem;">
+            <h4 style="font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin: 0 0 0.6rem 0; display: flex; justify-content: space-between;">
+              <span>🏆 Rendimiento por Liga</span>
+              <span style="font-size: 0.68rem; color: #94a3b8; font-weight: normal;">Muestra $\ge$ Requerida</span>
+            </h4>
+            <div style="overflow-x: auto; max-height: 200px; overflow-y: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.74rem;">
+                <thead>
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+                    <th style="padding: 0.35rem 0.5rem;">Liga</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: center;">Muestra</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: center;">Win Rate</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: right;">ROI %</th>
+                  </tr>
+                </thead>
+                <tbody id="tr-table-leagues">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Rendimiento por Mercado -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.6rem; padding: 0.85rem;">
+            <h4 style="font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin: 0 0 0.6rem 0; display: flex; justify-content: space-between;">
+              <span>🎯 Rendimiento por Mercado</span>
+              <span style="font-size: 0.68rem; color: #94a3b8; font-weight: normal;">Segmentado</span>
+            </h4>
+            <div style="overflow-x: auto; max-height: 200px; overflow-y: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.74rem;">
+                <thead>
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+                    <th style="padding: 0.35rem 0.5rem;">Mercado</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: center;">Muestra</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: center;">Win Rate</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: right;">ROI %</th>
+                  </tr>
+                </thead>
+                <tbody id="tr-table-markets">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Rendimiento Mensual -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.6rem; padding: 0.85rem;">
+            <h4 style="font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin: 0 0 0.6rem 0; display: flex; justify-content: space-between;">
+              <span>📅 Rendimiento Mensual</span>
+              <span style="font-size: 0.68rem; color: #94a3b8; font-weight: normal;">Historial auditado</span>
+            </h4>
+            <div style="overflow-x: auto; max-height: 200px; overflow-y: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.74rem;">
+                <thead>
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+                    <th style="padding: 0.35rem 0.5rem;">Mes</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: center;">Señales (W/L)</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: center;">Win Rate</th>
+                    <th style="padding: 0.35rem 0.5rem; text-align: right;">ROI %</th>
+                  </tr>
+                </thead>
+                <tbody id="tr-table-monthly">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mandatory Metodology Disclaimer Box -->
+        <div style="background: rgba(56, 189, 248, 0.06); border-left: 4px solid #38bdf8; padding: 0.75rem 1rem; border-radius: 0 0.5rem 0.5rem 0; font-size: 0.75rem; color: #94a3b8; line-height: 1.45;">
+          <strong style="color: #38bdf8;">📌 Aviso Metodológico Obligatorio:</strong><br />
+          "Los resultados se calculan a partir de las señales registradas por el sistema y no representan garantía de resultados futuros."
+        </div>
+      </dialog>
+
+
+      <!-- Modal PANEL DE ADMINISTRACIÓN & AUDIT LOG -->
+      <dialog id="admin-modal" class="custom-dialog" style="width: 96vw; max-width: 1180px; max-height: 92vh; padding: 1.75rem; border-radius: 1rem; border: 1px solid rgba(250, 204, 21, 0.4); color: var(--text-main); background: #0b1320; box-shadow: 0 0 50px rgba(0,0,0,0.8); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              ⚙️ PANEL DE CONTROL & ADMINISTRACIÓN GLOBAL
+            </h2>
+            <p style="font-size: 0.75rem; color: #facc15; margin-top: 0.25rem; margin-bottom: 0;">
+              Supervisión de usuarios, auditoría de cambios y configuración paramétrica del motor.
+            </p>
+          </div>
+          <button id="close-admin-modal" class="btn" style="padding: 0.35rem 0.75rem;">✕</button>
+        </div>
+
+        <!-- Admin Navigation Tabs: 9 Visual Sections -->
+        <div class="bankroll-tabs" style="display: flex; gap: 0.4rem; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; overflow-x: auto;">
+          <button class="bankroll-tab-btn active" data-admin-tab="adm-users">👥 USUARIOS</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-subs">💎 SUSCRIPCIONES</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-leagues">⚽ LIGAS (45)</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-signals">⚡ SEÑALES</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-strategies">🎯 ESTRATEGIAS</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-backtests">📈 BACKTESTS</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-telegram">✈️ TELEGRAM</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-results">📊 RESULTADOS</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-audit">🛡️ AUDIT LOG</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-config">⚙️ PARÁMETROS</button>
+        </div>
+
+        <!-- SECTION 1: USUARIOS & SUSCRIPCIONES -->
+        <div id="adm-users" class="admin-tab-content active" style="display: block;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">👥 Directorio de Usuarios & Estado de Suscripción</h3>
+          <div class="table-responsive-box" style="max-height: 45vh; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem;">
+            <table class="bankroll-table">
+              <thead>
+                <tr>
+                  <th>ID Usuario</th>
+                  <th>Email</th>
+                  <th>Nombre</th>
+                  <th>Plan Actual</th>
+                  <th>Estado</th>
+                  <th>Vencimiento</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="adm-users-table-body">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION 2: LIGAS (45 LIGAS OFICIALES) -->
+        <div id="adm-leagues" class="admin-tab-content" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin: 0;">⚽ Gestión Manual de Competiciones Oficiales</h3>
+            <span style="font-size: 0.75rem; color: #4ade80;">*Universo estricto de 45 ligas configuradas (Sin auto-inclusiones)</span>
+          </div>
+          <div id="adm-leagues-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.6rem; max-height: 45vh; overflow-y: auto; padding: 0.5rem; background: rgba(0,0,0,0.25); border-radius: 0.5rem;">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 3: CONFIGURACIÓN DE PARÁMETROS DEL MOTOR -->
+        <div id="adm-config" class="admin-tab-content" style="display: none;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">⚙️ Parámetros Cuantitativos y Reglas de Negocio</h3>
+          <form id="adm-config-form" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.25rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+              <div class="form-group">
+                <label style="color:#94a3b8; font-size:0.75rem; font-weight:700;">Score Mínimo de Señal (0 - 100)</label>
+                <input type="number" id="adm-cfg-score" min="40" max="95" value="60" style="background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:0.45rem; border-radius:4px;" />
+              </div>
+              <div class="form-group">
+                <label style="color:#94a3b8; font-size:0.75rem; font-weight:700;">Nivel Mínimo de Señal</label>
+                <select id="adm-cfg-tier" style="background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:0.45rem; border-radius:4px;">
+                  <option value="OBSERVABLE" selected>🟡 OBSERVABLE (Score 60+)</option>
+                  <option value="FUERTE">🔵 FUERTE (Score 75+)</option>
+                  <option value="PREMIUM">🟢 PREMIUM (Score 90+)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label style="color:#94a3b8; font-size:0.75rem; font-weight:700;">Tamaño Mínimo de Muestra Histórica</label>
+                <input type="number" id="adm-cfg-sample" min="10" max="100" value="30" style="background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:0.45rem; border-radius:4px;" />
+              </div>
+              <div class="form-group">
+                <label style="color:#94a3b8; font-size:0.75rem; font-weight:700;">Duración de Prueba Gratuita (Días)</label>
+                <input type="number" id="adm-cfg-trial-days" min="1" max="14" value="3" style="background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.2); padding:0.45rem; border-radius:4px;" />
+              </div>
+            </div>
+
+            <!-- Plantillas de Mensajes de Telegram -->
+            <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem;">
+              <h4 style="font-size: 0.88rem; color: #38bdf8; margin-bottom: 0.5rem;">✈️ Plantillas de Mensajes Telegram</h4>
+              <div class="form-group" style="margin-bottom: 0.6rem;">
+                <label style="color:#94a3b8; font-size:0.72rem;">Plantilla Canal FREE (Público)</label>
+                <input type="text" id="adm-cfg-tg-free" value="🚨 [CANAL FREE] — Oportunidad estadística en {league}. Mercado oculto." style="width:100%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.15); padding:0.4rem; border-radius:4px; font-size:0.8rem;" />
+              </div>
+              <div class="form-group" style="margin-bottom: 0.6rem;">
+                <label style="color:#94a3b8; font-size:0.72rem;">Plantilla Canal PRO</label>
+                <input type="text" id="adm-cfg-tg-pro" value="🔵 [CANAL PRO] — {league}: {fixture} | {market} (Racha: {streak}) | Score: {score}" style="width:100%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.15); padding:0.4rem; border-radius:4px; font-size:0.8rem;" />
+              </div>
+              <div class="form-group">
+                <label style="color:#94a3b8; font-size:0.72rem;">Plantilla Canal VIP</label>
+                <input type="text" id="adm-cfg-tg-vip" value="🟢 [CANAL VIP] — {league}: {fixture} | {market} | Score: {score}/100 | Muestra: {sample}" style="width:100%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid rgba(255,255,255,0.15); padding:0.4rem; border-radius:4px; font-size:0.8rem;" />
+              </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; text-align: right;">
+              <button type="submit" class="btn btn-premium" style="padding: 0.45rem 1.25rem; font-weight: 800;">💾 Guardar & Registrar en Audit Log</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- SECTION 4: AUDIT LOG ADMINISTRATIVO -->
+        <div id="adm-audit" class="admin-tab-content" style="display: none;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">🛡️ Registro Inmutable de Modificaciones Administrativas</h3>
+          <div class="table-responsive-box" style="max-height: 45vh; overflow: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem;">
+            <table class="bankroll-table">
+              <thead>
+                <tr>
+                  <th>ID Log</th>
+                  <th>Timestamp</th>
+                  <th>Admin</th>
+                  <th>Tipo Acción</th>
+                  <th>Entidad / Variable</th>
+                  <th>Valor Previo</th>
+                  <th>Nuevo Valor</th>
+                </tr>
+              </thead>
+              <tbody id="adm-audit-logs-table-body">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTIONS 5-9: SEÑALES, ESTRATEGIAS, BACKTESTS, TELEGRAM, RESULTADOS -->
+        <div id="adm-signals" class="admin-tab-content" style="display: none;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">⚡ Telemetría Global de Señales Generadas</h3>
+          <p style="font-size: 0.8rem; color: #94a3b8;">Supervisión en vivo del Ledger Inmutable y estados operativos (GENERADA, EN ESPERA, GANADA, PERDIDA).</p>
+          <div id="adm-signals-summary" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; font-size: 0.85rem; color: #cbd5e1;"></div>
+        </div>
+
+        <div id="adm-strategies" class="admin-tab-content" style="display: none;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">🎯 Estado de los 5 Mercados Estratégicos</h3>
+          <div id="adm-markets-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;"></div>
+        </div>
+
+        <div id="adm-backtests" class="admin-tab-content" style="display: none;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">📈 Métricas Globales de Backtesting</h3>
+          <p style="font-size: 0.8rem; color: #94a3b8;">427 simulaciones multi-temporada verificadas con Win Rate promedio de 67.9% y Drawdown 11.2%.</p>
+        </div>
+
+        <div id="adm-telegram" class="admin-tab-content" style="display: none;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">✈️ Monitor de Canales de Telegram</h3>
+          <p style="font-size: 0.8rem; color: #4ade80;">Bot Dispatcher Conectado • Canales FREE, PRO y VIP activos.</p>
+        </div>
+
+        <div id="adm-results" class="admin-tab-content" style="display: none;">
+          <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">📊 Balance Global Consolidado</h3>
+          <p style="font-size: 0.8rem; color: #38bdf8;">Trazabilidad completa sincronizada con el módulo de Transparencia & Resultados.</p>
+        </div>
+      </dialog>
+
+      <!-- CENTRO DE OPORTUNIDADES -->
+      <section id="opportunities-center-section" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 1rem; padding: 1.25rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);">
+              ⚡
+            </div>
+            <div>
+              <h2 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                CENTRO DE OPORTUNIDADES
+                <span id="opp-count-badge" style="font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                  0 detectadas
+                </span>
+              </h2>
+              <p style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.15rem; margin-bottom: 0;">
+                Ranking algorítmico multicriterio (Signal Score, Confianza, Muestra, Calidad de Liga y Horario).
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Filters: TODAS, PREMIUM, FUERTES, PRÓXIMAS, EN VIVO -->
+          <div class="filter-pills" id="opp-filter-pills" style="margin: 0;">
+            <button class="filter-pill active" data-opp-filter="all">🔘 TODAS (<span id="opp-fcount-all">0</span>)</button>
+            <button class="filter-pill" data-opp-filter="premium" style="color: #4ade80; border-color: rgba(74, 222, 128, 0.4);">🟢 PREMIUM (<span id="opp-fcount-premium">0</span>)</button>
+            <button class="filter-pill" data-opp-filter="strong" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">🔵 FUERTES (<span id="opp-fcount-strong">0</span>)</button>
+            <button class="filter-pill" data-opp-filter="live" style="color: #f87171; border-color: rgba(248, 113, 113, 0.4);">🔴 EN VIVO (<span id="opp-fcount-live">0</span>)</button>
+            <button class="filter-pill" data-opp-filter="upcoming" style="color: #facc15; border-color: rgba(250, 204, 21, 0.4);">📅 PRÓXIMAS (<span id="opp-fcount-upcoming">0</span>)</button>
+          </div>
+        </div>
+
+        <!-- Opportunities Cards Grid -->
+        <div id="opportunities-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 0.85rem;">
+          <!-- Injected via JS -->
+        </div>
+      </section>
 
       <!-- Dynamic Grid for Matches -->
       <div id="dashboard" class="dashboard-grid">
         <!-- Cards generated via JS -->
       </div>
     </main>
+
+    <!-- Floating Scroll-To-Top Arrow Button -->
+    <button id="btn-scroll-top" class="btn-scroll-top" title="Subir a la cabecera" aria-label="Subir a la cabecera">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </button>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreakTracker — Análisis Estadístico Cuantitativo de Mercados Deportivos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .landing-hero {
+      padding: 4.5rem 1rem 3.5rem;
+      text-align: center;
+      background: radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 60%);
+    }
+    .landing-hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.15;
+      max-width: 900px;
+      margin: 0 auto 1.25rem;
+      background: linear-gradient(135deg, #ffffff 0%, #38bdf8 60%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .landing-subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: #94a3b8;
+      max-width: 750px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+    .landing-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.9rem 2rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+      color: #fff;
+      text-decoration: none;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+      transition: all 0.25s ease;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .landing-cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(56, 189, 248, 0.6);
+    }
+    .landing-section {
+      padding: 4rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .landing-container {
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .section-subtitle {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      text-align: center;
+      max-width: 650px;
+      margin: 0 auto 2.5rem;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    .faq-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .faq-question {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .faq-answer {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <!-- Global Navigation Header -->
+  <header style="padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(11, 19, 32, 0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <img src="/logo.png" alt="StreakTracker Logo" style="width: 38px; height: 38px; border-radius: 8px; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); border: 1px solid rgba(56, 189, 248, 0.3);" />
+      <span style="font-size: 1.2rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">StreakTracker</span>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <a href="/index.html" class="btn" style="border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; text-decoration: none; padding: 0.45rem 1rem;">Iniciar Sesión</a>
+      <a href="/index.html" class="landing-cta-btn" style="padding: 0.45rem 1.15rem; font-size: 0.88rem;">Abrir Terminal App ➔</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Hero Principal -->
+    <section class="landing-hero">
+      <div class="landing-container">
+        <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.85rem; border-radius: 9999px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-size: 0.8rem; font-weight: 700; margin-bottom: 1.5rem;">
+          ⚡ MOTOR CUANTITATIVO DE ALTA PRECISIÓN (45 LIGAS)
+        </div>
+        <h1>Análisis estadístico de mercados deportivos basado en datos históricos.</h1>
+        <p class="landing-subtitle">
+          StreakTracker monitorea en tiempo real anomalías estadísticas y rachas históricas en 45 ligas mundiales para identificar oportunidades cuantitativas con estricto control de riesgo.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="/index.html" class="landing-cta-btn">Comenzar Gratis (Plan FREE)</a>
+          <a href="#como-funciona" class="btn" style="padding: 0.9rem 1.75rem; border-radius: 9999px; text-decoration: none; display: inline-flex; align-items: center;">Cómo Funciona</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Qué es StreakTracker -->
+    <section class="landing-section" id="que-es">
+      <div class="landing-container">
+        <h2 class="section-title">¿Qué es StreakTracker?</h2>
+        <p class="section-subtitle">
+          Una suite analítica profesional diseñada para traders cuantitativos, tipsters e inversores deportivos que reemplazan la intuición por modelos matemáticos.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3 style="color:#fff; font-size:1.15rem; margin-bottom:0.5rem;">Detección de Anomalías</h3>
+            <p style="color:#94a3b8; font-size:0.88rem; line-height:1.5;">
+              Rastrea secuencias de partidos consecutivos donde un resultado recurrente (como el empate o ambos marcan) se desvía de su media histórica.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 style="color:#fff; font-size:1.15rem; margin-bottom:0.5rem;">Modelado Cuantitativo</h3>
+            <p style="color:#94a3b8; font-size:0.88rem; line-height:1.5;">
+              Calcula el Signal Score (0-100), el Nivel de Confianza y la probabilidad implícita contrastada con las cuotas reales de mercado.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3 style="color:#fff; font-size:1.15rem; margin-bottom:0.5rem;">Disciplina de Riesgo</h3>
+            <p style="color:#94a3b8; font-size:0.88rem; line-height:1.5;">
+              Incorpora una Calculadora Anti-Martingala, control de banca en 11 divisas y Stop-Bank diario/semanal para proteger tu capital.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Cómo Funciona -->
+    <section class="landing-section" id="como-funciona" style="background: rgba(0,0,0,0.2);">
+      <div class="landing-container">
+        <h2 class="section-title">¿Cómo Funciona?</h2>
+        <p class="section-subtitle">
+          Un pipeline algorítmico continuo de 4 fases que procesa datos oficiales en tiempo real.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.8rem; font-weight: 900; color: #38bdf8; margin-bottom: 0.5rem;">01</div>
+            <h4 style="color:#fff; margin-bottom:0.4rem;">Ingesta de Datos</h4>
+            <p style="color:#94a3b8; font-size:0.82rem;">Lectura continua de marcadores, tiempos y alineaciones en 45 competiciones oficiales.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.8rem; font-weight: 900; color: #38bdf8; margin-bottom: 0.5rem;">02</div>
+            <h4 style="color:#fff; margin-bottom:0.4rem;">Filtro de Calidad</h4>
+            <p style="color:#94a3b8; font-size:0.82rem;">Evaluación de muestra histórica, estabilidad y completitud de datos (Score 0-100 por liga).</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.8rem; font-weight: 900; color: #38bdf8; margin-bottom: 0.5rem;">03</div>
+            <h4 style="color:#fff; margin-bottom:0.4rem;">Signal Engine</h4>
+            <p style="color:#94a3b8; font-size:0.82rem;">Cálculo de Signal Score, madurez de racha y comparación con el récord histórico de la liga.</p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.8rem; font-weight: 900; color: #38bdf8; margin-bottom: 0.5rem;">04</div>
+            <h4 style="color:#fff; margin-bottom:0.4rem;">Difusión y Registro</h4>
+            <p style="color:#94a3b8; font-size:0.82rem;">Envío a canales segmentados y sellado inmutable en el Ledger para auditoría posterior.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Ejemplo de una Señal -->
+    <section class="landing-section">
+      <div class="landing-container">
+        <h2 class="section-title">Anatomía de una Señal Cuantitativa</h2>
+        <p class="section-subtitle">
+          Cada oportunidad proporciona telemetría transparente y verificable antes del partido.
+        </p>
+        <div style="max-width: 750px; margin: 0 auto; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 1rem; padding: 1.75rem; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+            <div>
+              <span class="badge-status badge-success" style="font-size: 0.72rem;">🟢 SEÑAL PREMIUM #SIG-140-DRAW-0889</span>
+              <h3 style="color:#fff; font-size:1.15rem; margin-top:0.25rem;">🇪🇸 La Liga — Real Madrid vs Barcelona</h3>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 0.72rem; color: #94a3b8;">Score Cuantitativo</span>
+              <div style="font-size: 1.3rem; font-weight: 800; color: #38bdf8;">94 / 100</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; font-size: 0.82rem; margin-bottom: 1rem;">
+            <div style="background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 0.4rem;">
+              <span style="color:#94a3b8; display:block; font-size:0.7rem;">MERCADO OPERADO</span>
+              <strong style="color:#fff;">🎯 Empate (FT)</strong>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 0.4rem;">
+              <span style="color:#94a3b8; display:block; font-size:0.7rem;">RACHA DETECTADA</span>
+              <strong style="color:#38bdf8;">11 partidos sin empate</strong>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 0.4rem;">
+              <span style="color:#94a3b8; display:block; font-size:0.7rem;">CUOTA / PROB. IMPLÍCITA</span>
+              <strong style="color:#facc15;">@3.30 (30.3%)</strong>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 0.4rem;">
+              <span style="color:#94a3b8; display:block; font-size:0.7rem;">WIN RATE EN RUPTURA</span>
+              <strong style="color:#4ade80;">75.8% (380 casos)</strong>
+            </div>
+          </div>
+          <p style="font-size: 0.78rem; color: #cbd5e1; background: rgba(56, 189, 248, 0.08); padding: 0.6rem 0.8rem; border-radius: 0.4rem; border-left: 3px solid #38bdf8; margin: 0;">
+            <strong>Diagnóstico:</strong> Alta probabilidad empírica de reversión a la media respaldada por 5 temporadas de consistencia interanual.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Análisis Estadístico -->
+    <section class="landing-section" style="background: rgba(0,0,0,0.2);">
+      <div class="landing-container">
+        <h2 class="section-title">5 Mercados Cuantitativos Especializados</h2>
+        <p class="section-subtitle">
+          Estrategias probadas que explotan ineficiencias de reversión a la media en fútbol profesional.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h4 style="color:#38bdf8; margin-bottom:0.3rem;">1. Empate Final (FT)</h4>
+            <p style="color:#94a3b8; font-size:0.85rem;">Captura rachas prolongadas donde dos equipos o ligas enteras acumulan sequías de empates (Cuotas 3.10 - 3.60).</p>
+          </div>
+          <div class="feature-card">
+            <h4 style="color:#38bdf8; margin-bottom:0.3rem;">2. Más de 3.5 Goles</h4>
+            <p style="color:#94a3b8; font-size:0.85rem;">Explota rachas de baja anotación en ligas tradicionalmente ofensivas antes del ajuste de mercado (Cuotas 2.60 - 3.40).</p>
+          </div>
+          <div class="feature-card">
+            <h4 style="color:#38bdf8; margin-bottom:0.3rem;">3. Empate al Descanso (HT)</h4>
+            <p style="color:#94a3b8; font-size:0.85rem;">Opera el marcador 0-0 o 1-1 al finalizar los primeros 45 minutos (Cuotas 2.00 - 2.40).</p>
+          </div>
+          <div class="feature-card">
+            <h4 style="color:#38bdf8; margin-bottom:0.3rem;">4. Ambos Marcan + >2.5</h4>
+            <p style="color:#94a3b8; font-size:0.85rem;">Estrategia combinada de alta rentabilidad tras anomalías defensivas atípicas (Cuotas 2.10 - 2.60).</p>
+          </div>
+          <div class="feature-card">
+            <h4 style="color:#38bdf8; margin-bottom:0.3rem;">5. Ambos Marcan en 1er Tiempo</h4>
+            <p style="color:#94a3b8; font-size:0.85rem;">Mercado de alta cuota (@4.00 - @5.50) ejecutado exclusivamente con filtro de calidad 'EXCELENTE'.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Backtesting & 7. Transparencia -->
+    <section class="landing-section">
+      <div class="landing-container">
+        <h2 class="section-title">Backtesting Histórico y Transparencia Inmutable</h2>
+        <p class="section-subtitle">
+          Historial auditado y segregado para que evalúes la solidez de cada estrategia con total honestidad.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+          <div class="feature-card" style="border-left: 4px solid #38bdf8;">
+            <span class="badge-status badge-info" style="font-size: 0.7rem;">📈 SIMULADOR DE CAPITAL</span>
+            <h3 style="color:#fff; font-size:1.15rem; margin:0.5rem 0;">Curva de Capital (Equity Curve)</h3>
+            <p style="color:#94a3b8; font-size:0.85rem; line-height:1.5;">
+              Simula el rendimiento de cualquier estrategia en +3 temporadas históricas con dimensionamiento de stake y control de Drawdown máximo.
+            </p>
+          </div>
+          <div class="feature-card" style="border-left: 4px solid #4ade80;">
+            <span class="badge-status badge-success" style="font-size: 0.7rem;">🛡️ LEDGER INMUTABLE</span>
+            <h3 style="color:#fff; font-size:1.15rem; margin:0.5rem 0;">Auditoría Pública en Vivo</h3>
+            <p style="color:#94a3b8; font-size:0.85rem; line-height:1.5;">
+              Cada señal generada recibe un ID único y sello de integridad. Los resultados jamás se modifican retroactivamente.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Centro de Oportunidades & 9. Telegram -->
+    <section class="landing-section" style="background: rgba(0,0,0,0.2);">
+      <div class="landing-container">
+        <h2 class="section-title">Centro de Oportunidades & Bot de Telegram</h2>
+        <p class="section-subtitle">
+          Accede al ranking algorítmico en la web o recibe alertas prioritarias directamente en tu móvil.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 style="color:#fff; font-size:1.1rem; margin-bottom:0.4rem;">Centro de Oportunidades</h3>
+            <p style="color:#94a3b8; font-size:0.85rem;">
+              Clasifica automáticamente las mejores alertas del día según Signal Score, nivel de confianza, muestra y horario de partido.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">✈️</div>
+            <h3 style="color:#fff; font-size:1.1rem; margin-bottom:0.4rem;">Telegram VIP Instantáneo</h3>
+            <p style="color:#94a3b8; font-size:0.85rem;">
+              Canales segmentados (FREE, PRO, VIP) con protección anti-duplicados y formato listo para operar en 1 clic.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Planes de Suscripción -->
+    <section class="landing-section" id="planes">
+      <div class="landing-container">
+        <h2 class="section-title">Planes y Precios Transparentes</h2>
+        <p class="section-subtitle">
+          Comienza gratis y escala a herramientas institucionales cuando estés listo.
+        </p>
+        <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <!-- FREE -->
+          <div class="pricing-card">
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color:#94a3b8;">⚪ FREE</h3>
+              <div class="plan-price">$0 <span>/ mes</span></div>
+              <p class="plan-desc">Para explorar la plataforma y aprender gestión de riesgo.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> Hasta 5 ligas activas</li>
+              <li><span class="check">✓</span> Estadísticas y rachas básicas</li>
+              <li><span class="check">✓</span> 2 oportunidades diarias</li>
+              <li><span class="check">✓</span> Calculadora de stake básica</li>
+              <li><span class="cross">✕</span> <span class="muted">Alertas PREMIUM bloqueadas</span></li>
+            </ul>
+            <a href="/index.html" class="btn btn-tier-action" style="text-decoration:none; text-align:center;">Registrarme Gratis</a>
+          </div>
+
+          <!-- PRO -->
+          <div class="pricing-card pricing-card-pro">
+            <div class="badge-tag">POPULAR</div>
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color:#38bdf8;">🔵 PRO</h3>
+              <div class="plan-price">$19.00 <span>/ mes</span></div>
+              <p class="plan-desc">Para operadores cuantitativos que buscan volumen de señales.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> Hasta 15 ligas simultáneas</li>
+              <li><span class="check">✓</span> Alertas FUERTES desbloqueadas</li>
+              <li><span class="check">✓</span> Backtesting histórico (+3 Temp)</li>
+              <li><span class="check">✓</span> Control de banca hasta 50 ops</li>
+              <li><span class="check">✓</span> Descarga de Planilla Excel (.xlsx)</li>
+            </ul>
+            <a href="/index.html" class="btn btn-tier-action btn-tier-pro" style="text-decoration:none; text-align:center;">Suscribirme a PRO</a>
+          </div>
+
+          <!-- VIP -->
+          <div class="pricing-card pricing-card-elite" style="border-color: rgba(74, 222, 128, 0.4); box-shadow: 0 0 35px rgba(34, 197, 94, 0.2);">
+            <div class="badge-tag badge-elite" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">TODO INCLUIDO</div>
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color:#4ade80;">🟢 VIP</h3>
+              <div class="plan-price">$39.00 <span>/ mes</span></div>
+              <p class="plan-desc">La suite definitiva para traders profesionales y sindicatos.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> <strong>Todas las 45 ligas mundiales</strong></li>
+              <li><span class="check">✓</span> <strong>100% Señales PREMIUM desbloqueadas</strong></li>
+              <li><span class="check">✓</span> <strong>Bot de Telegram VIP en tiempo real</strong></li>
+              <li><span class="check">✓</span> <strong>Control de banca ILIMITADO</strong></li>
+              <li><span class="check">✓</span> <strong>Informes y Balances de Jornada</strong></li>
+            </ul>
+            <a href="/index.html" class="btn btn-tier-action btn-tier-elite" style="text-decoration:none; text-align:center; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Suscribirme a VIP</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Preguntas Frecuentes (FAQ) -->
+    <section class="landing-section">
+      <div class="landing-container" style="max-width: 800px;">
+        <h2 class="section-title">Preguntas Frecuentes</h2>
+        <p class="section-subtitle">Todo lo que necesitas saber antes de comenzar.</p>
+        
+        <div class="faq-item">
+          <div class="faq-question">¿StreakTracker garantiza ganancias o aciertos en las apuestas?</div>
+          <div class="faq-answer">No. StreakTracker es una plataforma analítica y cuantitativa que identifica patrones históricos y desvíos de la media. El rendimiento pasado no garantiza resultados futuros.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">¿Qué ligas y competiciones analiza la plataforma?</div>
+          <div class="faq-answer">Analizamos 45 ligas mundiales oficiales, incluyendo La Liga, Premier League, Serie A de Italia y Brasil, Bundesliga, Ligue 1, Liga MX, Primera A de Colombia y MLS, entre otras.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">¿Puedo probar la plataforma de forma gratuita?</div>
+          <div class="faq-answer">Sí. El plan FREE te permite monitorear hasta 5 ligas, ver estadísticas básicas y acceder a la Academia Anti-Ruina sin ingresar ninguna tarjeta de crédito.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">¿Cómo se reciben las señales en Telegram?</div>
+          <div class="faq-answer">Los miembros PRO y VIP pueden conectar el Bot de Telegram de StreakTracker para recibir notificaciones inmediatas en cuanto una racha entra en nivel observable o crítico.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. Aviso de Riesgo -->
+    <section class="landing-section" style="background: rgba(0,0,0,0.3);">
+      <div class="landing-container" style="max-width: 850px; text-align: center;">
+        <h3 style="font-size: 1.05rem; color: #f87171; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+          ⚠️ Aviso de Responsabilidad y Gestión de Riesgo
+        </h3>
+        <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.6;">
+          Los análisis, cuotas y métricas expuestos en StreakTracker tienen fines estrictamente informativos y estadísticos. Las inversiones y operaciones en mercados deportivos conllevan riesgo de pérdida de capital. Nunca operes con dinero que no puedas permitirte perder y aplica siempre una gestión de banca estricta y profesional.
+        </p>
+      </div>
+    </section>
+
+    <!-- 13. CTA de Registro Final -->
+    <section style="padding: 5rem 1rem; text-align: center; background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.12) 0%, transparent 70%);">
+      <div class="landing-container">
+        <h2 style="font-size: 2.3rem; font-weight: 900; color: #fff; margin-bottom: 1rem;">
+          Comienza a tomar decisiones basadas en datos hoy mismo.
+        </h2>
+        <p style="font-size: 1.05rem; color: #94a3b8; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+          Únete a la comunidad de operadores cuantitativos de StreakTracker.
+        </p>
+        <a href="/index.html" class="landing-cta-btn" style="font-size: 1.15rem; padding: 1rem 2.5rem;">
+          🚀 Abrir Terminal StreakTracker
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Global Footer -->
+  <footer style="border-top: 1px solid rgba(255,255,255,0.08); padding: 2rem 1rem; text-align: center; font-size: 0.8rem; color: #64748b;">
+    <p>© 2026 StreakTracker. Todos los derechos reservados. Plataforma Cuantitativa de Análisis Deportivo.</p>
+  </footer>
+</body>
+</html>
