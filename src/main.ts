@@ -63,7 +63,8 @@ import {
   saveAdminParameters, 
   loadAdminAuditLogs, 
   logAdminAction, 
-  getAdminDashboardOverview 
+  getAdminDashboardOverview,
+  updateRegisteredUserPlan 
 } from './logic/adminControl';
 
 export type SubscriptionPlan = 'FREE' | 'TRIAL' | 'PRO' | 'VIP';
@@ -2861,12 +2862,37 @@ function setupAdminModule() {
           <td><span class="badge-status" style="font-size:0.7rem;">${statusBadge}</span></td>
           <td style="font-size:0.75rem; color:#94a3b8;">${u.expiresAt ? u.expiresAt.slice(0, 10) : 'Sin vencimiento (Free)'}</td>
           <td>
-            <button class="btn" style="padding:0.2rem 0.5rem; font-size:0.7rem; background:rgba(56,189,248,0.15); color:#38bdf8;" onclick="alert('Usuario ${u.id} verificado.')">Ver Detalle</button>
+            <select class="dropdown-select adm-user-plan-changer" data-user-id="${u.id}" style="padding: 0.2rem 0.4rem; font-size: 0.72rem;">
+              <option value="FREE" ${u.plan === 'FREE' ? 'selected' : ''}>⚪ FREE</option>
+              <option value="TRIAL" ${u.plan === 'TRIAL' ? 'selected' : ''}>🧪 TRIAL</option>
+              <option value="PRO" ${u.plan === 'PRO' ? 'selected' : ''}>🔵 PRO</option>
+              <option value="VIP" ${u.plan === 'VIP' ? 'selected' : ''}>🟢 VIP</option>
+            </select>
           </td>
         `;
+
+        const sel = row.querySelector('.adm-user-plan-changer') as HTMLSelectElement;
+        if (sel) {
+          sel.addEventListener('change', (e) => {
+            const targetVal = (e.target as HTMLSelectElement).value as any;
+            const ok = updateRegisteredUserPlan(u.id, targetVal, 30);
+            if (ok) {
+              if (u.id === state.userProfile.id) {
+                setUserPlan(targetVal === 'TRIAL' ? 'VIP' : targetVal, targetVal === 'TRIAL' ? 'TRIAL' : 'ACTIVE');
+                state.currentPlan = targetVal;
+                const planSel = document.getElementById('plan-select') as HTMLSelectElement;
+                if (planSel) planSel.value = targetVal;
+                renderDashboard();
+              }
+              renderAdminUI();
+            }
+          });
+        }
+
         tbodyUsers.appendChild(row);
       });
     }
+
 
     // 2. Render Leagues List
     const leaguesContainer = document.getElementById('adm-leagues-list');

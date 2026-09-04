@@ -125,24 +125,73 @@ export function saveAdminParameters(params: Partial<AdminSystemParameters>, admi
   return updated;
 }
 
+const STORAGE_KEY_USERS_DB = 'streaktracker_admin_users_db_v1';
+
+export function loadAllRegisteredUsers(): Array<{ id: string; email: string; name: string; plan: PlatformPlan | 'TRIAL'; status: string; expiresAt: string | null; role: string }> {
+  const user = loadUserProfile();
+  const defaultUsers = [
+    { id: user.id, email: user.email, name: user.name, plan: user.subscription.plan, status: user.subscription.status, expiresAt: user.subscription.expiresAt, role: user.role },
+    { id: 'usr_demo_02', email: 'carlos.vip@quant.com', name: 'Carlos Mendoza', plan: 'VIP' as const, status: 'ACTIVE', expiresAt: new Date(Date.now() + 28 * 86400000).toISOString(), role: 'VIP' },
+    { id: 'usr_demo_03', email: 'miguel.pro@trader.io', name: 'Miguel Ángel Fernández', plan: 'PRO' as const, status: 'ACTIVE', expiresAt: new Date(Date.now() + 15 * 86400000).toISOString(), role: 'PRO' },
+    { id: 'usr_demo_04', email: 'laura.trial@gmail.com', name: 'Laura Benítez', plan: 'TRIAL' as const, status: 'TRIAL', expiresAt: new Date(Date.now() + 2 * 86400000).toISOString(), role: 'TRIAL' },
+    { id: 'usr_demo_05', email: 'roberto.free@hotmail.com', name: 'Roberto Silva', plan: 'FREE' as const, status: 'ACTIVE', expiresAt: null, role: 'FREE' },
+    { id: 'usr_demo_06', email: 'juan.expired@yahoo.com', name: 'Juan Pablo Duarte', plan: 'PRO' as const, status: 'EXPIRED', expiresAt: new Date(Date.now() - 5 * 86400000).toISOString(), role: 'FREE' }
+  ];
+
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_USERS_DB);
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEY_USERS_DB, JSON.stringify(defaultUsers));
+      return defaultUsers;
+    }
+    const parsed = JSON.parse(raw);
+    // Asegurar que el usuario actual siempre esté actualizado en la primera posición
+    if (parsed.length > 0 && parsed[0].id === user.id) {
+      parsed[0] = { id: user.id, email: user.email, name: user.name, plan: user.subscription.plan, status: user.subscription.status, expiresAt: user.subscription.expiresAt, role: user.role };
+    }
+    return parsed;
+  } catch (e) {
+    return defaultUsers;
+  }
+}
+
+export function saveAllRegisteredUsers(users: any[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY_USERS_DB, JSON.stringify(users));
+  } catch (e) {
+    console.error('Error saving users db:', e);
+  }
+}
+
+export function updateRegisteredUserPlan(userId: string, targetPlan: PlatformPlan | 'TRIAL', daysDuration: number = 30): boolean {
+  const users = loadAllRegisteredUsers();
+  const idx = users.findIndex(u => u.id === userId);
+  if (idx === -1) return false;
+
+  const prevPlan = users[idx].plan;
+  const isFree = targetPlan === 'FREE';
+  const isTrial = targetPlan === 'TRIAL';
+
+  users[idx].plan = targetPlan;
+  users[idx].status = isTrial ? 'TRIAL' : 'ACTIVE';
+  users[idx].role = targetPlan;
+  users[idx].expiresAt = isFree ? null : new Date(Date.now() + daysDuration * 86400000).toISOString();
+
+  saveAllRegisteredUsers(users);
+  logAdminAction('USER_ROLE_OVERRIDE', `Usuario ${users[idx].email} (${userId})`, prevPlan, `${targetPlan} (${daysDuration}d)`);
+  return true;
+}
+
 // Resumen cuantitativo integral para visualización del Administrador
 export function getAdminDashboardOverview() {
   const params = loadAdminParameters();
   const ledger = loadSignalLedger();
   const logs = loadAdminAuditLogs();
-  const user = loadUserProfile();
-
-  const mockUsers: Array<{ id: string; email: string; name: string; plan: PlatformPlan | 'TRIAL'; status: string; expiresAt: string | null }> = [
-    { id: user.id, email: user.email, name: user.name, plan: user.subscription.plan, status: user.subscription.status, expiresAt: user.subscription.expiresAt },
-    { id: 'usr_mock_02', email: 'trader.pro@quant.es', name: 'Carlos Mendoza', plan: 'PRO', status: 'ACTIVE', expiresAt: '2026-09-30T00:00:00.000Z' },
-    { id: 'usr_mock_03', email: 'sindicate@vipclub.io', name: 'Alpha Syndicate', plan: 'VIP', status: 'ACTIVE', expiresAt: '2026-12-31T00:00:00.000Z' },
-    { id: 'usr_mock_04', email: 'trial.user@gmail.com', name: 'Andrés López', plan: 'TRIAL', status: 'TRIAL', expiresAt: '2026-09-06T12:00:00.000Z' },
-    { id: 'usr_mock_05', email: 'free.member@hotmail.com', name: 'Martín Gómez', plan: 'FREE', status: 'ACTIVE', expiresAt: null }
-  ];
+  const usersList = loadAllRegisteredUsers();
 
   return {
-    usersCount: mockUsers.length,
-    usersList: mockUsers,
+    usersCount: usersList.length,
+    usersList,
     totalSignalsLedger: ledger.length,
     activeLeaguesCount: params.activeLeagueIds.length,
     totalOfficialLeagues: Object.keys(LEAGUES).length,
@@ -152,3 +201,4 @@ export function getAdminDashboardOverview() {
     parameters: params
   };
 }
+
