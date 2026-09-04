@@ -64,7 +64,9 @@ import {
   loadAdminAuditLogs, 
   logAdminAction, 
   getAdminDashboardOverview,
-  updateRegisteredUserPlan 
+  updateRegisteredUserPlan,
+  loadAllRegisteredUsers,
+  saveAllRegisteredUsers
 } from './logic/adminControl';
 
 export type SubscriptionPlan = 'FREE' | 'TRIAL' | 'PRO' | 'VIP';
@@ -1476,12 +1478,95 @@ function setupPricingModal() {
       const target = e.currentTarget as HTMLButtonElement;
       const tier = target.getAttribute('data-tier') as SubscriptionPlan;
       if (tier) {
-        setSubscriptionPlan(tier);
-        pricingModal.close();
+        if (tier === 'FREE') {
+          setSubscriptionPlan('FREE');
+          pricingModal.close();
+        } else {
+          pricingModal.close();
+          openCheckoutModal(tier);
+        }
       }
     });
   });
+
+  setupCheckoutModal();
 }
+
+let pendingCheckoutPlan: SubscriptionPlan = 'VIP';
+
+function openCheckoutModal(plan: SubscriptionPlan) {
+  const checkoutModal = document.getElementById('checkout-modal') as HTMLDialogElement;
+  const planNameEl = document.getElementById('checkout-plan-name');
+  const planPriceEl = document.getElementById('checkout-plan-price');
+  const nameInput = document.getElementById('checkout-user-name') as HTMLInputElement;
+  const emailInput = document.getElementById('checkout-user-email') as HTMLInputElement;
+  const form = document.getElementById('checkout-sim-form') as HTMLFormElement;
+  const successView = document.getElementById('checkout-success-view');
+
+  if (!checkoutModal) return;
+
+  pendingCheckoutPlan = plan;
+
+  if (planNameEl) planNameEl.innerText = plan === 'VIP' ? 'VIP QUANT (Completo)' : 'PRO QUANT (Avanzado)';
+  if (planPriceEl) planPriceEl.innerHTML = plan === 'VIP' ? '$39.00 <span style="font-size:0.75rem; color:#94a3b8;">/mes</span>' : '$19.00 <span style="font-size:0.75rem; color:#94a3b8;">/mes</span>';
+
+  if (nameInput) nameInput.value = state.userProfile.name || 'Usuario Trader';
+  if (emailInput) emailInput.value = state.userProfile.email || 'trader@streaktracker.io';
+
+  if (form) form.style.display = 'block';
+  if (successView) successView.style.display = 'none';
+
+  checkoutModal.showModal();
+}
+
+function setupCheckoutModal() {
+  const checkoutModal = document.getElementById('checkout-modal') as HTMLDialogElement;
+  const closeCheckoutModal = document.getElementById('close-checkout-modal');
+  const form = document.getElementById('checkout-sim-form') as HTMLFormElement;
+  const successView = document.getElementById('checkout-success-view');
+  const successCloseBtn = document.getElementById('checkout-success-close-btn');
+  const successMsg = document.getElementById('checkout-success-msg');
+
+  if (!checkoutModal || !form) return;
+
+  if (closeCheckoutModal) closeCheckoutModal.addEventListener('click', () => checkoutModal.close());
+  if (successCloseBtn) successCloseBtn.addEventListener('click', () => checkoutModal.close());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('checkout-user-name') as HTMLInputElement;
+    const emailInput = document.getElementById('checkout-user-email') as HTMLInputElement;
+
+    const newName = nameInput ? nameInput.value.trim() : 'Usuario Registrado';
+    const newEmail = emailInput ? emailInput.value.trim() : 'trader@streaktracker.io';
+
+    // Actualizar perfil del usuario
+    state.userProfile.name = newName;
+    state.userProfile.email = newEmail;
+
+    // Activar suscripción
+    setSubscriptionPlan(pendingCheckoutPlan);
+
+    // Actualizar en la lista de usuarios registrados del panel admin
+    const registeredUsers = loadAllRegisteredUsers();
+    const existingIdx = registeredUsers.findIndex(u => u.id === state.userProfile.id);
+    if (existingIdx !== -1) {
+      registeredUsers[existingIdx].name = newName;
+      registeredUsers[existingIdx].email = newEmail;
+      registeredUsers[existingIdx].plan = pendingCheckoutPlan;
+      registeredUsers[existingIdx].status = 'ACTIVE';
+      registeredUsers[existingIdx].expiresAt = new Date(Date.now() + 30 * 86400000).toISOString();
+      saveAllRegisteredUsers(registeredUsers);
+    }
+
+    if (form) form.style.display = 'none';
+    if (successView) successView.style.display = 'block';
+    if (successMsg) {
+      successMsg.innerHTML = `¡Felicidades <strong>${newName}</strong>! Tu suscripción al <strong>Plan ${pendingCheckoutPlan}</strong> ha sido activada con éxito por 30 días asociados a <strong>${newEmail}</strong>.`;
+    }
+  });
+}
+
 
 async function setSubscriptionPlan(newPlan: SubscriptionPlan) {
   state.currentPlan = newPlan;
