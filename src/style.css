@@ -1398,3 +1398,42 @@ dialog::backdrop {
     height: 42px;
   }
 }
+
+/* Unified & Identifiable Modal Close Buttons (X) */
+button[id^="close-"],
+.modal-close-btn,
+.btn-close {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  padding: 0 0.6rem !important;
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+  border-radius: 8px !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2) !important;
+  line-height: 1 !important;
+}
+
+button[id^="close-"]:hover,
+.modal-close-btn:hover,
+.btn-close:hover {
+  background: rgba(239, 68, 68, 0.9) !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.6) !important;
+  transform: scale(1.08) !important;
+}
+
+button[id^="close-"]:active,
+.modal-close-btn:active,
+.btn-close:active {
+  transform: scale(0.95) !important;
+}
+
