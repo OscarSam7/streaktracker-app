@@ -936,25 +936,71 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
   }
 
   filtered.forEach((opp, rankIdx) => {
+    // Check if there is already an open/pending operation in Bankroll for this match & market
+    const existingOp = state.bankrollRawOps.find(op => 
+      op.status === 'Pendiente' && 
+      (op.description.includes(opp.leagueName) || op.description.includes(opp.fixtureName)) &&
+      op.market.includes(opp.marketKey)
+    );
+
+    const isOptimalEntry = opp.tier === 'PREMIUM' || opp.tier === 'FUERTE' || opp.isLive;
+
     const card = document.createElement('div');
     card.style.background = 'rgba(15, 23, 42, 0.85)';
-    card.style.border = `1px solid ${opp.tierColor}40`;
+    card.style.border = isOptimalEntry ? '2px solid #10b981' : `1px solid ${opp.tierColor}40`;
     card.style.borderRadius = '0.75rem';
     card.style.padding = '0.9rem';
     card.style.cursor = 'pointer';
     card.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease';
     card.title = `👉 Clic para ir a las alertas de ${opp.leagueName} (${opp.country})`;
 
+    if (isOptimalEntry) {
+      card.classList.add('opp-card-active-trade');
+    }
+
     card.addEventListener('mouseenter', () => {
       card.style.transform = 'translateY(-2px)';
-      card.style.borderColor = opp.tierColor;
+      if (!isOptimalEntry) card.style.borderColor = opp.tierColor;
     });
     card.addEventListener('mouseleave', () => {
       card.style.transform = 'translateY(0)';
-      card.style.border = `1px solid ${opp.tierColor}40`;
+      if (!isOptimalEntry) card.style.border = `1px solid ${opp.tierColor}40`;
     });
 
+    // Operational Banner inside the card
+    let actionBannerHTML = '';
+    if (existingOp) {
+      actionBannerHTML = `
+        <div class="opp-active-trade-banner" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4);">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="font-size: 0.85rem;">📌</span>
+            <div>
+              <div style="font-size: 0.68rem; font-weight: 800; color: #38bdf8;">OPERACIÓN EN CURSO (${existingOp.id})</div>
+              <div style="font-size: 0.6rem; color: #cbd5e1;">Stake: ${existingOp.stake} • Cuota: @${existingOp.odds.toFixed(2)}</div>
+            </div>
+          </div>
+          <span class="opp-already-traded-badge">ACTIVA</span>
+        </div>
+      `;
+    } else if (isOptimalEntry) {
+      actionBannerHTML = `
+        <div class="opp-active-trade-banner">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="font-size: 0.85rem;">🎯</span>
+            <div>
+              <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80;">INICIAR OPERACIÓN: ${opp.marketLabel}</div>
+              <div style="font-size: 0.6rem; color: #e2e8f0;">✅ Señal Validada • Cuota sugerida: @${opp.suggestedOdds.toFixed(2)}</div>
+            </div>
+          </div>
+          <button class="opp-btn-action-trade btn-trigger-trade-entry" title="Registrar entrada en la gestión de banca">
+            🚀 Iniciar
+          </button>
+        </div>
+      `;
+    }
+
     card.innerHTML = `
+      ${actionBannerHTML}
       <!-- Header: Rank, League, Match Time -->
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.4rem;">
         <div class="opp-clickable-league" data-league-id="${opp.leagueId}" style="display: flex; align-items: center; gap: 0.4rem;">
@@ -971,7 +1017,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       </div>
 
       <!-- Partido & Mercado -->
-      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-top: 0.35rem;">
         <div style="font-size: 0.8rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           ⚽ ${opp.fixtureName}
         </div>
@@ -981,7 +1027,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       </div>
 
       <!-- Score & Confianza Banner -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.35); padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid ${opp.tierColor}30;">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.35); padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid ${opp.tierColor}30; margin-top: 0.35rem;">
         <div style="display: flex; align-items: center; gap: 0.35rem;">
           <span style="font-size: 0.85rem; font-weight: 900; color: ${opp.tierColor};">⚡ ${opp.signalScore}/100</span>
           <span style="font-size: 0.65rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 4px; background: rgba(255,255,255,0.06); color: ${opp.tierColor}; border: 1px solid ${opp.tierColor}40;">
@@ -994,7 +1040,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       </div>
 
       <!-- Statistical Grid: Racha, Muestra, WinRate, ROI, Cuota -->
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; background: rgba(255,255,255,0.02); padding: 0.4rem; border-radius: 5px; font-size: 0.65rem; text-align: center;">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; background: rgba(255,255,255,0.02); padding: 0.4rem; border-radius: 5px; font-size: 0.65rem; text-align: center; margin-top: 0.35rem;">
         <div>
           <span style="color: #94a3b8; display: block; font-size: 0.58rem;">RACHA ACTUAL</span>
           <strong style="color: #fff; font-size: 0.76rem;">${opp.streakCurrent} partidos</strong>
@@ -1022,7 +1068,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       </div>
 
       <!-- Rationale & Action Buttons -->
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-top: 0.15rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-top: 0.35rem;">
         <span style="font-size: 0.6rem; color: #cbd5e1; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;" title="${opp.confidenceExplanation}">
           "${opp.confidenceExplanation}"
         </span>
@@ -1046,11 +1092,50 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       });
     }
 
+    // Helper to open Bankroll modal and prefill operation
+    const handleTriggerTrade = (e: Event) => {
+      e.stopPropagation();
+      const bankrollModal = document.getElementById('bankroll-modal') as HTMLDialogElement;
+      if (bankrollModal) {
+        bankrollModal.showModal();
+        const tabCalcBtn = bankrollModal.querySelector('[data-tab="tab-calculator"]') as HTMLButtonElement;
+        if (tabCalcBtn) tabCalcBtn.click();
+        
+        const oddsInput = document.getElementById('calc-odds-input') as HTMLInputElement;
+        if (oddsInput) {
+          oddsInput.value = opp.suggestedOdds.toFixed(2);
+          triggerStakeCalc();
+        }
+
+        // Also prefill the New Operation form fields
+        const opFormDesc = document.getElementById('op-form-desc') as HTMLInputElement;
+        const opFormMarket = document.getElementById('op-form-market') as HTMLInputElement;
+        const opFormOdds = document.getElementById('op-form-odds') as HTMLInputElement;
+        const opFormCategory = document.getElementById('op-form-category') as HTMLSelectElement;
+
+        if (opFormDesc) opFormDesc.value = `${opp.leagueName} (${opp.country}) - ${opp.fixtureName}`;
+        if (opFormMarket) opFormMarket.value = `${opp.marketKey} (${opp.marketLabel})`;
+        if (opFormOdds) opFormOdds.value = opp.suggestedOdds.toFixed(2);
+        if (opFormCategory) opFormCategory.value = 'Fútbol Cuantitativo';
+      }
+    };
+
+    const triggerTradeBtn = card.querySelector('.btn-trigger-trade-entry');
+    if (triggerTradeBtn) {
+      triggerTradeBtn.addEventListener('click', handleTriggerTrade);
+    }
+
+    const opBtn = card.querySelector('.btn-1click-bankroll');
+    if (opBtn) {
+      opBtn.addEventListener('click', handleTriggerTrade);
+    }
+
     // Smooth Scroll to League Card in Dashboard when clicking anywhere on the opportunity card
     card.addEventListener('click', (e) => {
       // Ignore if clicking the action buttons
-      if ((e.target as HTMLElement).closest('.btn-1click-bankroll') || (e.target as HTMLElement).closest('.btn-push-alert')) return;
-
+      if ((e.target as HTMLElement).closest('.btn-1click-bankroll') || 
+          (e.target as HTMLElement).closest('.btn-push-alert') ||
+          (e.target as HTMLElement).closest('.btn-trigger-trade-entry')) return;
 
       const targetLid = opp.leagueId;
       
@@ -1077,25 +1162,6 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         }, 2800);
       }
     });
-
-    // 1-Click Bankroll handler for opportunity card
-    const opBtn = card.querySelector('.btn-1click-bankroll');
-    if (opBtn) {
-      opBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const bankrollModal = document.getElementById('bankroll-modal') as HTMLDialogElement;
-        if (bankrollModal) {
-          bankrollModal.showModal();
-          const tabCalcBtn = bankrollModal.querySelector('[data-tab="tab-calculator"]') as HTMLButtonElement;
-          if (tabCalcBtn) tabCalcBtn.click();
-          const oddsInput = document.getElementById('calc-odds-input') as HTMLInputElement;
-          if (oddsInput) {
-            oddsInput.value = opp.suggestedOdds.toFixed(2);
-            triggerStakeCalc();
-          }
-        }
-      });
-    }
 
     oppGrid.appendChild(card);
   });

@@ -1484,4 +1484,76 @@ button[id^="close-"]:hover,
   100% { transform: translateX(0); opacity: 1; }
 }
 
+/* ---------------------------------------------------------
+   OPPORTUNITY ACTIVE OPERATION GLOW & ACTION STYLING
+--------------------------------------------------------- */
+.opp-card-active-trade {
+  border-width: 2px !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25), inset 0 0 15px rgba(16, 185, 129, 0.08) !important;
+  animation: pulseNeonTrade 2.2s infinite alternate ease-in-out !important;
+  position: relative;
+}
+
+@keyframes pulseNeonTrade {
+  0% {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2), inset 0 0 8px rgba(16, 185, 129, 0.05);
+  }
+  100% {
+    border-color: #10b981;
+    box-shadow: 0 0 28px rgba(16, 185, 129, 0.5), inset 0 0 18px rgba(16, 185, 129, 0.15);
+  }
+}
+
+.opp-active-trade-banner {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 182, 212, 0.15) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.opp-btn-action-trade {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.72rem !important;
+  padding: 0.35rem 0.7rem !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+}
+
+.opp-btn-action-trade:hover {
+  transform: scale(1.04) translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.6) !important;
+  filter: brightness(1.1) !important;
+}
+
+.opp-btn-action-trade:active {
+  transform: scale(0.98) !important;
+}
+
+.opp-already-traded-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+
 
