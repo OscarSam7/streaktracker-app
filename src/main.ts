@@ -1590,6 +1590,8 @@ function setupPushNotificationModule() {
   const saveBtn = document.getElementById('btn-save-push-notify');
   const opt10Min = document.getElementById('push-opt-10min') as HTMLInputElement;
   const optLive = document.getElementById('push-opt-live') as HTMLInputElement;
+  const optGoal = document.getElementById('push-opt-goal') as HTMLInputElement;
+  const optFt = document.getElementById('push-opt-ft') as HTMLInputElement;
   const statusMsg = document.getElementById('push-status-msg');
 
   if (!modal) return;
@@ -1603,7 +1605,7 @@ function setupPushNotificationModule() {
   if (saveBtn) {
     saveBtn.addEventListener('click', async () => {
       // Solicitar permiso nativo de Notificaciones del Navegador si no está otorgado
-      if ('Notification' in window && Notification.permission !== 'granted') {
+      if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
         try {
           await Notification.requestPermission();
         } catch (e) {}
@@ -1621,8 +1623,12 @@ function setupPushNotificationModule() {
           matchTimestamp: currentTarget.sortTimestamp,
           notify10Min: opt10Min ? opt10Min.checked : true,
           notifyLive: optLive ? optLive.checked : true,
+          notifyGoal: optGoal ? optGoal.checked : true,
+          notifyFt: optFt ? optFt.checked : true,
+          lastKnownScore: '0-0',
           notified10Min: false,
           notifiedLive: false,
+          notifiedFt: false,
           createdAt: Date.now()
         };
 
@@ -1631,18 +1637,15 @@ function setupPushNotificationModule() {
         if (statusMsg) {
           statusMsg.style.display = 'block';
           statusMsg.style.color = '#4ade80';
-          statusMsg.innerText = '✅ ¡Alerta Push configurada! Te avisaremos 10 minutos antes del inicio.';
+          statusMsg.innerText = '✅ ¡Alerta Push configurada con éxito! (10 min antes, Goles y Final)';
         }
 
-        // Programar una notificación push de confirmación
-        if ('Notification' in window && Notification.permission === 'granted') {
-          try {
-            new Notification('🔔 StreakTracker: Alerta Push Activada', {
-              body: `Monitoreando ${currentTarget.fixtureName} (${currentTarget.leagueName}). Te notificaremos 10 minutos antes.`,
-              icon: '/logo.png'
-            });
-          } catch (e) {}
-        }
+        // Emitir notificación push de confirmación inmediata
+        triggerPushNotification(
+          '🔔 StreakTracker: Alerta Push Activada',
+          `Monitoreando ${currentTarget.fixtureName} (${currentTarget.leagueName}). Te notificaremos 10 min antes, goles y al finalizar.`,
+          'toast-10min'
+        );
 
         setTimeout(() => {
           if (statusMsg) statusMsg.style.display = 'none';
@@ -1652,8 +1655,8 @@ function setupPushNotificationModule() {
     });
   }
 
-  // Iniciar monitoreo en segundo plano de partidos próximos (revisa cada 30 segundos)
-  setInterval(checkScheduledPushAlerts, 30 * 1000);
+  // Monitoreo continuo cada 15 segundos
+  setInterval(checkScheduledPushAlerts, 15 * 1000);
 }
 
 let activePushModalOpportunity: any = null;
@@ -1692,8 +1695,12 @@ interface PushConfigEntry {
   matchTimestamp: number;
   notify10Min: boolean;
   notifyLive: boolean;
+  notifyGoal?: boolean;
+  notifyFt?: boolean;
+  lastKnownScore?: string;
   notified10Min: boolean;
   notifiedLive: boolean;
+  notifiedFt?: boolean;
   createdAt: number;
 }
 
@@ -1721,11 +1728,12 @@ function checkScheduledPushAlerts() {
   Object.values(prefs).forEach(item => {
     const timeUntilMatch = item.matchTimestamp - now;
 
-    // 1. Alerta de 10 minutos antes (entre 11 min y 1 min antes)
+    // 1. Alerta de 10 minutos antes (entre 11 min y 0 min antes)
     if (item.notify10Min && !item.notified10Min && timeUntilMatch > 0 && timeUntilMatch <= TEN_MINUTES_MS) {
       triggerPushNotification(
         `⏰ ¡Atención! Partido en 10 minutos (${item.leagueName})`,
-        `El encuentro ${item.fixtureName} comienza pronto. Oportunidad madura: ${item.marketLabel}.`
+        `El encuentro ${item.fixtureName} comienza pronto. Oportunidad madura: ${item.marketLabel}.`,
+        'toast-10min'
       );
       item.notified10Min = true;
       changed = true;
@@ -1735,10 +1743,45 @@ function checkScheduledPushAlerts() {
     if (item.notifyLive && !item.notifiedLive && timeUntilMatch <= 0 && timeUntilMatch >= -300000) {
       triggerPushNotification(
         `🔴 ¡PARTIDO EN VIVO! (${item.leagueName})`,
-        `Ha comenzado ${item.fixtureName}. Racha objetivo: ${item.marketLabel}.`
+        `Ha comenzado ${item.fixtureName}. Racha objetivo: ${item.marketLabel}.`,
+        'toast-push-alert'
       );
       item.notifiedLive = true;
       changed = true;
+    }
+
+    // 3. Alertas de GOL y Fin de Partido (FT) en vivo
+    const liveMatch = state.liveMatches.find(m => m.leagueId === item.leagueId);
+    if (liveMatch) {
+      const currentScore = `${liveMatch.goalsHome}-${liveMatch.goalsAway}`;
+      
+      // Detección de GOL
+      if (item.notifyGoal && item.lastKnownScore && item.lastKnownScore !== currentScore) {
+        const totalGoals = liveMatch.goalsHome + liveMatch.goalsAway;
+        if (totalGoals > 0) {
+          triggerPushNotification(
+            `⚽ ¡GOOOOOOL! en ${item.leagueName} (${liveMatch.elapsed}')`,
+            `Marcador actual: ${liveMatch.homeTeam} ${liveMatch.goalsHome} - ${liveMatch.goalsAway} ${liveMatch.awayTeam}. Racha en juego: ${item.marketLabel}`,
+            'toast-goal'
+          );
+        }
+        item.lastKnownScore = currentScore;
+        changed = true;
+      } else if (!item.lastKnownScore) {
+        item.lastKnownScore = currentScore;
+        changed = true;
+      }
+
+      // Detección de FINAL DE PARTIDO (FT)
+      if (item.notifyFt && !item.notifiedFt && (liveMatch.status === 'FT' || liveMatch.status === 'AET' || liveMatch.status === 'PEN')) {
+        triggerPushNotification(
+          `🏁 FINAL DEL PARTIDO en ${item.leagueName}`,
+          `Resultado final: ${liveMatch.homeTeam} ${liveMatch.goalsHome} - ${liveMatch.goalsAway} ${liveMatch.awayTeam}. Mercado evaluado: ${item.marketLabel}`,
+          'toast-ft'
+        );
+        item.notifiedFt = true;
+        changed = true;
+      }
     }
   });
 
@@ -1747,8 +1790,8 @@ function checkScheduledPushAlerts() {
   }
 }
 
-function triggerPushNotification(title: string, body: string) {
-  // Notificación nativa del sistema operativo
+function triggerPushNotification(title: string, body: string, toastType: string = 'toast-push-alert') {
+  // 1. Notificación Nativa Push del Sistema Operativo
   if ('Notification' in window && Notification.permission === 'granted') {
     try {
       new Notification(title, {
@@ -1759,19 +1802,55 @@ function triggerPushNotification(title: string, body: string) {
     } catch (e) {}
   }
 
-  // Alerta sonora sutil si está disponible
+  // 2. Banner Flotante Interactivo (Toast In-App Push) en pantalla
+  showInAppToast(title, body, toastType);
+
+  // 3. Alerta Sonora
   try {
     const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // Nota D5
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    
+    // Melodía de notificación
+    osc.frequency.setValueAtTime(toastType === 'toast-goal' ? 880 : 587.33, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.35);
+    osc.stop(audioCtx.currentTime + 0.4);
   } catch (e) {}
 }
+
+function showInAppToast(title: string, body: string, toastClass: string = 'toast-push-alert') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-notification-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast-push-alert ${toastClass}`;
+  toast.innerHTML = `
+    <div style="font-size: 1.4rem; flex-shrink: 0;">🔔</div>
+    <div style="flex: 1;">
+      <strong style="font-size: 0.85rem; color: #fff; display: block; margin-bottom: 0.2rem;">${title}</strong>
+      <p style="font-size: 0.74rem; color: #cbd5e1; margin: 0; line-height: 1.4;">${body}</p>
+    </div>
+    <button style="background: transparent; border: none; color: #94a3b8; font-size: 0.9rem; cursor: pointer; padding: 0 0.2rem;" onclick="this.parentElement.remove()">✕</button>
+  `;
+
+  container.appendChild(toast);
+
+  // Auto-remover después de 7 segundos
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(50px)';
+    setTimeout(() => toast.remove(), 350);
+  }, 7000);
+}
+
 
 async function setSubscriptionPlan(newPlan: SubscriptionPlan) {
 
