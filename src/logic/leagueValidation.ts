@@ -81,10 +81,16 @@ export const LEAGUE_VALIDATION_METRICS: Record<number, Partial<LeagueValidationT
   305: { matchesAvailable: 132, historicalSeasons: 3, signalsGeneratedCount: 16, dataCompletenessPct: 96.9, sampleSize: 'ESTÁNDAR' }, // Qatar Stars League
   330: { matchesAvailable: 132, historicalSeasons: 3, signalsGeneratedCount: 15, dataCompletenessPct: 96.2, sampleSize: 'ESTÁNDAR' }, // Kuwait Premier
   387: { matchesAvailable: 132, historicalSeasons: 3, signalsGeneratedCount: 14, dataCompletenessPct: 95.7, sampleSize: 'ESTÁNDAR' }, // Jordania League
-  200: { matchesAvailable: 240, historicalSeasons: 4, signalsGeneratedCount: 21, dataCompletenessPct: 97.4, sampleSize: 'ÓPTIMO' }, // Marruecos Botola
   567: { matchesAvailable: 240, historicalSeasons: 3, signalsGeneratedCount: 16, dataCompletenessPct: 95.9, sampleSize: 'ESTÁNDAR' }, // Tanzania Ligi Kuu
-  479: { matchesAvailable: 112, historicalSeasons: 3, signalsGeneratedCount: 13, dataCompletenessPct: 95.5, sampleSize: 'ESTÁNDAR' }  // Canadá Premier
+  479: { matchesAvailable: 112, historicalSeasons: 3, signalsGeneratedCount: 13, dataCompletenessPct: 95.5, sampleSize: 'ESTÁNDAR' }, // Canadá Premier
+  178: { matchesAvailable: 120, historicalSeasons: 3, signalsGeneratedCount: 15, dataCompletenessPct: 96.2, sampleSize: 'ESTÁNDAR' }, // Hong Kong Premier
+  271: { matchesAvailable: 198, historicalSeasons: 4, signalsGeneratedCount: 22, dataCompletenessPct: 97.5, sampleSize: 'ÓPTIMO' },   // Hungría NB I
+  262: { matchesAvailable: 342, historicalSeasons: 5, signalsGeneratedCount: 36, dataCompletenessPct: 98.9, sampleSize: 'GRANDE' },   // México Liga MX
+  254: { matchesAvailable: 198, historicalSeasons: 3, signalsGeneratedCount: 18, dataCompletenessPct: 96.8, sampleSize: 'ÓPTIMO' },   // Panamá LPF
+  365: { matchesAvailable: 180, historicalSeasons: 4, signalsGeneratedCount: 17, dataCompletenessPct: 96.4, sampleSize: 'ESTÁNDAR' }, // Letonia Virsliga
+  370: { matchesAvailable: 135, historicalSeasons: 3, signalsGeneratedCount: 14, dataCompletenessPct: 95.8, sampleSize: 'ESTÁNDAR' }  // Andorra Primera Divisió
 };
+
 
 export const STANDARD_MARKETS = [
   'Sin Empate (FT)',

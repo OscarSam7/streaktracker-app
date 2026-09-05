@@ -52,9 +52,16 @@ export const LEAGUES: Record<string, LeagueInfo> = {
     TURKEY2: { id: 204, name: "1. Lig", country: "Turquía", code: "tr", flag: "🇹🇷" },
     TURKEY: { id: 203, name: "Süper Lig", country: "Turquía", code: "tr", flag: "🇹🇷" },
     URUGUAY: { id: 268, name: "Primera División", country: "Uruguay", code: "uy", flag: "🇺🇾" },
+    HONG_KONG: { id: 178, name: "Premier League", country: "Hong Kong", code: "hk", flag: "🇭🇰" },
+    HUNGARY: { id: 271, name: "NB I", country: "Hungría", code: "hu", flag: "🇭🇺" },
+    MEXICO: { id: 262, name: "Liga MX", country: "México", code: "mx", flag: "🇲🇽" },
+    PANAMA: { id: 254, name: "LPF", country: "Panamá", code: "pa", flag: "🇵🇦" },
+    LATVIA: { id: 365, name: "Virsliga", country: "Letonia", code: "lv", flag: "🇱🇻" },
+    ANDORRA: { id: 370, name: "Primera Divisió", country: "Andorra", code: "ad", flag: "🇦🇩" },
 };
 
 export const DEFAULT_ACTIVE_LEAGUES = Object.values(LEAGUES).map(l => l.id);
+
 
 
 export const ORDERED_LEAGUES: LeagueInfo[] = Object.values(LEAGUES).sort((a, b) => 

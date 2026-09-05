@@ -136,11 +136,12 @@ function getActiveSeasonYear(leagueId: number): number {
   const year = now.getFullYear();
   const month = now.getMonth() + 1; // 1-12
 
-  // Calendar-year leagues (Jan/Feb to Nov/Dec): Conmebol Libertadores (13), Sudamericana (11), Brazil (71, 72), Colombia (239, 240), Chile (265, 266), Ecuador (242), Peru (281), Uruguay (268), Paraguay (252), etc.
-  const calendarYearLeagueIds = [13, 11, 71, 72, 239, 240, 265, 266, 242, 281, 268, 252, 253, 479, 329, 362, 188, 190, 278];
+  // Calendar-year leagues (Jan/Feb to Nov/Dec): Conmebol Libertadores (13), Sudamericana (11), Brazil (71, 72), Colombia (239, 240), Chile (265, 266), Ecuador (242), Peru (281), Uruguay (268), Paraguay (252), Panama (254), Latvia (365), etc.
+  const calendarYearLeagueIds = [13, 11, 71, 72, 239, 240, 265, 266, 242, 281, 268, 252, 253, 254, 365, 479, 329, 362, 188, 190, 278];
   if (calendarYearLeagueIds.includes(leagueId)) {
     return year;
   }
+
 
   // European / Winter leagues (La Liga 140, Premier 39, Serie A 135, Bundesliga 477, Ligue 1 61, etc.):
   // If month is January to June, season started in previous year (e.g. May 2026 -> season 2025). If July-Dec, season is current year.

@@ -130,7 +130,7 @@ export const PLAN_PERMISSIONS: Record<PlatformPlan | 'TRIAL', PlanFeatureMatrix>
     plan: 'VIP',
     displayName: 'Plan VIP Todo Incluido',
     priceTag: '$39.00 / mes',
-    maxActiveLeagues: 45,
+    maxActiveLeagues: 99, // Todas las 50+ ligas oficiales
     maxDailyOpportunities: 999, // Ilimitado
     unlockedTiers: ['PREMIUM', 'FUERTE', 'OBSERVABLE', 'SECUNDARIA'],
     unlockedAlertColors: ['orange', 'yellow', 'blue', 'green'],
