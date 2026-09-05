@@ -331,6 +331,77 @@
         </div>
       </dialog>
 
+      <!-- Modal NOTIFICACIONES PUSH & RECORDATORIO DE PARTIDOS -->
+      <dialog id="push-notify-modal" class="custom-dialog" style="width: 95vw; max-width: 520px; padding: 1.75rem; border-radius: 1rem; border: 1px solid rgba(250, 204, 21, 0.4); color: var(--text-main); background: #0f172a; box-shadow: 0 0 50px rgba(0,0,0,0.85); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #eab308, #ca8a04); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);">
+              🔔
+            </div>
+            <div>
+              <h2 id="push-notify-title" style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0;">
+                Configurar Alerta Push
+              </h2>
+              <p style="font-size: 0.74rem; color: #facc15; margin-top: 0.15rem; margin-bottom: 0;">
+                Aviso automático 10 minutos antes del inicio del partido.
+              </p>
+            </div>
+          </div>
+          <button id="close-push-notify-modal" class="btn">✕</button>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.25rem;">
+          <!-- Datos de la Liga y Partido -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
+            <span id="push-league-flag" style="font-size: 1.3rem;">⚽</span>
+            <div>
+              <strong id="push-league-name" style="font-size: 0.95rem; color: #fff; display: block;">Liga</strong>
+              <span id="push-league-country" style="font-size: 0.72rem; color: #94a3b8;">País</span>
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.65rem 0.8rem; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.2rem;">Próximo Encuentro / Oportunidad:</div>
+            <strong id="push-fixture-name" style="font-size: 0.88rem; color: #38bdf8; display: block;">Equipo A vs Equipo B</strong>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem; font-size: 0.75rem;">
+              <span id="push-market-target" style="color: #4ade80; font-weight: 700;">🎯 Mercado Objetivo</span>
+              <span id="push-match-time" style="color: #facc15; font-weight: 700; background: rgba(250, 204, 21, 0.15); padding: 0.1rem 0.4rem; border-radius: 4px;">📅 Horario</span>
+            </div>
+          </div>
+
+          <!-- Opciones de Configuración -->
+          <div style="display: grid; gap: 0.65rem;">
+            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); padding: 0.6rem 0.75rem; border-radius: 0.5rem;">
+              <input type="checkbox" id="push-opt-10min" checked style="cursor: pointer; transform: scale(1.2);" />
+              <div>
+                <strong style="font-size: 0.82rem; color: #fff; display: block;">⏰ Notificar 10 minutos antes</strong>
+                <span style="font-size: 0.7rem; color: #cbd5e1;">Aviso sonoro y push en pantalla para preparar la operación.</span>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 0.6rem 0.75rem; border-radius: 0.5rem;">
+              <input type="checkbox" id="push-opt-live" checked style="cursor: pointer; transform: scale(1.2);" />
+              <div>
+                <strong style="font-size: 0.82rem; color: #fff; display: block;">🔴 Notificar al inicio del partido</strong>
+                <span style="font-size: 0.7rem; color: #cbd5e1;">Aviso en tiempo real cuando el partido pase a En Vivo (00').</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+          <button id="btn-cancel-push-notify" class="btn" style="flex: 1; justify-content: center;">
+            Cancelar
+          </button>
+          <button id="btn-save-push-notify" class="btn btn-premium" style="flex: 2; justify-content: center; background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%); color: #0f172a; font-weight: 800; border: none;">
+            🔔 Activar Notificación Push
+          </button>
+        </div>
+
+        <div id="push-status-msg" style="display: none; text-align: center; margin-top: 0.85rem; font-size: 0.78rem; font-weight: 700;"></div>
+      </dialog>
+
+
 
       <!-- Modal League Manager (Hidden by default) -->
       <dialog id="league-modal"
