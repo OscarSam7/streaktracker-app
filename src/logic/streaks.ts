@@ -9,6 +9,7 @@ export interface MatchData {
     leagueName: string;
     status: string; // 'NS', '1H', 'HT', '2H', 'FT'
     elapsed: number;
+    receivedAt?: number;
     goalsHome: number;
     goalsAway: number;
     halftimeHome: number;

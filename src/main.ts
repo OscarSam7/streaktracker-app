@@ -25,7 +25,7 @@ function isDateToday(dateInput: string | number | Date): boolean {
 import './style.css';
 import { LEAGUES, DEFAULT_ACTIVE_LEAGUES, ORDERED_LEAGUES, getLeagueGlobalOrdinal } from './config/leagues';
 import { fetchLiveMatches, fetchRecentMatches, fetchUpcomingMatches, clearApiCache } from './api/api';
-import { loadStreaksState, saveStreaksState, processMatch, computeStreaksForMatches } from './logic/streaks';
+import { loadStreaksState, saveStreaksState, processMatch, computeStreaksForMatches, type MatchData } from './logic/streaks';
 import { 
   loadBankrollConfig, 
   saveBankrollConfig, 
@@ -170,8 +170,11 @@ async function run() {
   // 2. Fetch live matches immediately to populate state.liveMatches and draw dashboard
   await pollLiveMatches();
 
-  // 3. Start polling live fixtures (every 30 seconds with intelligent caching)
-  setInterval(() => pollLiveMatches(), 30 * 1000);
+  // 3. Start polling live fixtures (every 15 seconds with intelligent caching)
+  setInterval(() => pollLiveMatches(), 15 * 1000);
+
+  // 4. Start real-time live clock ticker (every 1 second with live seconds)
+  startLiveSecondsTicker();
 }
 
 async function initializeStreaks(forceRefresh: boolean = false) {
@@ -219,6 +222,70 @@ async function pollLiveMatches() {
   // Update dashboard and live scores UI
   renderDashboard(liveMatches);
   updateDataFreshnessUI();
+}
+
+// Helper to compute live elapsed time with active seconds
+export function formatLiveElapsedWithSeconds(match: MatchData): string {
+  const status = match.status;
+  const baseMinutes = match.elapsed || 0;
+  
+  // If not in active playing half (e.g. HT, FT, AET, PEN, NS, INT), show static status/minute
+  if (status === 'HT') return 'HT (Descanso)';
+  if (status === 'FT' || status === 'AET' || status === 'PEN') return `${status} ${baseMinutes}'`;
+  if (status !== '1H' && status !== '2H' && status !== 'ET') {
+    return `${status} ${baseMinutes > 0 ? baseMinutes + "'" : ''}`.trim();
+  }
+
+  // Calculate simulated seconds based on reception timestamp
+  const now = Date.now();
+  const receivedAt = match.receivedAt || now;
+  const elapsedSecTotal = Math.floor((now - receivedAt) / 1000);
+  
+  let currentMin = baseMinutes + Math.floor(elapsedSecTotal / 60);
+  let currentSec = elapsedSecTotal % 60;
+
+  // Clamp limits for normal halves before injury time
+  if (status === '1H' && currentMin > 45 && baseMinutes <= 45) {
+    currentMin = 45;
+  } else if (status === '2H' && currentMin > 90 && baseMinutes <= 90) {
+    currentMin = 90;
+  }
+
+  const secFormatted = currentSec.toString().padStart(2, '0');
+  return `${status} ${currentMin}' ${secFormatted}"`;
+}
+
+// 1-second interval ticker that updates live timer DOM nodes in real time
+function startLiveSecondsTicker() {
+  setInterval(() => {
+    if (!state.liveMatches || state.liveMatches.length === 0) return;
+    
+    // Update live match card headers on dashboard
+    document.querySelectorAll('[data-live-timer-match-id]').forEach(el => {
+      const matchId = parseInt(el.getAttribute('data-live-timer-match-id') || '0', 10);
+      if (!matchId) return;
+      const match = state.liveMatches.find(m => m.id === matchId);
+      if (match) {
+        const timerText = formatLiveElapsedWithSeconds(match);
+        if (el.textContent !== timerText) {
+          el.textContent = timerText;
+        }
+      }
+    });
+
+    // Update opportunity center live match pills
+    document.querySelectorAll('[data-live-opp-match-id]').forEach(el => {
+      const matchId = parseInt(el.getAttribute('data-live-opp-match-id') || '0', 10);
+      if (!matchId) return;
+      const match = state.liveMatches.find(m => m.id === matchId);
+      if (match) {
+        const timerText = `EN VIVO • ${formatLiveElapsedWithSeconds(match)}`;
+        if (el.textContent !== timerText) {
+          el.textContent = timerText;
+        }
+      }
+    });
+  }, 1000);
 }
 
 // ---------------------------------------------------------
@@ -442,7 +509,7 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
             <div style="margin-bottom: 0.3rem; padding: 0.4rem; background: rgba(0,0,0,0.3); border-radius: 0.5rem;">
                 ${multiMatchSwitcherHTML}
                 <div class="match-header">
-                    <span>${liveMatch.status} ${liveMatch.elapsed}'</span>
+                    <span data-live-timer-match-id="${liveMatch.id}">${formatLiveElapsedWithSeconds(liveMatch)}</span>
                 </div>
                 <div class="match-teams">
                     <div class="team-info">
@@ -682,6 +749,7 @@ interface OpportunityItem {
   fixtureName: string;
   matchTimeStr: string;
   isLive: boolean;
+  liveMatchId?: number | null;
   hasUpcoming: boolean;
   marketKey: string;
   marketLabel: string;
@@ -727,11 +795,14 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     let fixtureName = 'En espera de programación';
     let matchTimeStr = 'Sin horario confirmado';
     let sortTimestamp = Date.now() + 86400000;
+    let liveMatchId: number | null = null;
 
     if (isLive) {
       const lm = leagueLiveMatches[0];
-      fixtureName = `🔴 ${lm.homeTeam} vs ${lm.awayTeam} (${lm.status} ${lm.elapsed}')`;
-      matchTimeStr = `EN VIVO • ${lm.status} ${lm.elapsed}'`;
+      liveMatchId = lm.id;
+      const liveTimeFormatted = formatLiveElapsedWithSeconds(lm);
+      fixtureName = `🔴 ${lm.homeTeam} vs ${lm.awayTeam} (${liveTimeFormatted})`;
+      matchTimeStr = `EN VIVO • ${liveTimeFormatted}`;
       sortTimestamp = Date.now(); // Máxima prioridad de inmediatez
     } else if (hasUpcoming) {
       const um = validUpcoming[0];
@@ -764,6 +835,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           fixtureName,
           matchTimeStr,
           isLive,
+          liveMatchId,
           hasUpcoming,
           marketKey: m.key,
           marketLabel: m.label,
@@ -893,7 +965,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           <strong style="font-size: 0.8rem; color: #fff;">${opp.leagueName}</strong>
           <span style="font-size: 0.68rem; color: #64748b;">(${opp.country})</span>
         </div>
-        <span style="font-size: 0.65rem; font-weight: 700; color: ${opp.isLive ? '#f87171' : '#94a3b8'}; background: rgba(0,0,0,0.4); padding: 0.15rem 0.4rem; border-radius: 4px;">
+        <span ${opp.isLive && opp.liveMatchId ? `data-live-opp-match-id="${opp.liveMatchId}"` : ''} style="font-size: 0.65rem; font-weight: 700; color: ${opp.isLive ? '#f87171' : '#94a3b8'}; background: rgba(0,0,0,0.4); padding: 0.15rem 0.4rem; border-radius: 4px;">
           ${opp.matchTimeStr}
         </span>
       </div>
@@ -1308,7 +1380,7 @@ function findHottestStreak() {
     if (leagueLiveMatches.length > 0) {
       const lm = leagueLiveMatches[0];
       fixture = `${lm.homeTeam} vs ${lm.awayTeam}`;
-      timeStr = `EN VIVO (${lm.status} ${lm.elapsed}')`;
+      timeStr = `EN VIVO (${formatLiveElapsedWithSeconds(lm)})`;
     } else if (validUpcoming && validUpcoming.length > 0) {
       const um = validUpcoming[0];
       fixture = `${um.homeTeam} vs ${um.awayTeam}`;

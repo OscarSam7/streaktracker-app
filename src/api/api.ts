@@ -23,7 +23,7 @@ const USE_MOCK = false;
 // =========================================================================
 // INTELLIGENT MULTI-TIER CLIENT CACHE & TIMEOUT CONTROLLER
 // =========================================================================
-const LIVE_CACHE_TTL_MS = 45 * 1000;
+const LIVE_CACHE_TTL_MS = 15 * 1000;
 const RECENT_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const UPCOMING_CACHE_TTL_MS = 2 * 60 * 60 * 1000;
 
@@ -277,6 +277,7 @@ function mapResponseToMatchData(fixtureItem: any): MatchData {
     leagueName: fixtureItem.league.name,
     status: fixtureItem.fixture.status.short,
     elapsed: fixtureItem.fixture.status.elapsed || 0,
+    receivedAt: Date.now(),
     goalsHome: fixtureItem.goals.home ?? 0,
     goalsAway: fixtureItem.goals.away ?? 0,
     halftimeHome: fixtureItem.score?.halftime?.home ?? 0,

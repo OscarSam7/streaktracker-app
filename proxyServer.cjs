@@ -107,7 +107,7 @@ function writeDbFile(filename, data) {
 
 // Server-Side Centralized Cache for API-Sports
 const serverCache = {};
-const TTL_LIVE_MS = 45 * 1000;
+const TTL_LIVE_MS = 15 * 1000;
 const TTL_RECENT_MS = 6 * 60 * 60 * 1000;
 const TTL_UPCOMING_MS = 2 * 60 * 60 * 1000;
 
