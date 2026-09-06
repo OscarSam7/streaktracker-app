@@ -1214,22 +1214,14 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         </div>
       </div>
 
-      <!-- Rationale & Action Buttons -->
+      <!-- Rationale & Push Alert -->
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-top: 0.35rem;">
         <span style="font-size: 0.6rem; color: #cbd5e1; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;" title="${opp.confidenceExplanation}">
           "${opp.confidenceExplanation}"
         </span>
-        <div style="display: flex; gap: 0.35rem; align-items: center; flex-shrink: 0;">
-          <button class="btn-push-alert" data-league-id="${opp.leagueId}" title="🔔 Configurar Alerta Push (10 min antes)" style="font-size: 0.68rem; padding: 0.25rem 0.45rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 4px; cursor: pointer;">
-            🔔
-          </button>
-          <button class="btn-toggle-manual-trade ${isCurrentlyOperating ? 'btn-trade-deactivate-chip' : 'btn-trade-activate-chip'}" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; font-weight: 800; border-radius: 4px; cursor: pointer;" title="${isCurrentlyOperating ? 'Desactivar operación' : 'Activar operación'}">
-            ${isCurrentlyOperating ? '⏸️ Desactivar' : '⚡ Activar'}
-          </button>
-          <button class="btn-1click-bankroll" data-league="${opp.leagueName}" data-country="${opp.country}" data-market="${opp.actionMarketLabel}" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 700; border: none; border-radius: 4px; cursor: pointer;">
-            💼 Banca
-          </button>
-        </div>
+        <button class="btn-push-alert" data-league-id="${opp.leagueId}" title="🔔 Configurar Alerta Push (10 min antes)" style="font-size: 0.68rem; padding: 0.25rem 0.45rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 4px; cursor: pointer; flex-shrink: 0;">
+          🔔
+        </button>
       </div>
     `;
 
