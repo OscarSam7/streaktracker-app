@@ -72,6 +72,36 @@ import {
 export type SubscriptionPlan = 'FREE' | 'TRIAL' | 'PRO' | 'VIP';
 export type QuickFilter = 'all' | 'high_today' | 'high_alerts' | 'live' | 'upcoming' | 'today';
 
+export interface ActiveTrackedTrade {
+  leagueId: number;
+  leagueName: string;
+  country: string;
+  marketKey: string;
+  marketLabel: string;
+  actionMarketLabel: string;
+  initialStreak: number;
+  currentStreak: number;
+  fixtureName: string;
+  startedAt: string;
+}
+
+const STORAGE_KEY_ACTIVE_TRADES = 'football_streaks_active_trades_v1';
+
+function loadActiveTrades(): Record<string, ActiveTrackedTrade> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_ACTIVE_TRADES);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveActiveTrades(trades: Record<string, ActiveTrackedTrade>) {
+  try {
+    localStorage.setItem(STORAGE_KEY_ACTIVE_TRADES, JSON.stringify(trades));
+  } catch (e) {}
+}
+
 const state = {
   activeLeagues: [...DEFAULT_ACTIVE_LEAGUES],
   streaks: loadStreaksState(),
@@ -85,7 +115,8 @@ const state = {
   bankrollConfig: loadBankrollConfig(),
   bankrollRawOps: loadRawOperations(),
   activeLiveIndex: {} as Record<number, number>,
-  oppFilter: 'all' as 'all' | 'premium' | 'strong' | 'live' | 'upcoming'
+  oppFilter: 'all' as 'all' | 'premium' | 'strong' | 'live' | 'upcoming',
+  activeTrades: loadActiveTrades() as Record<string, ActiveTrackedTrade>
 };
 
 // UI Elements
@@ -177,6 +208,43 @@ async function run() {
   startLiveSecondsTicker();
 }
 
+function checkActiveTradesBreak() {
+  let changed = false;
+  const activeKeys = Object.keys(state.activeTrades);
+  
+  for (const key of activeKeys) {
+    const trade = state.activeTrades[key];
+    if (!trade) continue;
+
+    const streakObj = (state.streaks[trade.leagueId] as any)?.[trade.marketKey];
+    const currentVal = streakObj ? streakObj.current : 0;
+    const prevVal = streakObj ? streakObj.previous : 0;
+
+    // Detect quiebre (streak broken): current streak dropped to 0 or reset while previous >= initialStreak
+    if (currentVal === 0 && trade.initialStreak > 0) {
+      delete state.activeTrades[key];
+      changed = true;
+      triggerPushNotification(
+        `🎉 ¡QUIEBRE CONFIRMADO EN ${trade.leagueName}!`,
+        `El mercado ${trade.actionMarketLabel} se cumplió con éxito. Racha cortada tras ${trade.initialStreak} partidos.`,
+        'toast-ft'
+      );
+    } else if (prevVal >= trade.initialStreak && currentVal < trade.initialStreak && trade.initialStreak > 0) {
+      delete state.activeTrades[key];
+      changed = true;
+      triggerPushNotification(
+        `🎉 ¡QUIEBRE CONFIRMADO EN ${trade.leagueName}!`,
+        `El mercado ${trade.actionMarketLabel} se cumplió con éxito. Racha cortada en ${prevVal} partidos.`,
+        'toast-ft'
+      );
+    }
+  }
+
+  if (changed) {
+    saveActiveTrades(state.activeTrades);
+  }
+}
+
 async function initializeStreaks(forceRefresh: boolean = false) {
   const eligibleLeagues = getAuthorizedActiveLeagues(state.activeLeagues);
   for (const lid of eligibleLeagues) {
@@ -186,6 +254,7 @@ async function initializeStreaks(forceRefresh: boolean = false) {
     }
   }
   saveStreaksState(state.streaks);
+  checkActiveTradesBreak();
 }
 
 async function pollLiveMatches() {
@@ -204,6 +273,7 @@ async function pollLiveMatches() {
   if (changed) {
     saveStreaksState(state.streaks);
     recordDailySnapshot(state.streaks);
+    checkActiveTradesBreak();
   }
 
   // For any league with NO live matches, try to fetch upcoming matches if we haven't already
@@ -558,6 +628,15 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
       }
 
       const actionRaw = actionLabel.replace(/^🎯\s*(?:Operar|Action):\s*/i, '');
+      const opKey = `${lid}_${marketKey}`;
+      const isMarketOperating = !!state.activeTrades[opKey];
+      const operatingBadge = isMarketOperating ? `
+        <div style="font-size: 0.6rem; font-weight: 900; background: linear-gradient(135deg, rgba(6,182,212,0.25) 0%, rgba(16,185,129,0.25) 100%); color: #38bdf8; border: 1px solid #06b6d4; padding: 0.15rem 0.35rem; border-radius: 4px; margin-top: 0.2rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 0 8px rgba(6,182,212,0.3);">
+          <span>⚡ OPERANDO: <strong>${actionRaw}</strong></span>
+          <button class="btn-toggle-manual-trade" data-league-id="${lid}" data-market-key="${marketKey}" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #fca5a5; font-size: 0.58rem; font-weight: 800; cursor: pointer; padding: 0.1rem 0.3rem; border-radius: 3px;" title="Desactivar operación">✕</button>
+        </div>
+      ` : '';
+
       const isHighAlert = colorClass === 'streak-green' || colorClass === 'streak-blue';
       const oneClickBtn = isHighAlert ? `
         <button class="btn-1click-bankroll" data-league="${leagueInfo?.name || ''}" data-country="${leagueInfo?.country || ''}" data-market="${actionRaw}" title="Registrar esta oportunidad en la calculadora de banca">
@@ -604,12 +683,13 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
       ` : '';
 
       return `
-        <div class="streak-item ${colorClass}" style="flex-direction: column; align-items: stretch; gap: 0.15rem;">
+        <div class="streak-item ${colorClass} ${isMarketOperating ? 'streak-badge-operating' : ''}" style="flex-direction: column; align-items: stretch; gap: 0.15rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <span style="font-weight: 700; font-size: 0.74rem; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${marketLabel}</span>
             <span class="streak-value" style="margin-left: 0.4rem; flex-shrink: 0;">${streakInfo.current}</span>
           </div>
           <span class="action-market-tag">${actionLabel}</span>
+          ${operatingBadge}
           ${historyHTML}
           ${signalScoreBadge}
           ${oneClickBtn}
@@ -639,6 +719,56 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
                 ${renderStreakBadge('btts1H', lang.markets.btts1H, leagueStreaks.btts1H, true)}
             </div>
         `;
+
+    // Attach Toggle Manual Trade buttons in league card badges
+    card.querySelectorAll('.btn-toggle-manual-trade').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const target = e.currentTarget as HTMLElement;
+        const targetLid = parseInt(target.dataset.leagueId || '0', 10);
+        const marketKey = target.dataset.marketKey || '';
+        const opKey = `${targetLid}_${marketKey}`;
+
+        if (state.activeTrades[opKey]) {
+          const removed = state.activeTrades[opKey];
+          delete state.activeTrades[opKey];
+          saveActiveTrades(state.activeTrades);
+          triggerPushNotification(
+            `⏸️ Operación Desactivada`,
+            `Se detuvo el seguimiento de ${removed.actionMarketLabel} en ${removed.leagueName}.`,
+            'toast-push-alert'
+          );
+        } else {
+          const lInfo = Object.values(LEAGUES).find(l => l.id === targetLid);
+          const lang = t();
+          const actionLabel = getActionMarketLabel(marketKey, lang).replace(/^🎯\s*(?:Operar|Action):\s*/i, '');
+          const mLabel = (lang.markets as any)[marketKey] || marketKey;
+          const curStreak = (state.streaks[targetLid] as any)?.[marketKey]?.current ?? 0;
+
+          state.activeTrades[opKey] = {
+            leagueId: targetLid,
+            leagueName: lInfo?.name || `Liga ${targetLid}`,
+            country: lInfo?.country || '',
+            marketKey,
+            marketLabel: mLabel,
+            actionMarketLabel: actionLabel,
+            initialStreak: curStreak,
+            currentStreak: curStreak,
+            fixtureName: 'Próximo Partido',
+            startedAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+          };
+          saveActiveTrades(state.activeTrades);
+          triggerPushNotification(
+            `⚡ Operación Activada`,
+            `Monitoreando ${actionLabel} en ${lInfo?.name || ''} hasta el quiebre (${curStreak} PJ).`,
+            'toast-goal'
+          );
+        }
+        renderDashboard();
+        renderOpportunitiesCenter();
+      });
+    });
 
     // 1. Attach Switch Live Match event listener
     card.querySelectorAll('.btn-switch-match').forEach(btn => {
@@ -940,50 +1070,61 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
   }
 
   filtered.forEach((opp, rankIdx) => {
-    // Check if there is already an open/pending operation in Bankroll for this match & market
+    // Check if this opportunity is currently being operated (either manually or via pending bankroll op)
+    const opKey = `${opp.leagueId}_${opp.marketKey}`;
+    const isTradeActive = !!state.activeTrades[opKey];
     const existingOp = state.bankrollRawOps.find(op => 
       op.status === 'Pendiente' && 
       (op.description.includes(opp.leagueName) || op.description.includes(opp.fixtureName)) &&
-      op.market.includes(opp.marketKey)
+      (op.market.includes(opp.marketKey) || op.market.includes(opp.actionMarketLabel))
     );
-
-    const isOptimalEntry = opp.tier === 'PREMIUM' || opp.tier === 'FUERTE' || opp.isLive;
+    const isCurrentlyOperating = isTradeActive || !!existingOp;
+    const isOptimalEntry = opp.tier === 'PREMIUM' || opp.tier === 'FUERTE' || opp.isLive || isCurrentlyOperating;
 
     const card = document.createElement('div');
     card.style.background = 'rgba(15, 23, 42, 0.85)';
-    card.style.border = isOptimalEntry ? '2px solid #10b981' : `1px solid ${opp.tierColor}40`;
+    card.style.border = isCurrentlyOperating ? '2px solid #06b6d4' : (isOptimalEntry ? '2px solid #10b981' : `1px solid ${opp.tierColor}40`);
     card.style.borderRadius = '0.75rem';
     card.style.padding = '0.9rem';
     card.style.cursor = 'pointer';
     card.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease';
     card.title = `👉 Clic para ir a las alertas de ${opp.leagueName} (${opp.country})`;
 
-    if (isOptimalEntry) {
+    if (isCurrentlyOperating) {
+      card.classList.add('opp-card-currently-operating');
+    } else if (isOptimalEntry) {
       card.classList.add('opp-card-active-trade');
     }
 
     card.addEventListener('mouseenter', () => {
       card.style.transform = 'translateY(-2px)';
-      if (!isOptimalEntry) card.style.borderColor = opp.tierColor;
+      if (!isCurrentlyOperating && !isOptimalEntry) card.style.borderColor = opp.tierColor;
     });
     card.addEventListener('mouseleave', () => {
       card.style.transform = 'translateY(0)';
-      if (!isOptimalEntry) card.style.border = `1px solid ${opp.tierColor}40`;
+      if (!isCurrentlyOperating && !isOptimalEntry) card.style.border = `1px solid ${opp.tierColor}40`;
     });
 
     // Operational Banner inside the card
     let actionBannerHTML = '';
-    if (existingOp) {
+    if (isCurrentlyOperating) {
       actionBannerHTML = `
-        <div class="opp-active-trade-banner" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4);">
-          <div style="display: flex; align-items: center; gap: 0.4rem;">
-            <span style="font-size: 0.85rem;">📌</span>
+        <div class="opp-active-trade-banner opp-banner-operating-active">
+          <div style="display: flex; align-items: center; gap: 0.45rem;">
+            <span style="font-size: 1.1rem; filter: drop-shadow(0 0 4px #06b6d4);">⚡</span>
             <div>
-              <div style="font-size: 0.68rem; font-weight: 800; color: #38bdf8;">OPERACIÓN EN CURSO (${existingOp.id})</div>
-              <div style="font-size: 0.6rem; color: #cbd5e1;">Stake: ${existingOp.stake} • Cuota: @${existingOp.odds.toFixed(2)}</div>
+              <div style="font-size: 0.72rem; font-weight: 900; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
+                OPERANDO: ${opp.actionMarketLabel}
+                <span class="opp-operating-pill">EN CURSO</span>
+              </div>
+              <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.1rem;">
+                ⚡ Monitoreando hasta el quiebre (Racha: ${opp.marketLabel})
+              </div>
             </div>
           </div>
-          <span class="opp-already-traded-badge">ACTIVA</span>
+          <button class="btn-toggle-manual-trade btn-trade-deactivate" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" title="Desactivar seguimiento de esta operación">
+            ⏸️ Desactivar
+          </button>
         </div>
       `;
     } else if (isOptimalEntry) {
@@ -996,9 +1137,14 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
               <div style="font-size: 0.6rem; color: #e2e8f0;">✅ Señal Validada (Racha: ${opp.marketLabel}) • Cuota sugerida: @${opp.suggestedOdds.toFixed(2)}</div>
             </div>
           </div>
-          <button class="opp-btn-action-trade btn-trigger-trade-entry" title="Registrar entrada en la gestión de banca">
-            🚀 Iniciar
-          </button>
+          <div style="display: flex; gap: 0.3rem; align-items: center;">
+            <button class="btn-toggle-manual-trade btn-trade-activate" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" title="Activar operación en seguimiento">
+              ⚡ Activar
+            </button>
+            <button class="opp-btn-action-trade btn-trigger-trade-entry" title="Registrar entrada en la gestión de banca">
+              🚀 Iniciar
+            </button>
+          </div>
         </div>
       `;
     }
@@ -1077,8 +1223,11 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           <button class="btn-push-alert" data-league-id="${opp.leagueId}" title="🔔 Configurar Alerta Push (10 min antes)" style="font-size: 0.68rem; padding: 0.25rem 0.45rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 4px; cursor: pointer;">
             🔔
           </button>
+          <button class="btn-toggle-manual-trade ${isCurrentlyOperating ? 'btn-trade-deactivate-chip' : 'btn-trade-activate-chip'}" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; font-weight: 800; border-radius: 4px; cursor: pointer;" title="${isCurrentlyOperating ? 'Desactivar operación' : 'Activar operación'}">
+            ${isCurrentlyOperating ? '⏸️ Desactivar' : '⚡ Activar'}
+          </button>
           <button class="btn-1click-bankroll" data-league="${opp.leagueName}" data-country="${opp.country}" data-market="${opp.actionMarketLabel}" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 700; border: none; border-radius: 4px; cursor: pointer;">
-            💼 Operar
+            💼 Banca
           </button>
         </div>
       </div>
@@ -1093,9 +1242,71 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       });
     }
 
+    // Attach Toggle Manual Trade buttons inside the opportunity card
+    card.querySelectorAll('.btn-toggle-manual-trade').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const target = e.currentTarget as HTMLElement;
+        const targetLid = parseInt(target.dataset.leagueId || '0', 10);
+        const marketKey = target.dataset.marketKey || '';
+        const opKey = `${targetLid}_${marketKey}`;
+
+        if (state.activeTrades[opKey]) {
+          const removed = state.activeTrades[opKey];
+          delete state.activeTrades[opKey];
+          saveActiveTrades(state.activeTrades);
+          triggerPushNotification(
+            `⏸️ Operación Desactivada`,
+            `Se detuvo el seguimiento de ${removed.actionMarketLabel} en ${removed.leagueName}.`,
+            'toast-push-alert'
+          );
+        } else {
+          state.activeTrades[opKey] = {
+            leagueId: opp.leagueId,
+            leagueName: opp.leagueName,
+            country: opp.country,
+            marketKey: opp.marketKey,
+            marketLabel: opp.marketLabel,
+            actionMarketLabel: opp.actionMarketLabel,
+            initialStreak: opp.streakCurrent,
+            currentStreak: opp.streakCurrent,
+            fixtureName: opp.fixtureName,
+            startedAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+          };
+          saveActiveTrades(state.activeTrades);
+          triggerPushNotification(
+            `⚡ Operación Activada`,
+            `Monitoreando ${opp.actionMarketLabel} en ${opp.leagueName} hasta el quiebre (${opp.streakCurrent} PJ).`,
+            'toast-goal'
+          );
+        }
+        renderDashboard();
+        renderOpportunitiesCenter();
+      });
+    });
+
     // Helper to open Bankroll modal and prefill operation
     const handleTriggerTrade = (e: Event) => {
       e.stopPropagation();
+
+      // Auto-activate tracked trade if not already active
+      if (!state.activeTrades[opKey]) {
+        state.activeTrades[opKey] = {
+          leagueId: opp.leagueId,
+          leagueName: opp.leagueName,
+          country: opp.country,
+          marketKey: opp.marketKey,
+          marketLabel: opp.marketLabel,
+          actionMarketLabel: opp.actionMarketLabel,
+          initialStreak: opp.streakCurrent,
+          currentStreak: opp.streakCurrent,
+          fixtureName: opp.fixtureName,
+          startedAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+        };
+        saveActiveTrades(state.activeTrades);
+      }
+
       const bankrollModal = document.getElementById('bankroll-modal') as HTMLDialogElement;
       if (bankrollModal) {
         bankrollModal.showModal();
@@ -1136,6 +1347,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       // Ignore if clicking the action buttons
       if ((e.target as HTMLElement).closest('.btn-1click-bankroll') || 
           (e.target as HTMLElement).closest('.btn-push-alert') ||
+          (e.target as HTMLElement).closest('.btn-toggle-manual-trade') ||
           (e.target as HTMLElement).closest('.btn-trigger-trade-entry')) return;
 
       const targetLid = opp.leagueId;

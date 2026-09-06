@@ -1555,5 +1555,101 @@ button[id^="close-"]:hover,
   gap: 0.3rem;
 }
 
+.opp-banner-operating-active {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25) 0%, rgba(16, 185, 129, 0.25) 100%) !important;
+  border: 1.5px solid #06b6d4 !important;
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.4) !important;
+  animation: pulse-border-operating 2.5s infinite alternate !important;
+}
+
+@keyframes pulse-border-operating {
+  0% {
+    border-color: #06b6d4;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3), inset 0 0 6px rgba(6, 182, 212, 0.1);
+  }
+  100% {
+    border-color: #38bdf8;
+    box-shadow: 0 0 22px rgba(56, 189, 248, 0.6), inset 0 0 12px rgba(56, 189, 248, 0.2);
+  }
+}
+
+.opp-operating-pill {
+  font-size: 0.58rem !important;
+  background: #06b6d4 !important;
+  color: #031525 !important;
+  padding: 0.1rem 0.4rem !important;
+  border-radius: 4px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px !important;
+  display: inline-block !important;
+}
+
+.opp-card-currently-operating {
+  border: 2px solid #06b6d4 !important;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.35) !important;
+}
+
+.btn-trade-activate {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(16, 185, 129, 0.5) !important;
+  font-weight: 800 !important;
+  font-size: 0.68rem !important;
+  padding: 0.3rem 0.6rem !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+.btn-trade-activate:hover {
+  background: rgba(16, 185, 129, 0.35) !important;
+  border-color: #4ade80 !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-trade-deactivate {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.6) !important;
+  font-weight: 800 !important;
+  font-size: 0.68rem !important;
+  padding: 0.3rem 0.6rem !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+.btn-trade-deactivate:hover {
+  background: rgba(239, 68, 68, 0.4) !important;
+  border-color: #ef4444 !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-trade-activate-chip {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  transition: all 0.2s ease !important;
+}
+.btn-trade-activate-chip:hover {
+  background: rgba(56, 189, 248, 0.3) !important;
+  border-color: #38bdf8 !important;
+}
+
+.btn-trade-deactivate-chip {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+  transition: all 0.2s ease !important;
+}
+.btn-trade-deactivate-chip:hover {
+  background: rgba(239, 68, 68, 0.35) !important;
+  border-color: #ef4444 !important;
+}
+
+.streak-badge-operating {
+  border: 1.5px solid #06b6d4 !important;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.35) !important;
+}
+
+
 
 
