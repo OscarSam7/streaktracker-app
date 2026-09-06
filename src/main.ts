@@ -2255,6 +2255,7 @@ function setupBankrollModule() {
   const closeBankrollModal = document.getElementById('close-bankroll-modal') as HTMLButtonElement;
   const bankrollNewOpBtn = document.getElementById('bankroll-new-op-btn') as HTMLButtonElement;
   const addOpRowBtn = document.getElementById('add-op-row-btn') as HTMLButtonElement;
+  const clearAllOpsBtn = document.getElementById('clear-all-ops-btn') as HTMLButtonElement;
   const newOpModal = document.getElementById('new-op-modal') as HTMLDialogElement;
   const closeNewOpModal = document.getElementById('close-new-op-modal') as HTMLButtonElement;
   const cancelNewOpBtn = document.getElementById('cancel-new-op-btn') as HTMLButtonElement;
@@ -2264,6 +2265,23 @@ function setupBankrollModule() {
   const saveBankrollCfgBtn = document.getElementById('save-bankroll-cfg-btn') as HTMLButtonElement;
 
   if (!bankrollBtn || !bankrollModal) return;
+
+  // Clear all operations handler
+  if (clearAllOpsBtn) {
+    clearAllOpsBtn.addEventListener('click', () => {
+      const confirmReset = confirm(
+        '⚠️ ¿Estás seguro de que deseas BORRAR TODAS las operaciones y reiniciar el registro de banca desde cero?\n\nEsta acción no se puede deshacer.'
+      );
+      if (confirmReset) {
+        state.bankrollRawOps = [];
+        saveRawOperations([]);
+        // Sincronizar con backend si está disponible
+        DataRepository.syncBankroll(state.userProfile.id, [], state.bankrollConfig).catch(() => {});
+        refreshBankrollUI();
+        alert('✅ Registro de operaciones reiniciado con éxito a 0 operaciones.');
+      }
+    });
+  }
 
   // Open Bankroll Modal
   bankrollBtn.addEventListener('click', () => {
@@ -2503,7 +2521,18 @@ function refreshBankrollUI() {
   const tbody = document.getElementById('bankroll-table-body');
   if (tbody) {
     tbody.innerHTML = '';
-    processedOps.forEach((op, idx) => {
+    if (processedOps.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="12" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📋</div>
+            <p style="margin: 0; font-weight: 600; color: #fff;">Sin operaciones registradas</p>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">Haz clic en <strong>"➕ Añadir Registro"</strong> o pulsa <strong>"💼 Operar"</strong> desde el Centro de Oportunidades.</p>
+          </td>
+        </tr>
+      `;
+    } else {
+      processedOps.forEach((op, idx) => {
       const tr = document.createElement('tr');
       const discColor = op.discipline.includes('🔴') ? '#f87171' : op.discipline.includes('🟡') ? '#facc15' : '#4ade80';
 
@@ -2563,6 +2592,7 @@ function refreshBankrollUI() {
         }
       });
     });
+    }
   }
 
   // Pre-fill Calculator capital with available capital
