@@ -1020,14 +1020,10 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         </span>
       </div>
 
-      <!-- Partido & Mercado -->
-      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-top: 0.35rem;">
-        <div style="font-size: 0.8rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+      <!-- Partido / Equipos en disputa -->
+      <div style="margin-top: 0.35rem;">
+        <div style="font-size: 0.82rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${opp.fixtureName}">
           ⚽ ${opp.fixtureName}
-        </div>
-        <div style="text-align: right; flex-shrink: 0;">
-          <div style="font-size: 0.72rem; font-weight: 800; color: #38bdf8;">🎯 Operar: ${opp.actionMarketLabel}</div>
-          <div style="font-size: 0.6rem; color: #94a3b8;">Racha: ${opp.marketLabel}</div>
         </div>
       </div>
 
