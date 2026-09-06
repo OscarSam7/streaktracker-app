@@ -933,7 +933,9 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       const lm = leagueLiveMatches[0];
       liveMatchId = lm.id;
       const liveTimeFormatted = formatLiveElapsedWithSeconds(lm);
-      fixtureName = `🔴 ${lm.homeTeam} vs ${lm.awayTeam} (${liveTimeFormatted})`;
+      const isPastOrAtHT = lm.status === 'HT' || lm.status === '2H' || lm.status === 'FT' || lm.status === 'AET' || lm.status === 'PEN';
+      const htScoreSuffix = isPastOrAtHT ? ` (HT ${lm.halftimeHome ?? 0}-${lm.halftimeAway ?? 0})` : '';
+      fixtureName = `🔴 ${lm.homeTeam} ${lm.goalsHome} - ${lm.goalsAway} ${lm.awayTeam}${htScoreSuffix}`;
       matchTimeStr = `EN VIVO • ${liveTimeFormatted}`;
       sortTimestamp = Date.now(); // Máxima prioridad de inmediatez
     } else if (hasUpcoming) {
