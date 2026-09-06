@@ -557,9 +557,10 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
         `;
       }
 
+      const actionRaw = actionLabel.replace(/^🎯\s*(?:Operar|Action):\s*/i, '');
       const isHighAlert = colorClass === 'streak-green' || colorClass === 'streak-blue';
       const oneClickBtn = isHighAlert ? `
-        <button class="btn-1click-bankroll" data-league="${leagueInfo?.name || ''}" data-country="${leagueInfo?.country || ''}" data-market="${marketLabel}" title="Registrar esta oportunidad en la calculadora de banca">
+        <button class="btn-1click-bankroll" data-league="${leagueInfo?.name || ''}" data-country="${leagueInfo?.country || ''}" data-market="${actionRaw}" title="Registrar esta oportunidad en la calculadora de banca">
           ${lang.streaks.oneClickBankrollBtn}
         </button>
       ` : '';
@@ -753,6 +754,7 @@ interface OpportunityItem {
   hasUpcoming: boolean;
   marketKey: string;
   marketLabel: string;
+  actionMarketLabel: string;
   streakCurrent: number;
   streakPrevious: number;
   signalScore: number;
@@ -826,6 +828,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       if (colorClass !== '') {
         const sig = computeSignalScore(lid, m.key, m.label, m.info.current, m.info.previous, fixtureName);
         const leagueVal = validateLeagueEligibility(lid);
+        const actionLabel = getActionMarketLabel(m.key, lang).replace(/^🎯\s*(?:Operar|Action):\s*/i, '');
 
         allOpportunities.push({
           leagueId: lid,
@@ -839,6 +842,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           hasUpcoming,
           marketKey: m.key,
           marketLabel: m.label,
+          actionMarketLabel: actionLabel,
           streakCurrent: m.info.current,
           streakPrevious: m.info.previous,
           signalScore: sig.signalScore,
@@ -988,8 +992,8 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           <div style="display: flex; align-items: center; gap: 0.4rem;">
             <span style="font-size: 0.85rem;">🎯</span>
             <div>
-              <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80;">INICIAR OPERACIÓN: ${opp.marketLabel}</div>
-              <div style="font-size: 0.6rem; color: #e2e8f0;">✅ Señal Validada • Cuota sugerida: @${opp.suggestedOdds.toFixed(2)}</div>
+              <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80;">INICIAR OPERACIÓN: ${opp.actionMarketLabel}</div>
+              <div style="font-size: 0.6rem; color: #e2e8f0;">✅ Señal Validada (Racha: ${opp.marketLabel}) • Cuota sugerida: @${opp.suggestedOdds.toFixed(2)}</div>
             </div>
           </div>
           <button class="opp-btn-action-trade btn-trigger-trade-entry" title="Registrar entrada en la gestión de banca">
@@ -1021,9 +1025,10 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         <div style="font-size: 0.8rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           ⚽ ${opp.fixtureName}
         </div>
-        <span style="font-size: 0.72rem; font-weight: 800; color: #38bdf8; flex-shrink: 0;">
-          ${opp.marketLabel}
-        </span>
+        <div style="text-align: right; flex-shrink: 0;">
+          <div style="font-size: 0.72rem; font-weight: 800; color: #38bdf8;">🎯 Operar: ${opp.actionMarketLabel}</div>
+          <div style="font-size: 0.6rem; color: #94a3b8;">Racha: ${opp.marketLabel}</div>
+        </div>
       </div>
 
       <!-- Score & Confianza Banner -->
@@ -1076,7 +1081,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           <button class="btn-push-alert" data-league-id="${opp.leagueId}" title="🔔 Configurar Alerta Push (10 min antes)" style="font-size: 0.68rem; padding: 0.25rem 0.45rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 4px; cursor: pointer;">
             🔔
           </button>
-          <button class="btn-1click-bankroll" data-league="${opp.leagueName}" data-country="${opp.country}" data-market="${opp.marketLabel}" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 700; border: none; border-radius: 4px; cursor: pointer;">
+          <button class="btn-1click-bankroll" data-league="${opp.leagueName}" data-country="${opp.country}" data-market="${opp.actionMarketLabel}" style="font-size: 0.65rem; padding: 0.25rem 0.55rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 700; border: none; border-radius: 4px; cursor: pointer;">
             💼 Operar
           </button>
         </div>
@@ -1114,7 +1119,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         const opFormCategory = document.getElementById('op-form-category') as HTMLSelectElement;
 
         if (opFormDesc) opFormDesc.value = `${opp.leagueName} (${opp.country}) - ${opp.fixtureName}`;
-        if (opFormMarket) opFormMarket.value = `${opp.marketKey} (${opp.marketLabel})`;
+        if (opFormMarket) opFormMarket.value = `${opp.actionMarketLabel} (Racha: ${opp.marketLabel})`;
         if (opFormOdds) opFormOdds.value = opp.suggestedOdds.toFixed(2);
         if (opFormCategory) opFormCategory.value = 'Fútbol Cuantitativo';
       }

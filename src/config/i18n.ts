@@ -163,9 +163,9 @@ export const I18N: Record<Language, Translations> = {
     operationalMarkets: {
       draw: "🎯 Operar: Empate (FT)",
       over35: "🎯 Operar: Más de 3.5 goles",
-      htDraw: "🎯 Operar: Empate (1T / HT)",
+      htDraw: "🎯 Operar: Empate (HT)",
       bttsOver25: "🎯 Operar: Ambos Marcan + >2.5",
-      btts1H: "🎯 Operar: Ambos Marcan (1T)"
+      btts1H: "🎯 Operar: Ambos Marcan (HT)"
     },
     actionGuide: {
       title: "Guía de Ejecución: Mercados de Operación",
@@ -291,9 +291,9 @@ export const I18N: Record<Language, Translations> = {
     operationalMarkets: {
       draw: "🎯 Action: Draw (FT)",
       over35: "🎯 Action: Over 3.5 Goals",
-      htDraw: "🎯 Action: Draw Half-Time (HT)",
+      htDraw: "🎯 Action: Draw (HT)",
       bttsOver25: "🎯 Action: Both Teams Score + >2.5",
-      btts1H: "🎯 Action: Both Teams Score (1H)"
+      btts1H: "🎯 Action: Both Teams Score (HT)"
     },
     actionGuide: {
       title: "Execution Guide: Target Markets",
@@ -419,9 +419,9 @@ export const I18N: Record<Language, Translations> = {
     operationalMarkets: {
       draw: "🎯 Operar: Empate (FT)",
       over35: "🎯 Operar: Mais de 3.5 Gols",
-      htDraw: "🎯 Operar: Empate no Intervalo (HT)",
+      htDraw: "🎯 Operar: Empate (HT)",
       bttsOver25: "🎯 Operar: Ambas Marcam + >2.5",
-      btts1H: "🎯 Operar: Ambas Marcam (1º T)"
+      btts1H: "🎯 Operar: Ambas Marcam (HT)"
     },
     actionGuide: {
       title: "Guia de Execução: Mercados Alvo",

@@ -67,11 +67,11 @@ export interface SignalIntelligence {
 
 // Benchmarks cuantitativos verificados por mercado
 const MARKET_BENCHMARKS: Record<string, { avgOdds: number; baseThresholdG1: boolean; winrateBase: number; actionName: string; stability: number }> = {
-  draw: { avgOdds: 3.30, baseThresholdG1: true, winrateBase: 75.8, actionName: 'Empate FT', stability: 94.2 },
+  draw: { avgOdds: 3.30, baseThresholdG1: true, winrateBase: 75.8, actionName: 'Empate (FT)', stability: 94.2 },
   over35: { avgOdds: 2.85, baseThresholdG1: true, winrateBase: 76.7, actionName: 'Más de 3.5 goles', stability: 95.1 },
-  htDraw: { avgOdds: 2.15, baseThresholdG1: false, winrateBase: 75.5, actionName: 'Empate al Medio Tiempo (HT)', stability: 93.8 },
+  htDraw: { avgOdds: 2.15, baseThresholdG1: false, winrateBase: 75.5, actionName: 'Empate (HT)', stability: 93.8 },
   bttsOver25: { avgOdds: 2.30, baseThresholdG1: false, winrateBase: 75.0, actionName: 'Ambos Marcan + >2.5', stability: 92.4 },
-  btts1H: { avgOdds: 4.45, baseThresholdG1: true, winrateBase: 75.0, actionName: 'Ambos Marcan en 1er Tiempo', stability: 91.5 }
+  btts1H: { avgOdds: 4.45, baseThresholdG1: true, winrateBase: 75.0, actionName: 'Ambos Marcan (HT)', stability: 91.5 }
 };
 
 export function evaluateConfidenceLevel(
