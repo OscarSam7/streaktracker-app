@@ -411,6 +411,31 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
   let countBlue = 0;
   let countGreen = 0;
 
+  // Calculate global indicator counts across all active leagues (independent of UI filters/search)
+  state.activeLeagues.forEach(lid => {
+    const emptyStreak = { current: 0, maxHistory: 0, previous: 0 };
+    const leagueStreaks = state.streaks[lid] || { 
+      draw: emptyStreak, 
+      over35: emptyStreak, 
+      htDraw: emptyStreak, 
+      bttsOver25: emptyStreak, 
+      btts1H: emptyStreak 
+    };
+
+    const cDraw = getStreakColorClass(leagueStreaks.draw.current, true);
+    const cO35 = getStreakColorClass(leagueStreaks.over35.current, true);
+    const cHtd = getStreakColorClass(leagueStreaks.htDraw.current, false);
+    const cBttso = getStreakColorClass(leagueStreaks.bttsOver25.current, false);
+    const cBtts1 = getStreakColorClass(leagueStreaks.btts1H.current, true);
+
+    [cDraw, cO35, cHtd, cBttso, cBtts1].forEach(color => {
+      if (color === 'streak-green') countGreen++;
+      if (color === 'streak-blue') countBlue++;
+      if (color === 'streak-yellow') countYellow++;
+      if (color === 'streak-orange') countOrange++;
+    });
+  });
+
   const isPinOnTopEnabled = state.currentPlan !== 'FREE';
 
   // 1. Sort active leagues by threat priority (Pin on Top)
@@ -498,19 +523,6 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
       bttsOver25: emptyStreak, 
       btts1H: emptyStreak 
     };
-
-    const cDraw = getStreakColorClass(leagueStreaks.draw.current, true);
-    const cO35 = getStreakColorClass(leagueStreaks.over35.current, true);
-    const cHtd = getStreakColorClass(leagueStreaks.htDraw.current, false);
-    const cBttso = getStreakColorClass(leagueStreaks.bttsOver25.current, false);
-    const cBtts1 = getStreakColorClass(leagueStreaks.btts1H.current, true);
-
-    [cDraw, cO35, cHtd, cBttso, cBtts1].forEach(color => {
-      if (color === 'streak-green') countGreen++;
-      if (color === 'streak-blue') countBlue++;
-      if (color === 'streak-yellow') countYellow++;
-      if (color === 'streak-orange') countOrange++;
-    });
 
     const leagueLiveMatches = liveMatches.filter(m => m.leagueId === lid);
     const hasLive = leagueLiveMatches.length > 0;

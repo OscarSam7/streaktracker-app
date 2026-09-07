@@ -87,32 +87,29 @@ export function saveDailyReports(reports: DailyReportRecord[]) {
   localStorage.setItem(DAILY_REPORTS_KEY, JSON.stringify(reports));
 }
 
-// Fixed 00:00hs Baseline definition: exactly 27 alerts at 00:00 start of day
-export const CANONICAL_OPENING_BASELINE: Record<number, any> = {
-  140: { draw: 11, over35: 0, htDraw: 0, bttsOver25: 0, btts1H: 12 }, // La Liga (2 Green)
-  71:  { draw: 10, over35: 0, htDraw: 0, bttsOver25: 6, btts1H: 0 },  // Brasil (1 Green, 1 Blue)
-  135: { draw: 0, over35: 10, htDraw: 5, bttsOver25: 0, btts1H: 0 },  // Italia (1 Green, 1 Yellow)
-  39:  { draw: 0, over35: 8, htDraw: 0, bttsOver25: 0, btts1H: 11 },  // Premier League (1 Green, 1 Yellow)
-  94:  { draw: 9, over35: 0, htDraw: 0, bttsOver25: 7, btts1H: 0 },   // Portugal (1 Green, 1 Blue)
-  477: { draw: 7, over35: 10, htDraw: 0, bttsOver25: 0, btts1H: 0 },  // Alemania (1 Green, 1 Orange)
-  61:  { draw: 0, over35: 0, htDraw: 4, bttsOver25: 8, btts1H: 0 },   // Francia (1 Green, 1 Orange)
-  253: { draw: 10, over35: 0, htDraw: 0, bttsOver25: 0, btts1H: 10 }, // MLS (2 Green)
-  239: { draw: 10, over35: 0, htDraw: 0, bttsOver25: 0, btts1H: 10 }, // Colombia (2 Green)
-  262: { draw: 10, over35: 0, htDraw: 0, bttsOver25: 0, btts1H: 10 }, // Mexico (2 Green)
-  128: { draw: 10, over35: 0, htDraw: 0, bttsOver25: 0, btts1H: 0 },  // Argentina (1 Green, 1 Orange)
-  218: { draw: 10, over35: 0, htDraw: 0, bttsOver25: 0, btts1H: 0 },  // Austria (1 Green, 1 Orange)
-  144: { draw: 0, over35: 0, htDraw: 4, bttsOver25: 0, btts1H: 0 },   // Bélgica (1 Orange)
-  203: { draw: 0, over35: 0, htDraw: 4, bttsOver25: 0, btts1H: 0 },   // Turquía (1 Orange)
-  179: { draw: 0, over35: 0, htDraw: 4, bttsOver25: 0, btts1H: 0 }    // Escocia (1 Orange)
-};
+export function buildBaselineFromStreaks(currentStreaks?: LeagueStreaks): Record<number, any> {
+  const baseline: Record<number, any> = {};
+  Object.values(LEAGUES).forEach(lg => {
+    const lid = lg.id;
+    const cur = currentStreaks ? currentStreaks[lid] : null;
+    baseline[lid] = {
+      draw: cur?.draw?.current ?? 0,
+      over35: cur?.over35?.current ?? 0,
+      htDraw: cur?.htDraw?.current ?? 0,
+      bttsOver25: cur?.bttsOver25?.current ?? 0,
+      btts1H: cur?.btts1H?.current ?? 0
+    };
+  });
+  return baseline;
+}
 
-export function getOrCreateOpeningBaseline(): Record<number, any> {
+export function getOrCreateOpeningBaseline(currentStreaks?: LeagueStreaks): Record<number, any> {
   const todayStr = getLocalDateStr();
   const saved = localStorage.getItem(OPENING_BASELINE_KEY);
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      if (parsed.date === todayStr && parsed.leagues) {
+      if (parsed.date === todayStr && parsed.leagues && Object.keys(parsed.leagues).length >= Object.keys(LEAGUES).length) {
         return parsed.leagues;
       }
     } catch (e) {
@@ -120,8 +117,10 @@ export function getOrCreateOpeningBaseline(): Record<number, any> {
     }
   }
 
-  localStorage.setItem(OPENING_BASELINE_KEY, JSON.stringify({ date: todayStr, leagues: CANONICAL_OPENING_BASELINE }));
-  return CANONICAL_OPENING_BASELINE;
+  // Create baseline from current live streaks for all leagues
+  const dynamicBaseline = buildBaselineFromStreaks(currentStreaks);
+  localStorage.setItem(OPENING_BASELINE_KEY, JSON.stringify({ date: todayStr, leagues: dynamicBaseline }));
+  return dynamicBaseline;
 }
 
 // Real-Time Dynamic Synchronizer
@@ -133,7 +132,7 @@ export function recordDailySnapshot(currentStreaks: LeagueStreaks): DailyReportR
 
   let record = reports.find(r => r.date === dateStr);
 
-  const baselineLeagues = getOrCreateOpeningBaseline();
+  const baselineLeagues = getOrCreateOpeningBaseline(currentStreaks);
 
   const openSnapshot: AlertCountSnapshot = { orange: 0, yellow: 0, blue: 0, green: 0, total: 0 };
   const genSnapshot: AlertCountSnapshot = { orange: 0, yellow: 0, blue: 0, green: 0, total: 0 };
@@ -174,7 +173,7 @@ export function recordDailySnapshot(currentStreaks: LeagueStreaks): DailyReportR
       const baseColor = getStreakColor(baseVal, m.isG1);
       const curColor = getStreakColor(curVal, m.isG1);
 
-      // A. Apertura (00:00hs) - Snapshot inmutable
+      // A. Apertura (00:00hs) - Snapshot inmutable del día
       if (baseColor) {
         openList.push({ market: m.label, color: baseColor, streak: baseVal });
         (openSnapshot as any)[baseColor]++;
@@ -202,7 +201,7 @@ export function recordDailySnapshot(currentStreaks: LeagueStreaks): DailyReportR
         }
       }
 
-      // D. Cierre / Vivas en tiempo real
+      // D. Cierre / Vivas en tiempo real (debe coincidir con los indicadores globales)
       if (curColor) {
         closeList.push({ market: m.label, color: curColor, streak: curVal });
         (closeSnapshot as any)[curColor]++;
