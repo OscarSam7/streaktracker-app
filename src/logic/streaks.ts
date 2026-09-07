@@ -35,7 +35,7 @@ export interface StreakInfo {
 // The user asked to track consecutive matches in a LEAGUE where the result DOES NOT happen.
 // Example: "In La Liga, 10 matches have passed without a Draw".
 
-const STATE_KEY = 'football_streaks_state_v14_round1_lifecycle';
+const STATE_KEY = 'football_streaks_state_v15_sync_all_devices';
 
 export interface LeagueStreaks {
     [leagueId: number]: {

@@ -47,8 +47,8 @@ export interface DailyReportQuantitativeKPIs {
   signalsByMarket: Record<string, number>;
 }
 
-const DAILY_REPORTS_KEY = 'football_daily_journal_reports_v9_perfect_realtime';
-const OPENING_BASELINE_KEY = 'football_daily_opening_baseline_v9';
+const DAILY_REPORTS_KEY = 'football_daily_journal_reports_v10_sync';
+const OPENING_BASELINE_KEY = 'football_daily_opening_baseline_v10';
 
 export function getLocalDateStr(d: Date = new Date()): string {
   const year = d.getFullYear();
