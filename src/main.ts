@@ -3263,16 +3263,16 @@ function setupDailyReportModule() {
     const elCloseDet = document.getElementById('dr-sum-close-detail');
 
     if (elOpen) elOpen.innerText = `${totOpen} Alertas`;
-    if (elOpenDet) elOpenDet.innerHTML = `<span style="color:#4ade80;">🟢 ${totOpenG}</span> | <span style="color:#60a5fa;">🔵 ${totOpenB}</span> | <span style="color:#facc15;">🟡 ${totOpenY}</span> | <span style="color:#fb923c;">🟠 ${totOpenO}</span>`;
+    if (elOpenDet) elOpenDet.innerHTML = `<span style="color:#fb923c;">🟠 ${totOpenO}</span> | <span style="color:#facc15;">🟡 ${totOpenY}</span> | <span style="color:#60a5fa;">🔵 ${totOpenB}</span> | <span style="color:#4ade80;">🟢 ${totOpenG}</span>`;
 
     if (elGen) elGen.innerText = `+${totGen} Nuevas`;
-    if (elGenDet) elGenDet.innerHTML = `<span style="color:#4ade80;">🟢 ${totGenG}</span> | <span style="color:#60a5fa;">🔵 ${totGenB}</span> | <span style="color:#facc15;">🟡 ${totGenY}</span> | <span style="color:#fb923c;">🟠 ${totGenO}</span>`;
+    if (elGenDet) elGenDet.innerHTML = `<span style="color:#fb923c;">🟠 ${totGenO}</span> | <span style="color:#facc15;">🟡 ${totGenY}</span> | <span style="color:#60a5fa;">🔵 ${totGenB}</span> | <span style="color:#4ade80;">🟢 ${totGenG}</span>`;
 
     if (elCut) elCut.innerText = `-${totCut} Rupturas`;
-    if (elCutDet) elCutDet.innerHTML = `<span style="color:#4ade80;">🟢 ${totCutG}</span> | <span style="color:#60a5fa;">🔵 ${totCutB}</span> | <span style="color:#facc15;">🟡 ${totCutY}</span> | <span style="color:#fb923c;">🟠 ${totCutO}</span>`;
+    if (elCutDet) elCutDet.innerHTML = `<span style="color:#fb923c;">🟠 ${totCutO}</span> | <span style="color:#facc15;">🟡 ${totCutY}</span> | <span style="color:#60a5fa;">🔵 ${totCutB}</span> | <span style="color:#4ade80;">🟢 ${totCutG}</span>`;
 
     if (elClose) elClose.innerText = `${totClose} Vivas`;
-    if (elCloseDet) elCloseDet.innerHTML = `<span style="color:#4ade80;">🟢 ${totCloseG}</span> | <span style="color:#60a5fa;">🔵 ${totCloseB}</span> | <span style="color:#facc15;">🟡 ${totCloseY}</span> | <span style="color:#fb923c;">🟠 ${totCloseO}</span>`;
+    if (elCloseDet) elCloseDet.innerHTML = `<span style="color:#fb923c;">🟠 ${totCloseO}</span> | <span style="color:#facc15;">🟡 ${totCloseY}</span> | <span style="color:#60a5fa;">🔵 ${totCloseB}</span> | <span style="color:#4ade80;">🟢 ${totCloseG}</span>`;
 
     // Calculate and populate 11 Quantitative KPIs
     const kpis = computeDailyReportQuantitativeKPIs(filtered);
