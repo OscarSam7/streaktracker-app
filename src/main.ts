@@ -102,8 +102,29 @@ function saveActiveTrades(trades: Record<string, ActiveTrackedTrade>) {
   } catch (e) {}
 }
 
+const STORAGE_KEY_ACTIVE_LEAGUES = 'football_streaks_active_leagues_v2';
+
+function loadActiveLeagues(): number[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_ACTIVE_LEAGUES);
+    if (!raw) return [...DEFAULT_ACTIVE_LEAGUES];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      // Migrate 254 to 304 if needed
+      return parsed.map((id: number) => id === 254 ? 304 : id);
+    }
+  } catch (e) {}
+  return [...DEFAULT_ACTIVE_LEAGUES];
+}
+
+function saveActiveLeagues(leagues: number[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY_ACTIVE_LEAGUES, JSON.stringify(leagues));
+  } catch (e) {}
+}
+
 const state = {
-  activeLeagues: [...DEFAULT_ACTIVE_LEAGUES],
+  activeLeagues: loadActiveLeagues(),
   streaks: loadStreaksState(),
   upcoming: {} as Record<number, any[]>,
   liveMatches: [] as any[],
@@ -195,11 +216,15 @@ async function run() {
     });
   }
 
-  // 1. Fetch initial streak data logic to populate missing states
-  await initializeStreaks();
+  // Render initial dashboard immediately from local streaks state
+  renderDashboard();
 
-  // 2. Fetch live matches immediately to populate state.liveMatches and draw dashboard
+  // 1. Fetch live matches immediately to populate live cards & active states
   await pollLiveMatches();
+
+  // 2. Fetch/update full league streak data in background & re-render
+  await initializeStreaks();
+  renderDashboard();
 
   // 3. Start polling live fixtures (every 15 seconds with intelligent caching)
   setInterval(() => pollLiveMatches(), 15 * 1000);
@@ -254,13 +279,27 @@ async function initializeStreaks(forceRefresh: boolean = false) {
   }
 
   const eligibleLeagues = getAuthorizedActiveLeagues(state.activeLeagues);
-  for (const lid of eligibleLeagues) {
-    const history = await fetchRecentMatches(lid, forceRefresh);
-    if (history && history.length > 0) {
-      state.streaks[lid] = computeStreaksForMatches(history);
-    }
+  
+  // Parallel batch fetching with concurrency limit of 6 for speed & stability
+  const CHUNK_SIZE = 6;
+  for (let i = 0; i < eligibleLeagues.length; i += CHUNK_SIZE) {
+    const chunk = eligibleLeagues.slice(i, i + CHUNK_SIZE);
+    await Promise.all(
+      chunk.map(async lid => {
+        try {
+          const history = await fetchRecentMatches(lid, forceRefresh);
+          if (history && history.length > 0) {
+            state.streaks[lid] = computeStreaksForMatches(history);
+          }
+        } catch (e) {
+          // Keep existing streak state if fetch fails
+        }
+      })
+    );
   }
+
   saveStreaksState(state.streaks);
+  recordDailySnapshot(state.streaks);
   checkActiveTradesBreak();
 }
 
@@ -2299,6 +2338,7 @@ function setupLeagueModal() {
         state.activeLeagues = [];
       }
       
+      saveActiveLeagues(state.activeLeagues);
       updateLeagueModalToggles();
     });
   }
@@ -2386,6 +2426,7 @@ function renderLeagueToggles() {
         state.activeLeagues = state.activeLeagues.filter(id => id !== leagueInfo.id);
       }
 
+      saveActiveLeagues(state.activeLeagues);
       updateLeagueModalToggles();
     });
 
