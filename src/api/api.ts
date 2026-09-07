@@ -136,8 +136,8 @@ function getActiveSeasonYear(leagueId: number): number {
   const year = now.getFullYear();
   const month = now.getMonth() + 1; // 1-12
 
-  // Calendar-year leagues (Jan/Feb to Nov/Dec): Conmebol Libertadores (13), Sudamericana (11), Brazil (71, 72), Colombia (239, 240), Chile (265, 266), Ecuador (242), Peru (281), Uruguay (268), Paraguay (252), Panama (254), Latvia (365), etc.
-  const calendarYearLeagueIds = [13, 11, 71, 72, 239, 240, 265, 266, 242, 281, 268, 252, 253, 254, 365, 479, 329, 362, 188, 190, 278];
+  // Calendar-year leagues (Jan/Feb to Nov/Dec): Conmebol Libertadores (13), Sudamericana (11), Brazil (71, 72), Colombia (239, 240), Chile (265, 266), Ecuador (242), Peru (281), Uruguay (268), Paraguay (252), Panama (304), Latvia (365), etc.
+  const calendarYearLeagueIds = [13, 11, 71, 72, 239, 240, 265, 266, 242, 281, 268, 252, 253, 304, 365, 479, 329, 362, 188, 190, 278];
   if (calendarYearLeagueIds.includes(leagueId)) {
     return year;
   }

@@ -55,7 +55,7 @@ export const LEAGUES: Record<string, LeagueInfo> = {
     HONG_KONG: { id: 178, name: "Premier League", country: "Hong Kong", code: "hk", flag: "🇭🇰" },
     HUNGARY: { id: 271, name: "NB I", country: "Hungría", code: "hu", flag: "🇭🇺" },
     MEXICO: { id: 262, name: "Liga MX", country: "México", code: "mx", flag: "🇲🇽" },
-    PANAMA: { id: 254, name: "LPF", country: "Panamá", code: "pa", flag: "🇵🇦" },
+    PANAMA: { id: 304, name: "LPF", country: "Panamá", code: "pa", flag: "🇵🇦" },
     LATVIA: { id: 365, name: "Virsliga", country: "Letonia", code: "lv", flag: "🇱🇻" },
     ANDORRA: { id: 370, name: "Primera Divisió", country: "Andorra", code: "ad", flag: "🇦🇩" },
 };

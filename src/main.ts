@@ -246,6 +246,13 @@ function checkActiveTradesBreak() {
 }
 
 async function initializeStreaks(forceRefresh: boolean = false) {
+  // Migrate obsolete league IDs if present (e.g. 254 NWSL -> 304 Panama LPF)
+  state.activeLeagues = state.activeLeagues.map(id => id === 254 ? 304 : id);
+  if (state.streaks[254]) {
+    delete state.streaks[254];
+    saveStreaksState(state.streaks);
+  }
+
   const eligibleLeagues = getAuthorizedActiveLeagues(state.activeLeagues);
   for (const lid of eligibleLeagues) {
     const history = await fetchRecentMatches(lid, forceRefresh);
