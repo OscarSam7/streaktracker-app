@@ -6,8 +6,7 @@ export interface Translations {
   plans: {
     BASIC: string;
     PRO: string;
-    ELITE: string;
-    SYNDICATE: string;
+    VIP: string;
   };
   actions: {
     exportCsv: string;
@@ -133,10 +132,9 @@ export const I18N: Record<Language, Translations> = {
     appTitle: "Rastreador de Rachas",
     planLabel: "Plan:",
     plans: {
-      BASIC: "Básico (Gratis)",
-      PRO: "PRO",
-      ELITE: "ELITE (Full)",
-      SYNDICATE: "Sindicato VIP"
+      BASIC: "Plan FREE ($0)",
+      PRO: "Plan PRO ($19)",
+      VIP: "Plan VIP ($39)"
     },
     actions: {
       exportCsv: "📥 Exportar CSV",
@@ -146,7 +144,7 @@ export const I18N: Record<Language, Translations> = {
       telegramBot: "🤖 Bot Telegram",
       bankroll: "💼 Control de Banca",
       backtest: "📈 Backtesting",
-      audit: "🛡️ Auditoría Pública",
+      audit: "🛡️ Auditoria Pública",
       academy: "🎓 Academia Anti-Ruina",
       close: "✓ Aceptar"
     },
@@ -197,10 +195,10 @@ export const I18N: Record<Language, Translations> = {
     leaguesModal: {
       title: "Ligas Activas",
       selectAll: "Seleccionar Todas",
-      requireElite: "(🔒 Requiere Plan ELITE)",
-      limitBasicAlert: "🔒 En el Plan Básico solo puedes monitorear hasta 3 ligas. ¡Actualiza a PRO para desbloquear hasta 10 ligas o a ELITE para tener todas!",
-      limitProAlert: "🔒 En el Plan PRO tienes un límite de 10 ligas activas. ¡Actualiza a ELITE para monitorear todas las 32+ ligas simultáneamente!",
-      requireEliteAlert: "🔒 La opción \"Seleccionar Todas\" está disponible a partir del Plan ELITE (32+ ligas)."
+      requireElite: "(🔒 Requiere Plan VIP)",
+      limitBasicAlert: "🔒 En el Plan FREE solo puedes monitorear hasta 5 ligas. ¡Actualiza a PRO para 15 ligas o a VIP para todas las 51 ligas oficiales!",
+      limitProAlert: "🔒 En el Plan PRO tienes un límite de 15 ligas activas simultáneas. ¡Actualiza a VIP para monitorear todas las 51 ligas oficiales!",
+      requireEliteAlert: "🔒 La opción \"Seleccionar Todas\" está disponible exclusivamente en el Plan VIP (51 ligas oficiales)."
     },
     telegramModal: {
       title: "Simulador de Bot de Telegram VIP",
@@ -261,10 +259,9 @@ export const I18N: Record<Language, Translations> = {
     appTitle: "Streak Tracker",
     planLabel: "Plan:",
     plans: {
-      BASIC: "Basic (Free)",
-      PRO: "PRO",
-      ELITE: "ELITE (Full)",
-      SYNDICATE: "Syndicate VIP"
+      BASIC: "FREE Plan ($0)",
+      PRO: "PRO Plan ($19)",
+      VIP: "VIP Plan ($39)"
     },
     actions: {
       exportCsv: "📥 Export CSV",
@@ -325,10 +322,10 @@ export const I18N: Record<Language, Translations> = {
     leaguesModal: {
       title: "Active Leagues",
       selectAll: "Select All",
-      requireElite: "(🔒 Requires ELITE Plan)",
-      limitBasicAlert: "🔒 Basic Plan allows up to 3 leagues. Upgrade to PRO for 10 leagues or ELITE for unlimited!",
-      limitProAlert: "🔒 PRO Plan allows up to 10 active leagues. Upgrade to ELITE to track all 32+ leagues simultaneously!",
-      requireEliteAlert: "🔒 The \"Select All\" option is available exclusively on ELITE Plan (32+ leagues)."
+      requireElite: "(🔒 Requires VIP Plan)",
+      limitBasicAlert: "🔒 FREE Plan allows up to 5 leagues. Upgrade to PRO for 15 leagues or VIP for all 51 official leagues!",
+      limitProAlert: "🔒 PRO Plan allows up to 15 active leagues. Upgrade to VIP to track all 51 official leagues simultaneously!",
+      requireEliteAlert: "🔒 The \"Select All\" option is available exclusively on VIP Plan (51 official leagues)."
     },
     telegramModal: {
       title: "Telegram VIP Bot Simulator",
@@ -389,10 +386,9 @@ export const I18N: Record<Language, Translations> = {
     appTitle: "Rastreador de Sequências",
     planLabel: "Plano:",
     plans: {
-      BASIC: "Básico (Grátis)",
-      PRO: "PRO",
-      ELITE: "ELITE (Completo)",
-      SYNDICATE: "Sindicato VIP"
+      BASIC: "Plano FREE ($0)",
+      PRO: "Plano PRO ($19)",
+      VIP: "Plano VIP ($39)"
     },
     actions: {
       exportCsv: "📥 Exportar CSV",
@@ -453,10 +449,10 @@ export const I18N: Record<Language, Translations> = {
     leaguesModal: {
       title: "Ligas Ativas",
       selectAll: "Selecionar Todas",
-      requireElite: "(🔒 Requer Plano ELITE)",
-      limitBasicAlert: "🔒 No Plano Básico você pode monitorar até 3 ligas. Atualize para o PRO para até 10 ligas ou ELITE para todas!",
-      limitProAlert: "🔒 No Plano PRO você tem limite de 10 ligas ativas. Atualize para o ELITE para rastrear mais de 32 ligas simultaneamente!",
-      requireEliteAlert: "🔒 A opção \"Selecionar Todas\" está disponível a partir do Plano ELITE (32+ ligas)."
+      requireElite: "(🔒 Requer Plano VIP)",
+      limitBasicAlert: "🔒 No Plano FREE você pode monitorar até 5 ligas. Atualize para o PRO para até 15 ligas ou VIP para todas as 51 ligas oficiais!",
+      limitProAlert: "🔒 No Plano PRO você tem limite de 15 ligas ativas. Atualize para o VIP para rastrear todas as 51 ligas simultaneamente!",
+      requireEliteAlert: "🔒 A opção \"Selecionar Todas\" está disponível exclusivamente no Plano VIP (51 ligas oficiais)."
     },
     telegramModal: {
       title: "Simulador de Bot do Telegram VIP",

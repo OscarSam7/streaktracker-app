@@ -2737,7 +2737,7 @@ function setupBankrollModule() {
   // New Operation Modal triggers
   const openNewOp = () => {
     if (state.currentPlan === 'FREE' && state.bankrollRawOps.length >= 5) {
-      alert('🔒 En el Plan Básico puedes registrar hasta 5 operaciones de prueba. ¡Actualiza a PRO o ELITE para operaciones ilimitadas!');
+      alert('🔒 En el Plan FREE puedes registrar hasta 5 operaciones de prueba. ¡Actualiza a PRO o VIP para operaciones ilimitadas!');
       pricingModal.showModal();
       return;
     }
@@ -2823,7 +2823,7 @@ function setupBankrollModule() {
   if (bankrollDownloadXlsxBtn) {
     bankrollDownloadXlsxBtn.addEventListener('click', () => {
       if (state.currentPlan === 'FREE') {
-        alert('🔒 La descarga del archivo profesional de Excel (.xlsx) está disponible en los planes PRO, ELITE y SINDICATO VIP.');
+        alert('🔒 La descarga del archivo profesional de Excel (.xlsx) está disponible en los planes PRO y VIP.');
         pricingModal.showModal();
         return;
       }
