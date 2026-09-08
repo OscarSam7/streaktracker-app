@@ -88,7 +88,7 @@ export const LEAGUE_VALIDATION_METRICS: Record<number, Partial<LeagueValidationT
   262: { matchesAvailable: 306, historicalSeasons: 4, signalsGeneratedCount: 38, dataCompletenessPct: 98.6, sampleSize: 'ÓPTIMO' },   // México Liga MX
   304: { matchesAvailable: 198, historicalSeasons: 3, signalsGeneratedCount: 18, dataCompletenessPct: 96.8, sampleSize: 'ÓPTIMO' },   // Panamá LPF
   365: { matchesAvailable: 180, historicalSeasons: 4, signalsGeneratedCount: 17, dataCompletenessPct: 96.4, sampleSize: 'ESTÁNDAR' }, // Letonia Virsliga
-  370: { matchesAvailable: 135, historicalSeasons: 3, signalsGeneratedCount: 14, dataCompletenessPct: 95.8, sampleSize: 'ESTÁNDAR' }  // Andorra Primera Divisió
+  312: { matchesAvailable: 135, historicalSeasons: 3, signalsGeneratedCount: 14, dataCompletenessPct: 95.8, sampleSize: 'ESTÁNDAR' }  // Andorra 1a Divisió
 };
 
 

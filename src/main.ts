@@ -110,8 +110,8 @@ function loadActiveLeagues(): number[] {
     if (!raw) return [...DEFAULT_ACTIVE_LEAGUES];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Migrate 254 to 304 if needed
-      return parsed.map((id: number) => id === 254 ? 304 : id);
+      // Migrate 254 to 304 and 370 to 312 if needed
+      return parsed.map((id: number) => id === 254 ? 304 : id === 370 ? 312 : id);
     }
   } catch (e) {}
   return [...DEFAULT_ACTIVE_LEAGUES];

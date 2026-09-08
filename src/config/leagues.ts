@@ -57,7 +57,7 @@ export const LEAGUES: Record<string, LeagueInfo> = {
     MEXICO: { id: 262, name: "Liga MX", country: "México", code: "mx", flag: "🇲🇽" },
     PANAMA: { id: 304, name: "LPF", country: "Panamá", code: "pa", flag: "🇵🇦" },
     LATVIA: { id: 365, name: "Virsliga", country: "Letonia", code: "lv", flag: "🇱🇻" },
-    ANDORRA: { id: 370, name: "Primera Divisió", country: "Andorra", code: "ad", flag: "🇦🇩" },
+    ANDORRA: { id: 312, name: "1a Divisió", country: "Andorra", code: "ad", flag: "🇦🇩" },
 };
 
 export const DEFAULT_ACTIVE_LEAGUES = Object.values(LEAGUES).map(l => l.id);
