@@ -912,40 +912,42 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
       });
     });
 
-    // 3. Click on league title in dashboard scrolls smoothly back to Opportunities Center (Viceversa)
-    const leagueHeaderClickable = card.querySelector('.dashboard-clickable-league');
-    if (leagueHeaderClickable) {
-      leagueHeaderClickable.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
+    // 3. Click on the dashboard league card scrolls smoothly back to Opportunities Center (Viceversa)
+    card.style.cursor = 'pointer';
+    card.title = `👉 Clic para ver las oportunidades de ${leagueInfo.name} en el Centro de Oportunidades`;
 
-        // If opportunities filter is hiding this league, reset to 'all'
-        if (state.oppFilter !== 'all') {
-          const oppFilterPills = document.querySelectorAll('.opp-filter-pill');
-          oppFilterPills.forEach(p => p.classList.remove('active'));
-          const allOppPill = document.querySelector('[data-opp-filter="all"]');
-          if (allOppPill) allOppPill.classList.add('active');
-          state.oppFilter = 'all';
-          renderOpportunitiesCenter();
-        }
+    card.addEventListener('click', (e) => {
+      // Ignore if clicking internal buttons/actions inside the card
+      if ((e.target as HTMLElement).closest('.btn-toggle-manual-trade') ||
+          (e.target as HTMLElement).closest('.btn-1click-bankroll') ||
+          (e.target as HTMLElement).closest('.btn-switch-match')) return;
 
-        const targetOppCard = document.getElementById(`opp-card-league-${lid}`);
-        if (targetOppCard) {
-          targetOppCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          document.querySelectorAll('.opp-card-highlighted').forEach(el => el.classList.remove('opp-card-highlighted'));
-          targetOppCard.classList.add('opp-card-highlighted');
-          setTimeout(() => {
-            targetOppCard.classList.remove('opp-card-highlighted');
-          }, 2800);
-        } else {
-          // Fallback: scroll to Opportunities Center section
-          const oppSection = document.getElementById('opportunities-section') || document.getElementById('opportunities-grid');
-          if (oppSection) {
-            oppSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
+      // If opportunities filter is hiding this league, reset to 'all'
+      if (state.oppFilter !== 'all') {
+        const oppFilterPills = document.querySelectorAll('.opp-filter-pill');
+        oppFilterPills.forEach(p => p.classList.remove('active'));
+        const allOppPill = document.querySelector('[data-opp-filter="all"]');
+        if (allOppPill) allOppPill.classList.add('active');
+        state.oppFilter = 'all';
+        renderOpportunitiesCenter();
+      }
+
+      const targetOppCard = document.getElementById(`opp-card-league-${lid}`);
+      if (targetOppCard) {
+        targetOppCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.querySelectorAll('.opp-card-highlighted').forEach(el => el.classList.remove('opp-card-highlighted'));
+        targetOppCard.classList.add('opp-card-highlighted');
+        setTimeout(() => {
+          targetOppCard.classList.remove('opp-card-highlighted');
+        }, 2800);
+      } else {
+        // Fallback: scroll to Opportunities Center section
+        const oppSection = document.getElementById('opportunities-section') || document.getElementById('opportunities-grid');
+        if (oppSection) {
+          oppSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      });
-    }
+      }
+    });
 
     dashboard.appendChild(card);
   });
