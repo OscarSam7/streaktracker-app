@@ -141,7 +141,7 @@ export const PLAN_PERMISSIONS: Record<PlatformPlan | 'TRIAL', PlanFeatureMatrix>
     hasDailyReports: true,
     hasFullHistoricalAudit: true,
     pinOnTopEnabled: true,
-    canManageSystem: true
+    canManageSystem: false
   }
 };
 

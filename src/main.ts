@@ -1432,8 +1432,94 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       }
     });
 
-    oppGrid.appendChild(card);
+    // Plan-based feature gating for Opportunities Center:
+    // FREE: max 2 visible daily opportunities. Cards beyond #2 are blurred with upgrade overlay.
+    // Also lock PREMIUM (Green) tier cards for FREE and PRO (unless VIP).
+    const isFree = state.currentPlan === 'FREE';
+    const isPro = state.currentPlan === 'PRO';
+    const isOverFreeLimit = isFree && rankIdx >= 2;
+    const isTierLocked = (isFree && (opp.tier === 'PREMIUM' || opp.tier === 'FUERTE')) || (isPro && opp.tier === 'PREMIUM');
+
+    if (isOverFreeLimit || isTierLocked) {
+      const lockReason = isOverFreeLimit
+        ? '🔒 Límite Diario FREE (2/2 Oportunidades alcanzadas)'
+        : `🔒 Alerta [${opp.tier}] disponible en ${opp.tier === 'PREMIUM' ? 'Plan VIP' : 'Plan PRO / VIP'}`;
+
+      const lockedCard = document.createElement('div');
+      lockedCard.style.position = 'relative';
+      lockedCard.style.borderRadius = '0.75rem';
+      lockedCard.style.overflow = 'hidden';
+
+      card.style.filter = 'blur(4px)';
+      card.style.pointerEvents = 'none';
+      card.style.opacity = '0.55';
+
+      const lockOverlay = document.createElement('div');
+      lockOverlay.style.position = 'absolute';
+      lockOverlay.style.top = '0';
+      lockOverlay.style.left = '0';
+      lockOverlay.style.width = '100%';
+      lockOverlay.style.height = '100%';
+      lockOverlay.style.display = 'flex';
+      lockOverlay.style.flexDirection = 'column';
+      lockOverlay.style.justifyContent = 'center';
+      lockOverlay.style.alignItems = 'center';
+      lockOverlay.style.background = 'rgba(15, 23, 42, 0.75)';
+      lockOverlay.style.zIndex = '10';
+      lockOverlay.style.cursor = 'pointer';
+      lockOverlay.style.padding = '1rem';
+      lockOverlay.style.textAlign = 'center';
+
+      lockOverlay.innerHTML = `
+        <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🔒</div>
+        <div style="font-size: 0.82rem; font-weight: 800; color: #facc15; margin-bottom: 0.2rem;">${lockReason}</div>
+        <div style="font-size: 0.68rem; color: #cbd5e1; margin-bottom: 0.6rem;">Haz clic para desbloquear todas las alertas en tiempo real y señales ilimitadas.</div>
+        <button class="btn-upgrade-plan-pill" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); color: #fff; font-weight: 800; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);">
+          🚀 Desbloquear con Plan ${opp.tier === 'PREMIUM' ? 'VIP' : 'PRO'}
+        </button>
+      `;
+
+      lockOverlay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pricingModal.showModal();
+      });
+
+      lockedCard.appendChild(card);
+      lockedCard.appendChild(lockOverlay);
+      oppGrid.appendChild(lockedCard);
+    } else {
+      oppGrid.appendChild(card);
+    }
   });
+
+  if (state.currentPlan === 'FREE' && filtered.length > 2) {
+    const banner = document.createElement('div');
+    banner.style.gridColumn = '1 / -1';
+    banner.style.background = 'linear-gradient(135deg, rgba(2,132,199,0.15) 0%, rgba(56,189,248,0.08) 100%)';
+    banner.style.border = '1px dashed rgba(56,189,248,0.4)';
+    banner.style.borderRadius = '0.75rem';
+    banner.style.padding = '0.9rem 1.2rem';
+    banner.style.display = 'flex';
+    banner.style.justifyContent = 'space-between';
+    banner.style.alignItems = 'center';
+    banner.style.flexWrap = 'wrap';
+    banner.style.gap = '0.8rem';
+    banner.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span style="font-size: 1.4rem;">💎</span>
+        <div>
+          <strong style="color: #38bdf8; font-size: 0.85rem;">Estás viendo 2 de ${filtered.length} oportunidades detectadas (Plan FREE)</strong>
+          <p style="margin: 0.15rem 0 0 0; font-size: 0.72rem; color: #94a3b8;">Los planes PRO y VIP desbloquean hasta 8 e ilimitadas oportunidades diarias con señales de alta confianza.</p>
+        </div>
+      </div>
+      <button id="btn-unlock-opps-banner" style="font-size: 0.78rem; font-weight: 800; padding: 0.45rem 1rem; border-radius: 6px; background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); color: #fff; border: none; cursor: pointer; box-shadow: 0 0 12px rgba(56,189,248,0.35);">
+        🚀 Ver Todas las Señales
+      </button>
+    `;
+    const unlockBtn = banner.querySelector('#btn-unlock-opps-banner');
+    if (unlockBtn) unlockBtn.addEventListener('click', () => pricingModal.showModal());
+    oppGrid.appendChild(banner);
+  }
 }
 
 function setupOpportunitiesFilterHandlers() {
@@ -3462,6 +3548,12 @@ function setupDailyReportModule() {
   };
 
   drBtn.addEventListener('click', () => {
+    const auth = authorizeAccess('PRO');
+    if (!auth.allowed) {
+      alert(`🔒 Acceso Restringido: ${auth.reason || 'El Informe y Balance Diario de Jornadas es una función exclusiva de planes PRO y VIP.'}`);
+      pricingModal.showModal();
+      return;
+    }
     recordDailySnapshot(state.streaks);
     renderDailyReportUI();
     drModal.showModal();
