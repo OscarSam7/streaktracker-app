@@ -1763,20 +1763,28 @@ button[id^="close-"]:hover,
   color: #e2e8f0;
 }
 
+.opp-history-match-date {
+  font-size: 0.58rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.08rem 0.3rem;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
 .opp-history-score {
   font-weight: 800;
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.6);
   color: #f8fafc;
-  margin-left: 0.4rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .opp-history-ht {
   font-size: 0.55rem;
   color: #94a3b8;
-  margin-left: 0.3rem;
 }
 
 .opp-history-loading {

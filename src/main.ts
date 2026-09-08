@@ -1047,6 +1047,13 @@ async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HT
               const htInfo = (m.halftimeHome !== undefined && m.halftimeAway !== undefined) 
                 ? `<span class="opp-history-ht">(HT ${m.halftimeHome}-${m.halftimeAway})</span>` 
                 : '';
+
+              let matchDateStr = '';
+              if (m.date) {
+                const d = new Date(m.date);
+                matchDateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+              }
+
               return `
                 <div class="opp-history-match-item">
                   <div class="opp-history-teams" title="${m.homeTeam} vs ${m.awayTeam}">
@@ -1054,7 +1061,8 @@ async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HT
                     <span style="color: #64748b; font-size: 0.58rem; margin: 0 0.15rem;">vs</span>
                     <span>${m.awayTeam}</span>
                   </div>
-                  <div style="display: flex; align-items: center;">
+                  <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                    ${matchDateStr ? `<span class="opp-history-match-date">📅 ${matchDateStr}</span>` : ''}
                     <span class="opp-history-score">${m.goalsHome} - ${m.goalsAway}</span>
                     ${htInfo}
                   </div>
