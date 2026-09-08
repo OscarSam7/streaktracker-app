@@ -1691,15 +1691,32 @@ button[id^="close-"]:hover,
 
 .opp-history-content {
   display: none;
-  background: rgba(10, 15, 30, 0.95);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(10, 15, 30, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.35);
   border-top: none;
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   padding: 0.5rem;
-  max-height: 240px;
+  max-height: 290px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   animation: slideDownFade 0.22s ease forwards;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.opp-history-content::-webkit-scrollbar {
+  width: 5px;
+}
+.opp-history-content::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 3px;
+}
+.opp-history-content::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.4);
+  border-radius: 3px;
+}
+.opp-history-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.7);
 }
 
 .opp-history-content.show {

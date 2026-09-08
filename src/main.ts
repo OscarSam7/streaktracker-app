@@ -150,7 +150,8 @@ const state = {
   bankrollRawOps: loadRawOperations(),
   activeLiveIndex: {} as Record<number, number>,
   oppFilter: 'all' as 'all' | 'premium' | 'strong' | 'live' | 'upcoming' | 'operating',
-  activeTrades: loadActiveTrades() as Record<string, ActiveTrackedTrade>
+  activeTrades: loadActiveTrades() as Record<string, ActiveTrackedTrade>,
+  expandedOppHistoryKeys: new Set<string>()
 };
 
 // UI Elements
@@ -1269,6 +1270,16 @@ async function renderLeagueRecentRoundsHistory(
       fullHTML = pastRoundsHTML + nextRoundHTML;
     }
 
+    if (fullHTML && !isFullscreen) {
+      fullHTML += `
+        <div style="margin-top: 0.6rem; padding-top: 0.4rem; border-top: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: center;">
+          <button class="btn-close-opp-history-dropdown" style="width: 100%; padding: 0.28rem 0.5rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.62rem; font-weight: 700; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'">
+            <span>✕</span> ${lang.streaks.closeDropdownBtn || 'Cerrar Vista de Jornadas'}
+          </button>
+        </div>
+      `;
+    }
+
     containerEl.innerHTML = fullHTML || `
       <div style="font-size: 0.62rem; color: #94a3b8; text-align: center; padding: 0.4rem;">
         ${lang.streaks.noHistoryAvailable}
@@ -1735,6 +1746,39 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     const historyFullscreenBtn = card.querySelector('.btn-opp-fullscreen');
     const historyContent = card.querySelector(`#opp-history-content-${opp.leagueId}-${opp.marketKey}`) as HTMLElement;
     const historyChevron = card.querySelector('.opp-history-chevron') as HTMLElement;
+    const oppHistoryKey = `${opp.leagueId}_${opp.marketKey}`;
+
+    const closeDropdown = () => {
+      state.expandedOppHistoryKeys.delete(oppHistoryKey);
+      if (historyContent) historyContent.classList.remove('show');
+      if (historyToggleBtn) historyToggleBtn.classList.remove('expanded');
+      if (historyChevron) historyChevron.style.transform = 'rotate(0deg)';
+    };
+
+    const openDropdown = async () => {
+      state.expandedOppHistoryKeys.add(oppHistoryKey);
+      if (historyContent) historyContent.classList.add('show');
+      if (historyToggleBtn) historyToggleBtn.classList.add('expanded');
+      if (historyChevron) historyChevron.style.transform = 'rotate(180deg)';
+
+      // Fetch recent matches dynamically and render previous 3 rounds (orden descendente por defecto)
+      await renderLeagueRecentRoundsHistory(opp.leagueId, historyContent, lang, 'desc', false);
+
+      // Attach close button inside dropdown
+      const bottomCloseBtn = historyContent?.querySelector('.btn-close-opp-history-dropdown');
+      if (bottomCloseBtn) {
+        bottomCloseBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          closeDropdown();
+        });
+      }
+    };
+
+    // If this dropdown was already open before a re-render/poll, keep it open statically
+    if (state.expandedOppHistoryKeys.has(oppHistoryKey)) {
+      openDropdown();
+    }
 
     if (historyToggleBtn && historyContent) {
       historyToggleBtn.addEventListener('click', async (e) => {
@@ -1743,16 +1787,9 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
 
         const isShowing = historyContent.classList.contains('show');
         if (isShowing) {
-          historyContent.classList.remove('show');
-          historyToggleBtn.classList.remove('expanded');
-          if (historyChevron) historyChevron.style.transform = 'rotate(0deg)';
+          closeDropdown();
         } else {
-          historyContent.classList.add('show');
-          historyToggleBtn.classList.add('expanded');
-          if (historyChevron) historyChevron.style.transform = 'rotate(180deg)';
-
-          // Fetch recent matches dynamically and render previous 3 rounds (orden descendente por defecto)
-          await renderLeagueRecentRoundsHistory(opp.leagueId, historyContent, lang, 'desc', false);
+          await openDropdown();
         }
       });
     }

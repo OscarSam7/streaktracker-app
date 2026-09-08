@@ -67,6 +67,7 @@ export interface Translations {
     sortAscBtn: string;
     sortDescBtn: string;
     closeFullscreenBtn: string;
+    closeDropdownBtn: string;
     nextRoundTitle: string;
     nextRoundBadge: string;
     previousRoundsBadge: string;
@@ -208,6 +209,7 @@ export const I18N: Record<Language, Translations> = {
       sortAscBtn: "▲ Fecha: Antigua a Reciente",
       sortDescBtn: "▼ Fecha: Reciente a Antigua",
       closeFullscreenBtn: "✕ Cerrar",
+      closeDropdownBtn: "✕ Cerrar Vista de Jornadas",
       nextRoundTitle: "Próxima Jornada a Disputarse",
       nextRoundBadge: "PRÓXIMA JORNADA",
       previousRoundsBadge: "JORNADA ANTERIOR"
@@ -348,6 +350,7 @@ export const I18N: Record<Language, Translations> = {
       sortAscBtn: "▲ Date: Oldest to Newest",
       sortDescBtn: "▼ Date: Newest to Oldest",
       closeFullscreenBtn: "✕ Close",
+      closeDropdownBtn: "✕ Close Matchdays View",
       nextRoundTitle: "Upcoming Matchday (Next Fixtures)",
       nextRoundBadge: "NEXT MATCHDAY",
       previousRoundsBadge: "PAST MATCHDAY"
@@ -488,6 +491,7 @@ export const I18N: Record<Language, Translations> = {
       sortAscBtn: "▲ Data: Antiga para Recente",
       sortDescBtn: "▼ Data: Recente para Antiga",
       closeFullscreenBtn: "✕ Fechar",
+      closeDropdownBtn: "✕ Fechar Visualização de Rodadas",
       nextRoundTitle: "Próxima Rodada a Ser Disputada",
       nextRoundBadge: "PRÓXIMA RODADA",
       previousRoundsBadge: "RODADA ANTERIOR"
