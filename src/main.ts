@@ -1311,7 +1311,7 @@ async function renderLeagueRecentRoundsHistory(
       fullHTML += `
         <div style="margin-top: 0.6rem; padding-top: 0.4rem; border-top: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: center;">
           <button class="btn-close-opp-history-dropdown" style="width: 100%; padding: 0.28rem 0.5rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.62rem; font-weight: 700; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'">
-            <span>✕</span> ${lang.streaks.closeDropdownBtn || 'Cerrar Vista de Jornadas'}
+            ${lang.streaks.closeDropdownBtn || '✕ Cerrar Vista de Jornadas'}
           </button>
         </div>
       `;
@@ -1758,7 +1758,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       <div class="opp-history-dropdown-wrapper">
         <div style="display: flex; gap: 0.35rem; align-items: center;">
           <button class="opp-history-toggle-btn" data-league-id="${opp.leagueId}" title="${lang.streaks.recentRoundsTitle}" style="flex: 1;">
-            <span>📊 ${lang.streaks.viewHistoryBtn}</span>
+            <span>${lang.streaks.viewHistoryBtn}</span>
             <span class="opp-history-chevron" style="font-size: 0.65rem; transition: transform 0.2s ease;">▼</span>
           </button>
           <button class="btn-opp-fullscreen" data-league-id="${opp.leagueId}" title="${lang.streaks.fullscreenBtn}" style="display: flex; align-items: center; gap: 0.25rem; height: 100%; white-space: nowrap;">
