@@ -178,7 +178,7 @@ export const I18N: Record<Language, Translations> = {
       btts1H: "Sin BTTS (1er Tiempo)"
     },
     streaks: {
-      negativeStreaksTitle: "Alertas de Oportunidad:",
+      negativeStreaksTitle: "Rastreadores • Alertas de Oportunidad:",
       brokenAt: "Se cortó en:",
       matchesUnit: "partido(s)",
       lockedBadge: "🔒 Desbloquear en PRO",
