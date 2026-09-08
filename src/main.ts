@@ -210,6 +210,7 @@ async function run() {
   setupTransparencyModule();
   setupScrollToTop();
   setupPushNotificationModule();
+  setupLeagueHistoryModal();
   updateTrialBannerUI();
   updateUserHeaderUI();
   setupAdminModule();
@@ -979,16 +980,26 @@ interface OpportunityItem {
   sortTimestamp: number;
 }
 
+// Modal state for fullscreen matchdays history
+let currentHistoryLeagueId: number | null = null;
+let currentHistorySortOrder: 'desc' | 'asc' = 'desc';
+
 /**
  * Agrupa los partidos finalizados en sus últimas 3 jornadas oficiales (o en bloques de 3 fechas de disputa)
- * y genera el HTML dinámico para el menú desplegable en las alertas de oportunidad.
+ * y genera el HTML dinámico para el menú desplegable en las alertas de oportunidad o modal en pantalla completa.
  */
-async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HTMLElement, lang: Translations) {
+async function renderLeagueRecentRoundsHistory(
+  leagueId: number, 
+  containerEl: HTMLElement, 
+  lang: Translations, 
+  sortOrder: 'desc' | 'asc' = 'desc',
+  isFullscreen: boolean = false
+) {
   try {
     const matches = await fetchRecentMatches(leagueId);
     if (!matches || matches.length === 0) {
       containerEl.innerHTML = `
-        <div style="font-size: 0.62rem; color: #94a3b8; text-align: center; padding: 0.4rem;">
+        <div style="font-size: ${isFullscreen ? '0.85rem' : '0.62rem'}; color: #94a3b8; text-align: center; padding: 1.5rem;">
           ${lang.streaks.noHistoryAvailable}
         </div>
       `;
@@ -999,7 +1010,7 @@ async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HT
     const finishedMatches = matches.filter(m => m.status === 'FT' || m.status === 'AET' || m.status === 'PEN');
     if (finishedMatches.length === 0) {
       containerEl.innerHTML = `
-        <div style="font-size: 0.62rem; color: #94a3b8; text-align: center; padding: 0.4rem;">
+        <div style="font-size: ${isFullscreen ? '0.85rem' : '0.62rem'}; color: #94a3b8; text-align: center; padding: 1.5rem;">
           ${lang.streaks.noHistoryAvailable}
         </div>
       `;
@@ -1009,11 +1020,10 @@ async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HT
     // Agrupar por jornada (round) o agrupar por bloques temporales/fechas si round no está disponible
     const roundGroups = new Map<string, typeof finishedMatches>();
 
-    // Recorrer los partidos en orden cronológico
     finishedMatches.forEach(m => {
       let roundKey = m.round ? m.round.trim() : '';
       if (!roundKey && m.date) {
-        // Fallback: agrupar por fecha día (YYYY-MM-DD)
+        // Fallback: agrupar por fecha día
         roundKey = `Fecha ${new Date(m.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}`;
       }
       if (!roundKey) {
@@ -1028,50 +1038,112 @@ async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HT
 
     // Obtener las últimas 3 jornadas
     const allRoundKeys = Array.from(roundGroups.keys());
-    const last3RoundKeys = allRoundKeys.slice(-3).reverse(); // Las más recientes primero
+    let selectedRoundKeys = allRoundKeys.slice(-3);
+
+    // Ordenar las jornadas según el criterio solicitado (desc: más recientes primero, asc: más antiguas primero)
+    if (sortOrder === 'desc') {
+      selectedRoundKeys = selectedRoundKeys.reverse();
+    }
 
     let html = '';
 
-    last3RoundKeys.forEach((roundName, idx) => {
-      const roundMatches = roundGroups.get(roundName) || [];
-      const isLatest = idx === 0;
+    selectedRoundKeys.forEach((roundName, idx) => {
+      let roundMatches = [...(roundGroups.get(roundName) || [])];
+      
+      // Ordenar también los partidos individuales dentro de la jornada según fecha de disputa
+      roundMatches.sort((a, b) => {
+        const timeA = a.date ? new Date(a.date).getTime() : 0;
+        const timeB = b.date ? new Date(b.date).getTime() : 0;
+        return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
+      });
 
-      html += `
-        <div class="opp-history-round-group">
-          <div class="opp-history-round-title">
-            <span>📅 ${roundName}</span>
-            ${isLatest ? '<span style="font-size: 0.55rem; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.05rem 0.3rem; border-radius: 3px; font-weight: 900;">ÚLTIMA</span>' : ''}
-          </div>
-          <div class="opp-history-round-matches">
-            ${roundMatches.map(m => {
-              const htInfo = (m.halftimeHome !== undefined && m.halftimeAway !== undefined) 
-                ? `<span class="opp-history-ht">(HT ${m.halftimeHome}-${m.halftimeAway})</span>` 
-                : '';
+      const isLatest = sortOrder === 'desc' ? idx === 0 : idx === selectedRoundKeys.length - 1;
 
-              let matchDateStr = '';
-              if (m.date) {
-                const d = new Date(m.date);
-                matchDateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-              }
+      if (isFullscreen) {
+        // Renderizado en Pantalla Completa / Modal
+        html += `
+          <div class="history-modal-round-card">
+            <div class="opp-history-round-title" style="font-size: 0.85rem; padding-bottom: 0.35rem; margin-bottom: 0.6rem;">
+              <span>📅 ${roundName}</span>
+              ${isLatest ? '<span style="font-size: 0.68rem; background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 0.1rem 0.45rem; border-radius: 4px; font-weight: 900;">ÚLTIMA JORNADA</span>' : ''}
+              <span style="font-size: 0.72rem; color: #94a3b8; margin-left: auto; font-weight: normal; text-transform: none;">
+                (${roundMatches.length} partidos)
+              </span>
+            </div>
+            <div class="history-modal-grid">
+              ${roundMatches.map(m => {
+                const htInfo = (m.halftimeHome !== undefined && m.halftimeAway !== undefined) 
+                  ? `<span style="font-size: 0.65rem; color: #94a3b8; font-weight: normal;">(HT ${m.halftimeHome}-${m.halftimeAway})</span>` 
+                  : '';
 
-              return `
-                <div class="opp-history-match-item">
-                  <div class="opp-history-teams" title="${m.homeTeam} vs ${m.awayTeam}">
-                    <span>${m.homeTeam}</span>
-                    <span style="color: #64748b; font-size: 0.58rem; margin: 0 0.15rem;">vs</span>
-                    <span>${m.awayTeam}</span>
+                let matchDateStr = '';
+                if (m.date) {
+                  const d = new Date(m.date);
+                  matchDateStr = d.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' }) + ' • ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                return `
+                  <div class="history-modal-match-box">
+                    <div style="flex: 1; overflow: hidden;">
+                      <div style="font-weight: 700; color: #f8fafc; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${m.homeTeam}
+                      </div>
+                      <div style="font-weight: 700; color: #cbd5e1; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 0.15rem;">
+                        ${m.awayTeam}
+                      </div>
+                      ${matchDateStr ? `<div style="font-size: 0.65rem; color: #38bdf8; margin-top: 0.3rem;">📅 ${matchDateStr}</div>` : ''}
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem;">
+                      <span style="font-size: 1.05rem; font-weight: 900; background: rgba(0,0,0,0.7); color: #fff; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(56,189,248,0.25);">
+                        ${m.goalsHome} - ${m.goalsAway}
+                      </span>
+                      ${htInfo}
+                    </div>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
-                    ${matchDateStr ? `<span class="opp-history-match-date">📅 ${matchDateStr}</span>` : ''}
-                    <span class="opp-history-score">${m.goalsHome} - ${m.goalsAway}</span>
-                    ${htInfo}
-                  </div>
-                </div>
-              `;
-            }).join('')}
+                `;
+              }).join('')}
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      } else {
+        // Renderizado en la tarjeta desplegable
+        html += `
+          <div class="opp-history-round-group">
+            <div class="opp-history-round-title">
+              <span>📅 ${roundName}</span>
+              ${isLatest ? '<span style="font-size: 0.55rem; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.05rem 0.3rem; border-radius: 3px; font-weight: 900;">ÚLTIMA</span>' : ''}
+            </div>
+            <div class="opp-history-round-matches">
+              ${roundMatches.map(m => {
+                const htInfo = (m.halftimeHome !== undefined && m.halftimeAway !== undefined) 
+                  ? `<span class="opp-history-ht">(HT ${m.halftimeHome}-${m.halftimeAway})</span>` 
+                  : '';
+
+                let matchDateStr = '';
+                if (m.date) {
+                  const d = new Date(m.date);
+                  matchDateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                return `
+                  <div class="opp-history-match-item">
+                    <div class="opp-history-teams" title="${m.homeTeam} vs ${m.awayTeam}">
+                      <span>${m.homeTeam}</span>
+                      <span style="color: #64748b; font-size: 0.58rem; margin: 0 0.15rem;">vs</span>
+                      <span>${m.awayTeam}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                      ${matchDateStr ? `<span class="opp-history-match-date">📅 ${matchDateStr}</span>` : ''}
+                      <span class="opp-history-score">${m.goalsHome} - ${m.goalsAway}</span>
+                      ${htInfo}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
     });
 
     containerEl.innerHTML = html || `
@@ -1087,6 +1159,86 @@ async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HT
     `;
   }
 }
+
+function openLeagueHistoryFullscreenModal(leagueId: number, opp?: OpportunityItem) {
+  const modal = document.getElementById('league-history-modal') as HTMLDialogElement;
+  const modalFlag = document.getElementById('history-modal-flag');
+  const modalTitle = document.getElementById('history-modal-title');
+  const modalSubtitle = document.getElementById('history-modal-subtitle');
+  const modalBody = document.getElementById('history-modal-body');
+  const lang = t();
+
+  if (!modal || !modalBody) return;
+
+  currentHistoryLeagueId = leagueId;
+
+  const leagueInfo = Object.values(LEAGUES).find(l => l.id === leagueId);
+  const leagueName = opp ? opp.leagueName : (leagueInfo ? leagueInfo.name : 'Liga');
+  const country = opp ? opp.country : (leagueInfo ? leagueInfo.country : '');
+  const flag = opp ? opp.flag : (leagueInfo ? leagueInfo.flag || '⚽' : '⚽');
+
+  if (modalFlag) modalFlag.innerText = flag;
+  if (modalTitle) modalTitle.innerHTML = `${leagueName} <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 500;">(${country})</span>`;
+  if (modalSubtitle) modalSubtitle.innerText = `Resultados oficiales de las últimas 3 jornadas completas • Orden: ${currentHistorySortOrder === 'desc' ? 'Recientes primero' : 'Antiguos primero'}`;
+
+  modalBody.innerHTML = `
+    <div class="opp-history-loading" style="padding: 2.5rem 0;">
+      <span style="animation: spin 1s linear infinite; display: inline-block; font-size: 1.4rem;">⏳</span> 
+      <span style="font-size: 0.9rem;">${lang.streaks.loadingHistory}</span>
+    </div>
+  `;
+
+  modal.showModal();
+  renderLeagueRecentRoundsHistory(leagueId, modalBody, lang, currentHistorySortOrder, true);
+}
+
+function setupLeagueHistoryModal() {
+  const modal = document.getElementById('league-history-modal') as HTMLDialogElement;
+  const closeBtn = document.getElementById('close-history-modal');
+  const sortDescBtn = document.getElementById('history-sort-desc-btn');
+  const sortAscBtn = document.getElementById('history-sort-asc-btn');
+  const modalBody = document.getElementById('history-modal-body');
+  const modalSubtitle = document.getElementById('history-modal-subtitle');
+
+  if (closeBtn && modal) {
+    closeBtn.addEventListener('click', () => modal.close());
+  }
+
+  const updateSortOrder = (newOrder: 'desc' | 'asc') => {
+    currentHistorySortOrder = newOrder;
+    if (sortDescBtn && sortAscBtn) {
+      if (newOrder === 'desc') {
+        sortDescBtn.classList.add('active');
+        sortAscBtn.classList.remove('active');
+      } else {
+        sortAscBtn.classList.add('active');
+        sortDescBtn.classList.remove('active');
+      }
+    }
+
+    if (modalSubtitle) {
+      modalSubtitle.innerText = `Resultados oficiales de las últimas 3 jornadas completas • Orden: ${newOrder === 'desc' ? 'Recientes primero' : 'Antiguos primero'}`;
+    }
+
+    if (currentHistoryLeagueId && modalBody && modal && modal.open) {
+      modalBody.innerHTML = `
+        <div class="opp-history-loading" style="padding: 2.5rem 0;">
+          <span style="animation: spin 1s linear infinite; display: inline-block; font-size: 1.4rem;">⏳</span> 
+          <span style="font-size: 0.9rem;">${t().streaks.loadingHistory}</span>
+        </div>
+      `;
+      renderLeagueRecentRoundsHistory(currentHistoryLeagueId, modalBody, t(), currentHistorySortOrder, true);
+    }
+  };
+
+  if (sortDescBtn) {
+    sortDescBtn.addEventListener('click', () => updateSortOrder('desc'));
+  }
+  if (sortAscBtn) {
+    sortAscBtn.addEventListener('click', () => updateSortOrder('asc'));
+  }
+}
+
 
 function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
   const oppGrid = document.getElementById('opportunities-grid');
@@ -1427,12 +1579,17 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         </button>
       </div>
 
-      <!-- Desplegable dinámico: Últimas 3 Jornadas de Resultados -->
+      <!-- Desplegable dinámico y Pantalla Completa: Últimas 3 Jornadas de Resultados -->
       <div class="opp-history-dropdown-wrapper">
-        <button class="opp-history-toggle-btn" data-league-id="${opp.leagueId}" title="${lang.streaks.recentRoundsTitle}">
-          <span>📊 ${lang.streaks.viewHistoryBtn}</span>
-          <span class="opp-history-chevron" style="font-size: 0.65rem; transition: transform 0.2s ease;">▼</span>
-        </button>
+        <div style="display: flex; gap: 0.35rem; align-items: center;">
+          <button class="opp-history-toggle-btn" data-league-id="${opp.leagueId}" title="${lang.streaks.recentRoundsTitle}" style="flex: 1;">
+            <span>📊 ${lang.streaks.viewHistoryBtn}</span>
+            <span class="opp-history-chevron" style="font-size: 0.65rem; transition: transform 0.2s ease;">▼</span>
+          </button>
+          <button class="btn-opp-fullscreen" data-league-id="${opp.leagueId}" title="${lang.streaks.fullscreenBtn}" style="display: flex; align-items: center; gap: 0.25rem; height: 100%; white-space: nowrap;">
+            <span>⛶</span>
+          </button>
+        </div>
         <div class="opp-history-content" id="opp-history-content-${opp.leagueId}-${opp.marketKey}">
           <div class="opp-history-loading">
             <span style="animation: spin 1s linear infinite; display: inline-block;">⏳</span> ${lang.streaks.loadingHistory}
@@ -1452,6 +1609,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
 
     // Handle Dynamic History Dropdown Toggle (Últimas 3 jornadas)
     const historyToggleBtn = card.querySelector('.opp-history-toggle-btn');
+    const historyFullscreenBtn = card.querySelector('.btn-opp-fullscreen');
     const historyContent = card.querySelector(`#opp-history-content-${opp.leagueId}-${opp.marketKey}`) as HTMLElement;
     const historyChevron = card.querySelector('.opp-history-chevron') as HTMLElement;
 
@@ -1470,9 +1628,17 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           historyToggleBtn.classList.add('expanded');
           if (historyChevron) historyChevron.style.transform = 'rotate(180deg)';
 
-          // Fetch recent matches dynamically and render previous 3 rounds
-          await renderLeagueRecentRoundsHistory(opp.leagueId, historyContent, lang);
+          // Fetch recent matches dynamically and render previous 3 rounds (orden descendente por defecto)
+          await renderLeagueRecentRoundsHistory(opp.leagueId, historyContent, lang, 'desc', false);
         }
+      });
+    }
+
+    if (historyFullscreenBtn) {
+      historyFullscreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        openLeagueHistoryFullscreenModal(opp.leagueId, opp);
       });
     }
 
@@ -1584,7 +1750,8 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           (e.target as HTMLElement).closest('.btn-toggle-manual-trade') ||
           (e.target as HTMLElement).closest('.btn-trigger-trade-entry') ||
           (e.target as HTMLElement).closest('.opp-history-dropdown-wrapper') ||
-          (e.target as HTMLElement).closest('.opp-history-toggle-btn')) return;
+          (e.target as HTMLElement).closest('.opp-history-toggle-btn') ||
+          (e.target as HTMLElement).closest('.btn-opp-fullscreen')) return;
 
       const targetLid = opp.leagueId;
       

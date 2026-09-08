@@ -1551,6 +1551,41 @@
         </div>
       </dialog>
 
+      <!-- MODAL PANTALLA COMPLETA: RESULTADOS HISTÓRICOS DE LA LIGA (3 JORNADAS) -->
+      <dialog id="league-history-modal" class="modal-dialog" style="max-width: 900px; width: 94vw; border-radius: 1rem; background: linear-gradient(135deg, #090e17 0%, #0f172a 100%); border: 1px solid rgba(56, 189, 248, 0.35); box-shadow: 0 25px 60px rgba(0,0,0,0.85); padding: 1.5rem; color: #f8fafc;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.85rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <div id="history-modal-flag" style="font-size: 1.8rem;">⚽</div>
+            <div>
+              <h2 id="history-modal-title" style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+                Últimas 3 Jornadas de Resultados
+              </h2>
+              <p id="history-modal-subtitle" style="font-size: 0.75rem; color: #94a3b8; margin: 0.2rem 0 0 0;">
+                Detalle cronológico de partidos finalizados y marcadores oficiales.
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <!-- Controles de ordenamiento: Ascendente (antiguo a reciente) / Descendente (reciente a antiguo) -->
+            <div class="history-sort-controls" style="display: flex; gap: 0.3rem; background: rgba(0,0,0,0.4); padding: 0.25rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.08);">
+              <button id="history-sort-desc-btn" class="btn-sort-history active" title="Ordenar de más reciente a más antiguo">
+                ▼ Recientes Primero
+              </button>
+              <button id="history-sort-asc-btn" class="btn-sort-history" title="Ordenar de más antiguo a más reciente">
+                ▲ Antiguos Primero
+              </button>
+            </div>
+            <button id="close-history-modal" class="btn" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.4rem 0.85rem; font-size: 0.8rem; border-radius: 0.5rem; cursor: pointer;">
+              ✕ Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="history-modal-body" style="max-height: 68vh; overflow-y: auto; padding-right: 0.3rem;">
+          <!-- Contenido inyectado dinámicamente -->
+        </div>
+      </dialog>
+
       <!-- CENTRO DE OPORTUNIDADES -->
       <section id="opportunities-center-section" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 1rem; padding: 1.25rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">

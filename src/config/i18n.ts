@@ -63,6 +63,10 @@ export interface Translations {
     hideHistoryBtn: string;
     loadingHistory: string;
     noHistoryAvailable: string;
+    fullscreenBtn: string;
+    sortAscBtn: string;
+    sortDescBtn: string;
+    closeFullscreenBtn: string;
   };
   counters: {
     orange: string;
@@ -196,7 +200,11 @@ export const I18N: Record<Language, Translations> = {
       viewHistoryBtn: "📊 Ver Últimas 3 Jornadas",
       hideHistoryBtn: "▲ Ocultar Resultados",
       loadingHistory: "Cargando resultados de la liga...",
-      noHistoryAvailable: "No hay resultados registrados en las últimas jornadas."
+      noHistoryAvailable: "No hay resultados registrados en las últimas jornadas.",
+      fullscreenBtn: "⛶ Pantalla Completa",
+      sortAscBtn: "▲ Fecha: Antigua a Reciente",
+      sortDescBtn: "▼ Fecha: Reciente a Antigua",
+      closeFullscreenBtn: "✕ Cerrar"
     },
     counters: {
       orange: "Naranjas",
@@ -329,7 +337,11 @@ export const I18N: Record<Language, Translations> = {
       viewHistoryBtn: "📊 View Last 3 Matchdays",
       hideHistoryBtn: "▲ Hide Results",
       loadingHistory: "Loading league results...",
-      noHistoryAvailable: "No past match results recorded for recent matchdays."
+      noHistoryAvailable: "No past match results recorded for recent matchdays.",
+      fullscreenBtn: "⛶ Fullscreen",
+      sortAscBtn: "▲ Date: Oldest to Newest",
+      sortDescBtn: "▼ Date: Newest to Oldest",
+      closeFullscreenBtn: "✕ Close"
     },
     counters: {
       orange: "Orange",
@@ -462,7 +474,11 @@ export const I18N: Record<Language, Translations> = {
       viewHistoryBtn: "📊 Ver Últimas 3 Rodadas",
       hideHistoryBtn: "▲ Ocultar Resultados",
       loadingHistory: "Carregando resultados da liga...",
-      noHistoryAvailable: "Nenhum resultado registrado nas últimas rodadas."
+      noHistoryAvailable: "Nenhum resultado registrado nas últimas rodadas.",
+      fullscreenBtn: "⛶ Tela Cheia",
+      sortAscBtn: "▲ Data: Antiga para Recente",
+      sortDescBtn: "▼ Data: Recente para Antiga",
+      closeFullscreenBtn: "✕ Fechar"
     },
     counters: {
       orange: "Laranjas",
