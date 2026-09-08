@@ -806,21 +806,37 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
         const targetLid = parseInt(target.dataset.leagueId || '0', 10);
         const marketKey = target.dataset.marketKey || '';
         const opKey = `${targetLid}_${marketKey}`;
+        const lInfo = Object.values(LEAGUES).find(l => l.id === targetLid);
+        const lang = t();
+        const actionLabel = getActionMarketLabel(marketKey, lang).replace(/^🎯\s*(?:Operar|Action):\s*/i, '');
+        const mLabel = (lang.markets as any)[marketKey] || marketKey;
 
         if (state.activeTrades[opKey]) {
           const removed = state.activeTrades[opKey];
           delete state.activeTrades[opKey];
           saveActiveTrades(state.activeTrades);
+
+          // Also cancel any matching pending operations in bankroll to avoid state desync
+          let bankrollChanged = false;
+          state.bankrollRawOps.forEach(op => {
+            if (op.status === 'Pendiente' && 
+                (op.description.includes(removed.leagueName) || (lInfo && op.description.includes(lInfo.name))) &&
+                (op.market.includes(removed.marketKey) || op.market.includes(removed.actionMarketLabel) || op.market.includes(removed.marketLabel))) {
+              op.status = 'Cancelada';
+              bankrollChanged = true;
+            }
+          });
+          if (bankrollChanged) {
+            saveRawOperations(state.bankrollRawOps);
+            refreshBankrollUI();
+          }
+
           triggerPushNotification(
             `⏸️ Operación Desactivada`,
             `Se detuvo el seguimiento de ${removed.actionMarketLabel} en ${removed.leagueName}.`,
             'toast-push-alert'
           );
         } else {
-          const lInfo = Object.values(LEAGUES).find(l => l.id === targetLid);
-          const lang = t();
-          const actionLabel = getActionMarketLabel(marketKey, lang).replace(/^🎯\s*(?:Operar|Action):\s*/i, '');
-          const mLabel = (lang.markets as any)[marketKey] || marketKey;
           const curStreak = (state.streaks[targetLid] as any)?.[marketKey]?.current ?? 0;
 
           state.activeTrades[opKey] = {
@@ -1763,6 +1779,22 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           const removed = state.activeTrades[opKey];
           delete state.activeTrades[opKey];
           saveActiveTrades(state.activeTrades);
+
+          // Also cancel any matching pending operations in bankroll to avoid state desync
+          let bankrollChanged = false;
+          state.bankrollRawOps.forEach(op => {
+            if (op.status === 'Pendiente' && 
+                (op.description.includes(opp.leagueName) || op.description.includes(removed.leagueName)) &&
+                (op.market.includes(opp.marketKey) || op.market.includes(opp.actionMarketLabel) || op.market.includes(opp.marketLabel))) {
+              op.status = 'Cancelada';
+              bankrollChanged = true;
+            }
+          });
+          if (bankrollChanged) {
+            saveRawOperations(state.bankrollRawOps);
+            refreshBankrollUI();
+          }
+
           triggerPushNotification(
             `⏸️ Operación Desactivada`,
             `Se detuvo el seguimiento de ${removed.actionMarketLabel} en ${removed.leagueName}.`,
