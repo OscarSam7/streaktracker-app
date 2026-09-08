@@ -44,7 +44,7 @@ export function getTransparencySuite(): TransparencySuite {
     trackTitle: 'RESULTADOS HISTÓRICOS / BACKTEST',
     trackBadge: '📈 BACKTEST MULTI-TEMPORADA',
     trackColor: '#38bdf8',
-    trackDescription: 'Simulación algorítmica cuantitativa sobre 45 ligas y +3 temporadas históricas (2022-2026).',
+    trackDescription: 'Simulación algorítmica cuantitativa sobre 51 ligas y +3 temporadas históricas (2022-2026).',
     sampleSize: 427,
     sampleAdequate: true,
     minSampleRequired: 30,

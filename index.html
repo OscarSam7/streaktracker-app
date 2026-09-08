@@ -47,6 +47,12 @@
           </select>
         </div>
         
+        <div id="user-badge-header" style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.76rem;">
+          <span style="color: #38bdf8;">👤</span>
+          <span id="header-user-name" style="font-weight: 700; color: #fff;">Usuario</span>
+          <span id="header-user-plan-pill" style="font-size: 0.68rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 4px; background: #38bdf8; color: #0b1320;">VIP</span>
+        </div>
+        <button id="logout-header-btn" class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; color: #f87171; border-color: rgba(239, 68, 68, 0.3);" title="Cerrar sesión y volver al Portal Web">🚪 Salir</button>
         <button id="guide-btn" class="btn" title="Ver Guía de Mercados a Operar">📖 ¿Qué Mercado Operar?</button>
         <button id="backtest-btn" class="btn" title="Ver Backtesting y Rendimiento Histórico">📈 Backtesting</button>
         <button id="audit-btn" class="btn" title="Ver Auditoría Pública y Track Record">🛡️ Auditoría</button>
@@ -60,7 +66,7 @@
         <button id="daily-report-btn" class="btn" style="background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%); color: #fff; font-weight: 700; border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 0 15px rgba(14, 165, 233, 0.25);" title="Ver Informe y Balance de Jornada por Día, Semana y Mes">📊 Informe de Jornada</button>
         <button id="transparency-btn" class="btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #fff; font-weight: 800; border: 1px solid rgba(74, 222, 128, 0.5); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);" title="Ver Métricas Oficiales de Rendimiento y Transparencia">🔍 Transparencia & Resultados</button>
         <a href="/landing.html" class="btn" style="text-decoration: none; border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; display: inline-flex; align-items: center; gap: 0.3rem;" title="Ver Landing Page informativa">🌐 Portal Web</a>
-        <button id="admin-panel-btn" class="btn" style="background: linear-gradient(135deg, #475569 0%, #1e293b 100%); color: #facc15; font-weight: 800; border: 1px solid rgba(250, 204, 21, 0.4); box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
+        <button id="admin-panel-btn" class="btn" style="display: none; background: linear-gradient(135deg, #475569 0%, #1e293b 100%); color: #facc15; font-weight: 800; border: 1px solid rgba(250, 204, 21, 0.4); box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
       </div>
     </header>
 
@@ -1399,7 +1405,7 @@
         <div class="bankroll-tabs" style="display: flex; gap: 0.4rem; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; overflow-x: auto;">
           <button class="bankroll-tab-btn active" data-admin-tab="adm-users">👥 USUARIOS</button>
           <button class="bankroll-tab-btn" data-admin-tab="adm-subs">💎 SUSCRIPCIONES</button>
-          <button class="bankroll-tab-btn" data-admin-tab="adm-leagues">⚽ LIGAS (45)</button>
+          <button class="bankroll-tab-btn" data-admin-tab="adm-leagues">⚽ LIGAS (51)</button>
           <button class="bankroll-tab-btn" data-admin-tab="adm-signals">⚡ SEÑALES</button>
           <button class="bankroll-tab-btn" data-admin-tab="adm-strategies">🎯 ESTRATEGIAS</button>
           <button class="bankroll-tab-btn" data-admin-tab="adm-backtests">📈 BACKTESTS</button>

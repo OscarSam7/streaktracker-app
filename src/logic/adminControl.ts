@@ -74,7 +74,7 @@ export function logAdminAction(
 
 export function loadAdminParameters(): AdminSystemParameters {
   const defaultParams: AdminSystemParameters = {
-    activeLeagueIds: Object.values(LEAGUES).map(l => l.id), // Las 45 ligas oficiales
+    activeLeagueIds: Object.values(LEAGUES).map(l => l.id), // Las 51 ligas oficiales
     activeMarkets: ['draw', 'over35', 'htDraw', 'bttsOver25', 'btts1H'],
     minimumSignalScore: 60,
     minimumSignalTier: 'OBSERVABLE',

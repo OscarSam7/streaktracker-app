@@ -37,7 +37,7 @@ export interface LeagueValidationTelemetry {
   quality: LeagueQualityScorecard;
 }
 
-// Catálogo interno de telemetría y evaluación cuantitativa para las 45 ligas autorizadas
+// Catálogo interno de telemetría y evaluación cuantitativa para las 51 ligas autorizadas
 export const LEAGUE_VALIDATION_METRICS: Record<number, Partial<LeagueValidationTelemetry>> = {
   39:  { matchesAvailable: 380, historicalSeasons: 5, signalsGeneratedCount: 42, dataCompletenessPct: 99.8, sampleSize: 'GRANDE' }, // Inglaterra Premier
   140: { matchesAvailable: 380, historicalSeasons: 5, signalsGeneratedCount: 38, dataCompletenessPct: 99.5, sampleSize: 'GRANDE' }, // España La Liga

@@ -152,14 +152,14 @@ export function loadUserProfile(): UserProfile {
     id: 'usr_default_01',
     email: 'trader@streaktracker.io',
     name: 'Usuario StreakTracker',
-    role: 'VIP',
+    role: 'FREE',
     subscription: {
-      plan: 'VIP',
+      plan: 'FREE',
       status: 'ACTIVE',
       startedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      autoRenew: true,
-      accessLevel: 'VIP',
+      expiresAt: null,
+      autoRenew: false,
+      accessLevel: 'FREE',
       paymentGatewayReady: true
     }
   };
@@ -207,6 +207,41 @@ export function startTrialSubscription(userEmail: string = 'nuevo_usuario@streak
 
   saveUserProfile(trialUser);
   return trialUser;
+}
+
+export function registerNewUser(name: string, email: string, plan: PlatformPlan | 'TRIAL' = 'FREE'): UserProfile {
+  const profile: UserProfile = {
+    id: `usr_${Date.now()}`,
+    email: email.trim(),
+    name: name.trim(),
+    role: plan === 'TRIAL' ? 'TRIAL' : (plan as UserRole),
+    subscription: {
+      plan: plan === 'TRIAL' ? 'PRO' : plan,
+      status: plan === 'TRIAL' ? 'TRIAL' : 'ACTIVE',
+      startedAt: new Date().toISOString(),
+      expiresAt: plan === 'FREE' ? null : new Date(Date.now() + (plan === 'TRIAL' ? 3 : 30) * 24 * 60 * 60 * 1000).toISOString(),
+      autoRenew: plan !== 'FREE',
+      accessLevel: plan === 'TRIAL' ? 'TRIAL' : (plan as UserRole),
+      paymentGatewayReady: true
+    }
+  };
+
+  saveUserProfile(profile);
+  return profile;
+}
+
+export function loginExistingUser(profile: Partial<UserProfile>): UserProfile {
+  const current = loadUserProfile();
+  const updated: UserProfile = {
+    ...current,
+    ...profile,
+    subscription: {
+      ...current.subscription,
+      ...(profile.subscription || {})
+    }
+  };
+  saveUserProfile(updated);
+  return updated;
 }
 
 export function setUserPlan(plan: PlatformPlan, customStatus: SubscriptionStatus = 'ACTIVE'): UserProfile {

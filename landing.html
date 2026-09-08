@@ -194,8 +194,8 @@
       <span style="font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: -0.5px;">StreakTracker</span>
     </div>
     <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-      <a href="/index.html" class="btn" style="border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; text-decoration: none; padding: 0.45rem 1rem;">Iniciar Sesión</a>
-      <a href="/index.html" class="landing-cta-btn" style="padding: 0.45rem 1.25rem; font-size: 0.88rem;">Abrir Terminal App ➔</a>
+      <button id="landing-login-btn" class="btn" style="border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 0.45rem 1rem; cursor: pointer;">🔑 Iniciar Sesión</button>
+      <button id="landing-register-btn" class="landing-cta-btn" style="padding: 0.45rem 1.25rem; font-size: 0.88rem; cursor: pointer; border: none;">🚀 Crear Cuenta Gratis ➔</button>
     </div>
   </header>
 
@@ -211,7 +211,7 @@
           StreakTracker escanea en tiempo real millones de datos históricos y anomalías consecutivas en 51 ligas oficiales para identificar con precisión matemática el punto óptimo de reversión a la media. Elimina la intuición y opera con ventaja estadística, cuotas con valor esperado positivo y control estricto de banca.
         </p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="/index.html" class="landing-cta-btn">🚀 Probar Gratis (Plan FREE)</a>
+          <button id="hero-free-btn" class="landing-cta-btn" style="cursor: pointer; border: none;">🚀 Probar Gratis (Plan FREE)</button>
           <a href="#como-funciona" class="btn" style="padding: 0.95rem 1.85rem; border-radius: 9999px; text-decoration: none; display: inline-flex; align-items: center;">📖 Conocer la Metodología</a>
         </div>
 
@@ -425,7 +425,7 @@
               <li><span class="check">✓</span> Calculadora de stake proporcional</li>
               <li><span class="cross">✕</span> <span class="muted">Alertas PREMIUM y FUERTES bloqueadas</span></li>
             </ul>
-            <a href="/index.html" class="btn btn-tier-action" style="text-decoration:none; text-align:center;">Registrarme Gratis</a>
+            <button class="btn btn-tier-action btn-plan-trigger" data-plan="FREE" style="text-decoration:none; text-align:center; cursor:pointer; width:100%;">Registrarme Gratis</button>
           </div>
 
           <!-- PRO -->
@@ -443,7 +443,7 @@
               <li><span class="check">✓</span> Control de banca hasta 50 operaciones</li>
               <li><span class="check">✓</span> 📥 Descarga de Planilla Excel Oficial (.xlsx)</li>
             </ul>
-            <a href="/index.html" class="btn btn-tier-action btn-tier-pro" style="text-decoration:none; text-align:center;">Suscribirme a PRO</a>
+            <button class="btn btn-tier-action btn-tier-pro btn-plan-trigger" data-plan="PRO" style="text-decoration:none; text-align:center; cursor:pointer; width:100%;">Suscribirme a PRO</button>
           </div>
 
           <!-- VIP -->
@@ -461,7 +461,7 @@
               <li><span class="check">✓</span> <strong>Control de banca y registro ILIMITADO</strong></li>
               <li><span class="check">✓</span> <strong>📊 Balance e Informes de Jornada automáticos</strong></li>
             </ul>
-            <a href="/index.html" class="btn btn-tier-action btn-tier-elite" style="text-decoration:none; text-align:center; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Suscribirme a VIP</a>
+            <button class="btn btn-tier-action btn-tier-elite btn-plan-trigger" data-plan="VIP" style="text-decoration:none; text-align:center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); cursor:pointer; width:100%;">Suscribirme a VIP</button>
           </div>
         </div>
       </div>
@@ -513,16 +513,196 @@
         <p style="font-size: 1.1rem; color: #94a3b8; margin-bottom: 2.25rem; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6;">
           Únete a los operadores cuantitativos que ya utilizan StreakTracker para operar con disciplina, rigor y respaldo estadístico.
         </p>
-        <a href="/index.html" class="landing-cta-btn" style="font-size: 1.15rem; padding: 1rem 2.5rem;">
+        <button id="cta-bottom-btn" class="landing-cta-btn" style="font-size: 1.15rem; padding: 1rem 2.5rem; cursor: pointer; border: none;">
           🚀 Abrir Terminal StreakTracker
-        </a>
+        </button>
       </div>
     </section>
   </main>
+
+  <!-- Modal Unificado de Autenticación (Registro / Inicio de Sesión) -->
+  <dialog id="auth-modal" class="custom-dialog" style="width: 95vw; max-width: 480px; padding: 2rem; border-radius: 1.25rem; border: 1px solid rgba(56, 189, 248, 0.4); color: #f8fafc; background: #0b1320; box-shadow: 0 0 60px rgba(15, 23, 42, 0.95); overflow-y: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.85rem;">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <img src="/logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 6px;" />
+        <div>
+          <h3 id="auth-modal-title" style="font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0;">Acceso a StreakTracker</h3>
+          <p id="auth-modal-subtitle" style="font-size: 0.75rem; color: #94a3b8; margin: 0.15rem 0 0 0;">Crea tu cuenta o inicia sesión para ingresar a la terminal.</p>
+        </div>
+      </div>
+      <button id="close-auth-modal" class="btn" style="padding: 0.25rem 0.6rem;">✕</button>
+    </div>
+
+    <!-- Pestañas Registro vs Iniciar Sesión -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: rgba(255,255,255,0.04); padding: 0.35rem; border-radius: 0.5rem; margin-bottom: 1.25rem; border: 1px solid rgba(255,255,255,0.08);">
+      <button type="button" id="tab-auth-register" class="filter-pill active" style="text-align: center; border-radius: 0.35rem; margin: 0; font-weight: 700;">📝 Crear Cuenta</button>
+      <button type="button" id="tab-auth-login" class="filter-pill" style="text-align: center; border-radius: 0.35rem; margin: 0; font-weight: 700;">🔑 Iniciar Sesión</button>
+    </div>
+
+    <form id="auth-form">
+      <!-- Nombre (solo en registro) -->
+      <div id="auth-group-name" class="form-group" style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.78rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.35rem;">Nombre Completo:</label>
+        <input type="text" id="auth-user-name" required placeholder="Ej. Carlos Mendoza" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.18); color: #fff; padding: 0.6rem 0.8rem; border-radius: 0.45rem; font-size: 0.88rem; box-sizing: border-box;" />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.78rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.35rem;">Correo Electrónico:</label>
+        <input type="email" id="auth-user-email" required placeholder="tu.email@ejemplo.com" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.18); color: #fff; padding: 0.6rem 0.8rem; border-radius: 0.45rem; font-size: 0.88rem; box-sizing: border-box;" />
+      </div>
+
+      <!-- Plan Seleccionado (solo en registro) -->
+      <div id="auth-group-plan" class="form-group" style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.78rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.35rem;">Plan Inicial:</label>
+        <select id="auth-user-plan" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 800; padding: 0.6rem 0.8rem; border-radius: 0.45rem; font-size: 0.88rem; box-sizing: border-box;">
+          <option value="FREE">⚪ Plan FREE ($0 / mes — 5 Ligas)</option>
+          <option value="TRIAL">🧪 Plan TRIAL (3 Días de Prueba Guiada)</option>
+          <option value="PRO">🔵 Plan PRO ($19.00 / mes — 15 Ligas + Backtest)</option>
+          <option value="VIP">🟢 Plan VIP ($39.00 / mes — 51 Ligas + Telegram VIP)</option>
+        </select>
+      </div>
+
+      <!-- Usuarios Rápidos Demo (en modo login) -->
+      <div id="auth-demo-accounts" style="display: none; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 1.25rem;">
+        <span style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.4rem; font-weight: 700;">O selecciona una cuenta demo de prueba:</span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;">
+          <button type="button" class="btn-demo-quick" data-demo-email="admin@streaktracker.io" data-demo-name="Administrador Central" data-demo-plan="ADMIN" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.3); color: #facc15; border-radius: 4px; cursor: pointer;">🛡️ Admin Demo</button>
+          <button type="button" class="btn-demo-quick" data-demo-email="carlos.vip@quant.com" data-demo-name="Carlos Mendoza" data-demo-plan="VIP" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; border-radius: 4px; cursor: pointer;">🟢 VIP Demo</button>
+          <button type="button" class="btn-demo-quick" data-demo-email="miguel.pro@trader.io" data-demo-name="Miguel Fernández" data-demo-plan="PRO" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; border-radius: 4px; cursor: pointer;">🔵 PRO Demo</button>
+          <button type="button" class="btn-demo-quick" data-demo-email="roberto.free@hotmail.com" data-demo-name="Roberto Silva" data-demo-plan="FREE" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 4px; cursor: pointer;">⚪ FREE Demo</button>
+        </div>
+      </div>
+
+      <button type="submit" id="auth-submit-btn" class="btn btn-premium" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; font-weight: 800; justify-content: center; cursor: pointer;">
+        🚀 Registrarse y Entrar a la Terminal
+      </button>
+    </form>
+  </dialog>
 
   <!-- Global Footer -->
   <footer style="border-top: 1px solid rgba(255,255,255,0.08); padding: 2.25rem 1rem; text-align: center; font-size: 0.82rem; color: #64748b; background: rgba(11, 19, 32, 0.95);">
     <p>© 2026 StreakTracker. Todos los derechos reservados. Plataforma Cuantitativa de Análisis Deportivo.</p>
   </footer>
+
+  <script>
+    // Control Interactivo de Registro e Inicio de Sesión
+    const authModal = document.getElementById('auth-modal');
+    const closeAuthModal = document.getElementById('close-auth-modal');
+    const tabRegister = document.getElementById('tab-auth-register');
+    const tabLogin = document.getElementById('tab-auth-login');
+    const groupName = document.getElementById('auth-group-name');
+    const groupPlan = document.getElementById('auth-group-plan');
+    const demoAccounts = document.getElementById('auth-demo-accounts');
+    const authTitle = document.getElementById('auth-modal-title');
+    const authSubmit = document.getElementById('auth-submit-btn');
+    const authForm = document.getElementById('auth-form');
+    const nameInput = document.getElementById('auth-user-name');
+    const emailInput = document.getElementById('auth-user-email');
+    const planSelect = document.getElementById('auth-user-plan');
+
+    let authMode = 'REGISTER'; // 'REGISTER' | 'LOGIN'
+
+    function openModal(mode, preferredPlan) {
+      authMode = mode || 'REGISTER';
+      if (preferredPlan && planSelect) {
+        planSelect.value = preferredPlan;
+      }
+      if (authMode === 'REGISTER') {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        groupName.style.display = 'block';
+        groupPlan.style.display = 'block';
+        demoAccounts.style.display = 'none';
+        nameInput.required = true;
+        authTitle.innerText = 'Crear Cuenta en StreakTracker';
+        authSubmit.innerText = '🚀 Registrarse y Entrar a la Terminal';
+      } else {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        groupName.style.display = 'none';
+        groupPlan.style.display = 'none';
+        demoAccounts.style.display = 'block';
+        nameInput.required = false;
+        authTitle.innerText = 'Iniciar Sesión en StreakTracker';
+        authSubmit.innerText = '🔑 Iniciar Sesión y Abrir Terminal';
+      }
+      authModal.showModal();
+    }
+
+    if (closeAuthModal) closeAuthModal.addEventListener('click', () => authModal.close());
+    authModal.addEventListener('click', (e) => { if (e.target === authModal) authModal.close(); });
+
+    if (tabRegister) tabRegister.addEventListener('click', () => openModal('REGISTER'));
+    if (tabLogin) tabLogin.addEventListener('click', () => openModal('LOGIN'));
+
+    document.getElementById('landing-login-btn')?.addEventListener('click', () => openModal('LOGIN'));
+    document.getElementById('landing-register-btn')?.addEventListener('click', () => openModal('REGISTER', 'FREE'));
+    document.getElementById('hero-free-btn')?.addEventListener('click', () => openModal('REGISTER', 'FREE'));
+    document.getElementById('cta-bottom-btn')?.addEventListener('click', () => openModal('REGISTER', 'FREE'));
+
+    document.querySelectorAll('.btn-plan-trigger').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const plan = e.currentTarget.getAttribute('data-plan') || 'FREE';
+        openModal('REGISTER', plan);
+      });
+    });
+
+    document.querySelectorAll('.btn-demo-quick').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget;
+        const email = target.getAttribute('data-demo-email');
+        const name = target.getAttribute('data-demo-name');
+        const plan = target.getAttribute('data-demo-plan');
+
+        const userObj = {
+          id: 'usr_' + Date.now(),
+          name: name,
+          email: email,
+          role: plan,
+          subscription: {
+            plan: plan === 'ADMIN' ? 'VIP' : (plan === 'TRIAL' ? 'PRO' : plan),
+            status: plan === 'TRIAL' ? 'TRIAL' : 'ACTIVE',
+            startedAt: new Date().toISOString(),
+            expiresAt: plan === 'FREE' ? null : new Date(Date.now() + 30 * 86400000).toISOString(),
+            autoRenew: true,
+            accessLevel: plan,
+            paymentGatewayReady: true
+          }
+        };
+
+        localStorage.setItem('streaktracker_user_profile_v2', JSON.stringify(userObj));
+        window.location.href = '/index.html';
+      });
+    });
+
+    if (authForm) {
+      authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const name = nameInput.value.trim() || email.split('@')[0];
+        const plan = authMode === 'REGISTER' ? planSelect.value : 'VIP';
+
+        const userObj = {
+          id: 'usr_' + Date.now(),
+          name: name,
+          email: email,
+          role: plan === 'TRIAL' ? 'TRIAL' : plan,
+          subscription: {
+            plan: plan === 'TRIAL' ? 'PRO' : plan,
+            status: plan === 'TRIAL' ? 'TRIAL' : 'ACTIVE',
+            startedAt: new Date().toISOString(),
+            expiresAt: plan === 'FREE' ? null : new Date(Date.now() + (plan === 'TRIAL' ? 3 : 30) * 86400000).toISOString(),
+            autoRenew: plan !== 'FREE',
+            accessLevel: plan === 'TRIAL' ? 'TRIAL' : plan,
+            paymentGatewayReady: true
+          }
+        };
+
+        localStorage.setItem('streaktracker_user_profile_v2', JSON.stringify(userObj));
+        window.location.href = '/index.html';
+      });
+    }
+  </script>
 </body>
 </html>

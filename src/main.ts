@@ -123,13 +123,16 @@ function saveActiveLeagues(leagues: number[]) {
   } catch (e) {}
 }
 
+const initialUserProfile = loadUserProfile();
+const initialPlan = (initialUserProfile.subscription?.status === 'TRIAL' ? 'TRIAL' : initialUserProfile.subscription?.plan) || 'FREE';
+
 const state = {
   activeLeagues: loadActiveLeagues(),
   streaks: loadStreaksState(),
   upcoming: {} as Record<number, any[]>,
   liveMatches: [] as any[],
-  currentPlan: 'VIP' as SubscriptionPlan,
-  userProfile: loadUserProfile() as UserProfile,
+  currentPlan: initialPlan as SubscriptionPlan,
+  userProfile: initialUserProfile as UserProfile,
   currentLang: 'es' as Language,
   searchQuery: '',
   currentFilter: 'all' as QuickFilter,
@@ -198,6 +201,7 @@ async function run() {
   setupScrollToTop();
   setupPushNotificationModule();
   updateTrialBannerUI();
+  updateUserHeaderUI();
   setupAdminModule();
 
   // Multi-Device Persistence: Realizar migración segura y sincronizar estado con el servidor
@@ -2285,10 +2289,59 @@ async function setSubscriptionPlan(newPlan: SubscriptionPlan) {
 
   updateTrialBannerUI();
   updateLeagueModalToggles();
+  updateUserHeaderUI();
   initializeStreaks().then(() => {
     renderDashboard();
     pollLiveMatches();
   });
+}
+
+function updateUserHeaderUI() {
+  const nameEl = document.getElementById('header-user-name');
+  const pillEl = document.getElementById('header-user-plan-pill');
+  const logoutBtn = document.getElementById('logout-header-btn');
+
+  if (nameEl) {
+    nameEl.innerText = state.userProfile.name || 'Usuario';
+  }
+
+  const isAdmin = state.userProfile?.role === 'ADMIN' || state.currentPlan === 'ADMIN' as any;
+
+  if (pillEl) {
+    if (isAdmin) {
+      pillEl.style.background = '#facc15';
+      pillEl.style.color = '#0b1320';
+      pillEl.innerText = '🛡️ ADMIN';
+    } else if (state.currentPlan === 'VIP') {
+      pillEl.style.background = '#4ade80';
+      pillEl.style.color = '#0b1320';
+      pillEl.innerText = 'VIP';
+    } else if (state.currentPlan === 'PRO') {
+      pillEl.style.background = '#38bdf8';
+      pillEl.style.color = '#0b1320';
+      pillEl.innerText = 'PRO';
+    } else if (state.currentPlan === 'TRIAL') {
+      pillEl.style.background = '#facc15';
+      pillEl.style.color = '#0b1320';
+      pillEl.innerText = 'TRIAL';
+    } else {
+      pillEl.style.background = '#94a3b8';
+      pillEl.style.color = '#0b1320';
+      pillEl.innerText = 'FREE';
+    }
+  }
+
+  // Visibilidad del botón de Panel Admin: Estrictamente visible SÓLO cuando isAdmin sea true
+  const adminBtn = document.getElementById('admin-panel-btn');
+  if (adminBtn) {
+    adminBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+  }
+
+  if (logoutBtn) {
+    logoutBtn.onclick = () => {
+      window.location.href = '/landing.html';
+    };
+  }
 }
 
 // ---------------------------------------------------------
@@ -3792,7 +3845,7 @@ function setupAdminModule() {
           </div>
           <div style="background:rgba(255,255,255,0.03); padding:0.5rem; border-radius:4px;">
             <span style="font-size:0.7rem; color:#94a3b8; display:block;">LIGAS ACTIVAS</span>
-            <strong style="color:#4ade80; font-size:1.1rem;">${state.activeLeagues.length} / 45</strong>
+            <strong style="color:#4ade80; font-size:1.1rem;">${state.activeLeagues.length} / 51</strong>
           </div>
           <div style="background:rgba(255,255,255,0.03); padding:0.5rem; border-radius:4px;">
             <span style="font-size:0.7rem; color:#94a3b8; display:block;">MERCADOS OPERATIVOS</span>
@@ -3830,8 +3883,13 @@ function setupAdminModule() {
     }
   };
 
-  // Open modal
+  // Open modal con verificación estricta de rol ADMIN
   adminBtn.addEventListener('click', () => {
+    const auth = authorizeAccess('ADMIN');
+    if (!auth.allowed && state.userProfile.role !== 'ADMIN') {
+      alert('⛔ Acceso Denegado (403): Se requieren privilegios de Administrador Central para acceder a este panel.');
+      return;
+    }
     renderAdminUI();
     adminModal.showModal();
   });
