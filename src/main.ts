@@ -126,8 +126,18 @@ function saveActiveLeagues(leagues: number[]) {
 const initialUserProfile = loadUserProfile();
 const initialPlan = (initialUserProfile.subscription?.status === 'TRIAL' ? 'TRIAL' : initialUserProfile.subscription?.plan) || 'FREE';
 
+function getEffectiveActiveLeagues(plan: SubscriptionPlan): number[] {
+  const loaded = loadActiveLeagues();
+  const perms = PLAN_PERMISSIONS[plan as (PlatformPlan | 'TRIAL')] || PLAN_PERMISSIONS.FREE;
+  const maxAllowed = perms.maxActiveLeagues || 5;
+  if (loaded.length > maxAllowed) {
+    return loaded.slice(0, maxAllowed);
+  }
+  return loaded;
+}
+
 const state = {
-  activeLeagues: loadActiveLeagues(),
+  activeLeagues: getEffectiveActiveLeagues(initialPlan as SubscriptionPlan),
   streaks: loadStreaksState(),
   upcoming: {} as Record<number, any[]>,
   liveMatches: [] as any[],
@@ -2479,6 +2489,8 @@ function setupLeagueModal() {
       
       saveActiveLeagues(state.activeLeagues);
       updateLeagueModalToggles();
+      renderDashboard();
+      renderOpportunitiesCenter();
     });
   }
 
@@ -2567,6 +2579,8 @@ function renderLeagueToggles() {
 
       saveActiveLeagues(state.activeLeagues);
       updateLeagueModalToggles();
+      renderDashboard();
+      renderOpportunitiesCenter();
     });
 
     label.appendChild(span);
