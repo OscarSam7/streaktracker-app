@@ -996,28 +996,15 @@ async function renderLeagueRecentRoundsHistory(
   isFullscreen: boolean = false
 ) {
   try {
-    const matches = await fetchRecentMatches(leagueId);
-    if (!matches || matches.length === 0) {
-      containerEl.innerHTML = `
-        <div style="font-size: ${isFullscreen ? '0.85rem' : '0.62rem'}; color: #94a3b8; text-align: center; padding: 1.5rem;">
-          ${lang.streaks.noHistoryAvailable}
-        </div>
-      `;
-      return;
-    }
+    const [pastMatches, upcomingMatches] = await Promise.all([
+      fetchRecentMatches(leagueId),
+      fetchUpcomingMatches(leagueId, 15)
+    ]);
 
     // Filtrar solo partidos finalizados (FT, AET, PEN)
-    const finishedMatches = matches.filter(m => m.status === 'FT' || m.status === 'AET' || m.status === 'PEN');
-    if (finishedMatches.length === 0) {
-      containerEl.innerHTML = `
-        <div style="font-size: ${isFullscreen ? '0.85rem' : '0.62rem'}; color: #94a3b8; text-align: center; padding: 1.5rem;">
-          ${lang.streaks.noHistoryAvailable}
-        </div>
-      `;
-      return;
-    }
+    const finishedMatches = (pastMatches || []).filter(m => m.status === 'FT' || m.status === 'AET' || m.status === 'PEN');
 
-    // Agrupar por jornada (round) o agrupar por bloques temporales/fechas si round no está disponible
+    // Agrupar partidos finalizados por jornada oficial
     const roundGroups = new Map<string, typeof finishedMatches>();
 
     finishedMatches.forEach(m => {
@@ -1036,36 +1023,148 @@ async function renderLeagueRecentRoundsHistory(
       roundGroups.get(roundKey)!.push(m);
     });
 
-    // Obtener las últimas 3 jornadas
-    const allRoundKeys = Array.from(roundGroups.keys());
-    let selectedRoundKeys = allRoundKeys.slice(-3);
+    // Obtener las últimas 3 jornadas de resultados
+    const allPastRoundKeys = Array.from(roundGroups.keys());
+    let selectedPastRoundKeys = allPastRoundKeys.slice(-3);
 
-    // Ordenar las jornadas según el criterio solicitado (desc: más recientes primero, asc: más antiguas primero)
-    if (sortOrder === 'desc') {
-      selectedRoundKeys = selectedRoundKeys.reverse();
+    // Agrupar próximos partidos (Próxima Jornada)
+    const validUpcoming = (upcomingMatches || []).filter(m => m.status === 'NS' || m.status === 'TBD' || m.status === 'PST');
+    let nextRoundName = '';
+    let nextRoundMatches: typeof validUpcoming = [];
+
+    if (validUpcoming.length > 0) {
+      // Tomar la ronda del primer partido próximo o agrupar los que pertenezcan a la primera jornada inmediata
+      nextRoundName = validUpcoming[0].round ? validUpcoming[0].round.trim() : 'Próxima Jornada';
+      nextRoundMatches = validUpcoming.filter(m => (m.round ? m.round.trim() : 'Próxima Jornada') === nextRoundName);
+      if (nextRoundMatches.length === 0) {
+        nextRoundMatches = validUpcoming.slice(0, 8);
+      }
     }
 
-    let html = '';
+    if (finishedMatches.length === 0 && nextRoundMatches.length === 0) {
+      containerEl.innerHTML = `
+        <div style="font-size: ${isFullscreen ? '0.85rem' : '0.62rem'}; color: #94a3b8; text-align: center; padding: 1.5rem;">
+          ${lang.streaks.noHistoryAvailable}
+        </div>
+      `;
+      return;
+    }
 
-    selectedRoundKeys.forEach((roundName, idx) => {
+    // Ordenar las jornadas pasadas según el orden elegido (desc: más reciente primero, asc: más antigua primero)
+    if (sortOrder === 'desc') {
+      selectedPastRoundKeys = selectedPastRoundKeys.reverse();
+    }
+
+    // Generar bloque HTML de la PRÓXIMA JORNADA (si existe)
+    let nextRoundHTML = '';
+    if (nextRoundMatches.length > 0) {
+      const sortedNext = [...nextRoundMatches].sort((a, b) => {
+        const timeA = a.date ? new Date(a.date).getTime() : 0;
+        const timeB = b.date ? new Date(b.date).getTime() : 0;
+        return timeA - timeB; // Siempre cronológico ascendente los que juegan antes
+      });
+
+      if (isFullscreen) {
+        nextRoundHTML = `
+          <div class="history-modal-round-card next-round-card">
+            <div class="opp-history-round-title" style="font-size: 0.85rem; padding-bottom: 0.35rem; margin-bottom: 0.6rem; color: #38bdf8; border-bottom-color: rgba(56, 189, 248, 0.3);">
+              <span>⚡ ${nextRoundName}</span>
+              <span class="opp-history-next-badge" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">${lang.streaks.nextRoundBadge}</span>
+              <span style="font-size: 0.72rem; color: #94a3b8; margin-left: auto; font-weight: normal; text-transform: none;">
+                (${sortedNext.length} partidos programados)
+              </span>
+            </div>
+            <div class="history-modal-grid">
+              ${sortedNext.map(m => {
+                let matchDateStr = 'Horario por confirmar';
+                let matchDayTime = '--:--';
+                if (m.date) {
+                  const d = new Date(m.date);
+                  matchDateStr = d.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' });
+                  matchDayTime = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                return `
+                  <div class="history-modal-match-box" style="border-color: rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.04);">
+                    <div style="flex: 1; overflow: hidden;">
+                      <div style="font-weight: 700; color: #f8fafc; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${m.homeTeam}
+                      </div>
+                      <div style="font-weight: 700; color: #cbd5e1; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 0.15rem;">
+                        ${m.awayTeam}
+                      </div>
+                      <div style="font-size: 0.65rem; color: #38bdf8; margin-top: 0.3rem;">📅 ${matchDateStr}</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem;">
+                      <span class="history-next-time-badge">
+                        ${matchDayTime}
+                      </span>
+                      <span style="font-size: 0.58rem; color: #94a3b8;">Por disputar</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        nextRoundHTML = `
+          <div class="opp-history-round-group" style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 6px; padding: 0.4rem; margin-bottom: 0.6rem;">
+            <div class="opp-history-round-title" style="color: #38bdf8; border-bottom-color: rgba(56, 189, 248, 0.25);">
+              <span>⚡ ${nextRoundName}</span>
+              <span class="opp-history-next-badge">${lang.streaks.nextRoundBadge}</span>
+            </div>
+            <div class="opp-history-round-matches">
+              ${sortedNext.map(m => {
+                let matchDateStr = '';
+                let timeStr = '--:--';
+                if (m.date) {
+                  const d = new Date(m.date);
+                  matchDateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+                  timeStr = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                return `
+                  <div class="opp-history-match-item" style="border-left: 2px solid #38bdf8;">
+                    <div class="opp-history-teams" title="${m.homeTeam} vs ${m.awayTeam}">
+                      <span>${m.homeTeam}</span>
+                      <span style="color: #64748b; font-size: 0.58rem; margin: 0 0.15rem;">vs</span>
+                      <span>${m.awayTeam}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                      ${matchDateStr ? `<span class="opp-history-match-date">📅 ${matchDateStr}</span>` : ''}
+                      <span style="font-size: 0.64rem; font-weight: 800; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.08rem 0.35rem; border-radius: 4px;">${timeStr}</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Generar bloque HTML de las 3 JORNADAS ANTERIORES
+    let pastRoundsHTML = '';
+
+    selectedPastRoundKeys.forEach((roundName, idx) => {
       let roundMatches = [...(roundGroups.get(roundName) || [])];
       
-      // Ordenar también los partidos individuales dentro de la jornada según fecha de disputa
+      // Ordenar los partidos según fecha de disputa
       roundMatches.sort((a, b) => {
         const timeA = a.date ? new Date(a.date).getTime() : 0;
         const timeB = b.date ? new Date(b.date).getTime() : 0;
         return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
       });
 
-      const isLatest = sortOrder === 'desc' ? idx === 0 : idx === selectedRoundKeys.length - 1;
+      const isLatest = sortOrder === 'desc' ? idx === 0 : idx === selectedPastRoundKeys.length - 1;
 
       if (isFullscreen) {
-        // Renderizado en Pantalla Completa / Modal
-        html += `
+        pastRoundsHTML += `
           <div class="history-modal-round-card">
             <div class="opp-history-round-title" style="font-size: 0.85rem; padding-bottom: 0.35rem; margin-bottom: 0.6rem;">
               <span>📅 ${roundName}</span>
-              ${isLatest ? '<span style="font-size: 0.68rem; background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 0.1rem 0.45rem; border-radius: 4px; font-weight: 900;">ÚLTIMA JORNADA</span>' : ''}
+              ${isLatest ? '<span style="font-size: 0.68rem; background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 0.1rem 0.45rem; border-radius: 4px; font-weight: 900;">ÚLTIMA JORNADA DISPUTADA</span>' : ''}
               <span style="font-size: 0.72rem; color: #94a3b8; margin-left: auto; font-weight: normal; text-transform: none;">
                 (${roundMatches.length} partidos)
               </span>
@@ -1106,8 +1205,7 @@ async function renderLeagueRecentRoundsHistory(
           </div>
         `;
       } else {
-        // Renderizado en la tarjeta desplegable
-        html += `
+        pastRoundsHTML += `
           <div class="opp-history-round-group">
             <div class="opp-history-round-title">
               <span>📅 ${roundName}</span>
@@ -1146,7 +1244,16 @@ async function renderLeagueRecentRoundsHistory(
       }
     });
 
-    containerEl.innerHTML = html || `
+    // En orden descendente (recientes primero): la próxima jornada va arriba, luego las pasadas
+    // En orden ascendente (antiguos primero): las pasadas van primero, luego la próxima jornada al final
+    let fullHTML = '';
+    if (sortOrder === 'desc') {
+      fullHTML = nextRoundHTML + pastRoundsHTML;
+    } else {
+      fullHTML = pastRoundsHTML + nextRoundHTML;
+    }
+
+    containerEl.innerHTML = fullHTML || `
       <div style="font-size: 0.62rem; color: #94a3b8; text-align: center; padding: 0.4rem;">
         ${lang.streaks.noHistoryAvailable}
       </div>

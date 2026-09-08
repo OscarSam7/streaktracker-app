@@ -255,6 +255,7 @@ export async function fetchUpcomingMatches(leagueId: number, count: number = 10)
       leagueId: fixtureItem.league.id,
       leagueName: fixtureItem.league.name,
       status: fixtureItem.fixture.status.short,
+      round: fixtureItem.league?.round || '',
     }));
 
     memoryCache.upcomingMatches[leagueId] = { data: parsedUpcoming, timestamp: now };

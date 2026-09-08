@@ -67,6 +67,9 @@ export interface Translations {
     sortAscBtn: string;
     sortDescBtn: string;
     closeFullscreenBtn: string;
+    nextRoundTitle: string;
+    nextRoundBadge: string;
+    previousRoundsBadge: string;
   };
   counters: {
     orange: string;
@@ -204,7 +207,10 @@ export const I18N: Record<Language, Translations> = {
       fullscreenBtn: "⛶ Pantalla Completa",
       sortAscBtn: "▲ Fecha: Antigua a Reciente",
       sortDescBtn: "▼ Fecha: Reciente a Antigua",
-      closeFullscreenBtn: "✕ Cerrar"
+      closeFullscreenBtn: "✕ Cerrar",
+      nextRoundTitle: "Próxima Jornada a Disputarse",
+      nextRoundBadge: "PRÓXIMA JORNADA",
+      previousRoundsBadge: "JORNADA ANTERIOR"
     },
     counters: {
       orange: "Naranjas",
@@ -341,7 +347,10 @@ export const I18N: Record<Language, Translations> = {
       fullscreenBtn: "⛶ Fullscreen",
       sortAscBtn: "▲ Date: Oldest to Newest",
       sortDescBtn: "▼ Date: Newest to Oldest",
-      closeFullscreenBtn: "✕ Close"
+      closeFullscreenBtn: "✕ Close",
+      nextRoundTitle: "Upcoming Matchday (Next Fixtures)",
+      nextRoundBadge: "NEXT MATCHDAY",
+      previousRoundsBadge: "PAST MATCHDAY"
     },
     counters: {
       orange: "Orange",
@@ -478,7 +487,10 @@ export const I18N: Record<Language, Translations> = {
       fullscreenBtn: "⛶ Tela Cheia",
       sortAscBtn: "▲ Data: Antiga para Recente",
       sortDescBtn: "▼ Data: Recente para Antiga",
-      closeFullscreenBtn: "✕ Fechar"
+      closeFullscreenBtn: "✕ Fechar",
+      nextRoundTitle: "Próxima Rodada a Ser Disputada",
+      nextRoundBadge: "PRÓXIMA RODADA",
+      previousRoundsBadge: "RODADA ANTERIOR"
     },
     counters: {
       orange: "Laranjas",
