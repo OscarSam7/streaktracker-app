@@ -777,7 +777,7 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
 
     card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; gap: 0.35rem;">
-                <h3 style="font-weight: 700; font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; display: flex; align-items: center; gap: 0.35rem; margin: 0; min-width: 0; flex: 1;">
+                <h3 class="dashboard-clickable-league" data-league-id="${lid}" title="👉 Clic para ver las oportunidades de ${leagueInfo.name} en el Centro de Oportunidades" style="font-weight: 700; font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; display: flex; align-items: center; gap: 0.35rem; margin: 0; min-width: 0; flex: 1; cursor: pointer;">
                     <span class="league-index-badge">#${getLeagueGlobalOrdinal(lid)}</span>
                     <span style="font-size: 1.05rem; flex-shrink: 0;" title="${leagueInfo.country}">${leagueInfo.flag || '⚽'}</span>
                     ${liveMatch ? '<span class="live-indicator" style="flex-shrink: 0;"></span>' : ''}
@@ -911,6 +911,41 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
         }
       });
     });
+
+    // 3. Click on league title in dashboard scrolls smoothly back to Opportunities Center (Viceversa)
+    const leagueHeaderClickable = card.querySelector('.dashboard-clickable-league');
+    if (leagueHeaderClickable) {
+      leagueHeaderClickable.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        // If opportunities filter is hiding this league, reset to 'all'
+        if (state.oppFilter !== 'all') {
+          const oppFilterPills = document.querySelectorAll('.opp-filter-pill');
+          oppFilterPills.forEach(p => p.classList.remove('active'));
+          const allOppPill = document.querySelector('[data-opp-filter="all"]');
+          if (allOppPill) allOppPill.classList.add('active');
+          state.oppFilter = 'all';
+          renderOpportunitiesCenter();
+        }
+
+        const targetOppCard = document.getElementById(`opp-card-league-${lid}`);
+        if (targetOppCard) {
+          targetOppCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          document.querySelectorAll('.opp-card-highlighted').forEach(el => el.classList.remove('opp-card-highlighted'));
+          targetOppCard.classList.add('opp-card-highlighted');
+          setTimeout(() => {
+            targetOppCard.classList.remove('opp-card-highlighted');
+          }, 2800);
+        } else {
+          // Fallback: scroll to Opportunities Center section
+          const oppSection = document.getElementById('opportunities-section') || document.getElementById('opportunities-grid');
+          if (oppSection) {
+            oppSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    }
 
     dashboard.appendChild(card);
   });
@@ -1571,6 +1606,10 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     const isOptimalEntry = opp.tier === 'PREMIUM' || opp.tier === 'FUERTE' || opp.isLive || isCurrentlyOperating;
 
     const card = document.createElement('div');
+    card.id = `opp-card-league-${opp.leagueId}`;
+    card.setAttribute('data-league-id', opp.leagueId.toString());
+    card.setAttribute('data-market-key', opp.marketKey);
+    card.className = 'opp-opportunity-card';
     card.style.background = 'rgba(15, 23, 42, 0.85)';
     card.style.border = isCurrentlyOperating ? '2px solid #06b6d4' : (isOptimalEntry ? '2px solid #10b981' : `1px solid ${opp.tierColor}40`);
     card.style.borderRadius = '0.75rem';

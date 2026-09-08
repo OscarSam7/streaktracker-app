@@ -173,9 +173,10 @@ h1 img {
   background: var(--bg-card-hover);
 }
 
-.league-card-highlighted {
+.league-card-highlighted,
+.opp-card-highlighted {
   border-color: #38bdf8 !important;
-  box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), inset 0 0 15px rgba(56, 189, 248, 0.2) !important;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.7), inset 0 0 15px rgba(56, 189, 248, 0.25) !important;
   animation: cardTargetPulse 2.5s ease-out;
   transform: scale(1.02);
 }
@@ -199,6 +200,24 @@ h1 img {
 }
 
 .opp-clickable-league:hover strong {
+  color: #38bdf8 !important;
+  text-decoration: underline;
+}
+
+.dashboard-clickable-league {
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  border-radius: 4px;
+  padding: 0.1rem 0.25rem;
+}
+
+.dashboard-clickable-league:hover {
+  background: rgba(56, 189, 248, 0.15);
+  transform: translateX(2px);
+  color: #38bdf8 !important;
+}
+
+.dashboard-clickable-league:hover span {
   color: #38bdf8 !important;
   text-decoration: underline;
 }
