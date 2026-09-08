@@ -70,7 +70,7 @@ import {
 } from './logic/adminControl';
 
 export type SubscriptionPlan = 'FREE' | 'TRIAL' | 'PRO' | 'VIP';
-export type QuickFilter = 'all' | 'high_today' | 'high_alerts' | 'live' | 'upcoming' | 'today';
+export type QuickFilter = 'all' | 'high_today' | 'high_alerts' | 'live' | 'upcoming' | 'today' | 'operating';
 
 export interface ActiveTrackedTrade {
   leagueId: number;
@@ -149,7 +149,7 @@ const state = {
   bankrollConfig: loadBankrollConfig(),
   bankrollRawOps: loadRawOperations(),
   activeLiveIndex: {} as Record<number, number>,
-  oppFilter: 'all' as 'all' | 'premium' | 'strong' | 'live' | 'upcoming',
+  oppFilter: 'all' as 'all' | 'premium' | 'strong' | 'live' | 'upcoming' | 'operating',
   activeTrades: loadActiveTrades() as Record<string, ActiveTrackedTrade>
 };
 
@@ -560,6 +560,10 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
     if (state.currentFilter === 'live') return isLive;
     if (state.currentFilter === 'today') return isToday;
     if (state.currentFilter === 'upcoming') return hasUpcoming;
+    if (state.currentFilter === 'operating') {
+      return Object.keys(state.activeTrades).some(k => k.startsWith(`${lid}_`)) ||
+             state.bankrollRawOps.some(op => op.status === 'Pendiente' && op.description.includes(leagueInfo.name));
+    }
 
     return true;
   });
@@ -1102,24 +1106,39 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     return a.sortTimestamp - b.sortTimestamp;
   });
 
+  // Helper to check if an opportunity is operating
+  const isOppOperating = (o: OpportunityItem) => {
+    const opKey = `${o.leagueId}_${o.marketKey}`;
+    const isTradeActive = !!state.activeTrades[opKey];
+    const existingOp = state.bankrollRawOps.find(op => 
+      op.status === 'Pendiente' && 
+      (op.description.includes(o.leagueName) || op.description.includes(o.fixtureName)) &&
+      (op.market.includes(o.marketKey) || op.market.includes(o.actionMarketLabel))
+    );
+    return isTradeActive || !!existingOp;
+  };
+
   // Update filter counters
   const cAll = allOpportunities.length;
   const cPrem = allOpportunities.filter(o => o.tier === 'PREMIUM').length;
   const cStrong = allOpportunities.filter(o => o.tier === 'FUERTE').length;
   const cLive = allOpportunities.filter(o => o.isLive).length;
   const cUpc = allOpportunities.filter(o => o.hasUpcoming).length;
+  const cOperating = allOpportunities.filter(isOppOperating).length;
 
   const elCAll = document.getElementById('opp-fcount-all');
   const elCPrem = document.getElementById('opp-fcount-premium');
   const elCStrong = document.getElementById('opp-fcount-strong');
   const elCLive = document.getElementById('opp-fcount-live');
   const elCUpc = document.getElementById('opp-fcount-upcoming');
+  const elCOperating = document.getElementById('opp-fcount-operating');
 
   if (elCAll) elCAll.innerText = cAll.toString();
   if (elCPrem) elCPrem.innerText = cPrem.toString();
   if (elCStrong) elCStrong.innerText = cStrong.toString();
   if (elCLive) elCLive.innerText = cLive.toString();
   if (elCUpc) elCUpc.innerText = cUpc.toString();
+  if (elCOperating) elCOperating.innerText = cOperating.toString();
   if (countBadge) countBadge.innerText = `${cAll} detectadas`;
 
   // Apply oppFilter
@@ -1128,6 +1147,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     if (state.oppFilter === 'strong') return o.tier === 'FUERTE';
     if (state.oppFilter === 'live') return o.isLive;
     if (state.oppFilter === 'upcoming') return o.hasUpcoming;
+    if (state.oppFilter === 'operating') return isOppOperating(o);
     return true;
   });
 
@@ -1593,6 +1613,7 @@ function updateStaticLanguageTexts() {
   const pillToday = document.querySelector('[data-filter="today"]') as HTMLElement;
   const pillLive = document.querySelector('[data-filter="live"]') as HTMLElement;
   const pillUpcoming = document.querySelector('[data-filter="upcoming"]') as HTMLElement;
+  const pillOperating = document.querySelector('[data-filter="operating"]') as HTMLElement;
 
   if (pillAll) pillAll.innerText = lang.filters.all;
   if (pillHighToday) pillHighToday.innerText = lang.filters.highToday;
@@ -1600,6 +1621,7 @@ function updateStaticLanguageTexts() {
   if (pillToday) pillToday.innerText = lang.filters.todayOnly;
   if (pillLive) pillLive.innerText = lang.filters.liveOnly;
   if (pillUpcoming) pillUpcoming.innerText = lang.filters.upcomingOnly;
+  if (pillOperating) pillOperating.innerText = lang.filters.operating;
 
   // Counter Badges Labels
   const countLabels = document.querySelectorAll('.counter-label');

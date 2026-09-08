@@ -29,6 +29,7 @@ export interface Translations {
     upcomingOnly: string;
     todayOnly: string;
     todayBadge: string;
+    operating: string;
   };
   markets: {
     draw: string;
@@ -155,6 +156,7 @@ export const I18N: Record<Language, Translations> = {
       highToday: "🟢🔵 Alertas Verdes / Azules de Hoy",
       liveOnly: "🔴 Solo En Vivo",
       upcomingOnly: "📅 Con Próximos Partidos",
+      operating: "⚡ Operando",
       todayOnly: "🔥 Partidos de Hoy",
       todayBadge: "🔥 JUEGA HOY"
     },
@@ -282,6 +284,7 @@ export const I18N: Record<Language, Translations> = {
       highAlerts: "🟢 Green / Blue Alerts (All)",
       liveOnly: "🔴 Live Matches Only",
       upcomingOnly: "📅 With Upcoming Fixtures",
+      operating: "⚡ Active Trades",
       todayOnly: "🔥 Matches Today",
       todayBadge: "🔥 PLAYS TODAY"
     },
@@ -409,6 +412,7 @@ export const I18N: Record<Language, Translations> = {
       highToday: "🟢🔵 Alertas Verdes / Azuis de Hoje",
       liveOnly: "🔴 Apenas Ao Vivo",
       upcomingOnly: "📅 Com Próximos Jogos",
+      operating: "⚡ Operando",
       todayOnly: "🔥 Jogos de Hoje",
       todayBadge: "🔥 JOGA HOJE"
     },
