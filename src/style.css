@@ -1650,6 +1650,147 @@ button[id^="close-"]:hover,
   box-shadow: 0 0 10px rgba(6, 182, 212, 0.35) !important;
 }
 
+/* =========================================================
+   OPPORTUNITY CARD PREVIOUS RESULTS DROPDOWN (JORNADAS)
+   ========================================================= */
+.opp-history-dropdown-wrapper {
+  margin-top: 0.5rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-top: 0.4rem;
+}
+
+.opp-history-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.32rem 0.6rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 6px;
+  color: #38bdf8;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.opp-history-toggle-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.opp-history-toggle-btn.expanded {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #7dd3fc;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.opp-history-content {
+  display: none;
+  background: rgba(10, 15, 30, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-top: none;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding: 0.5rem;
+  max-height: 240px;
+  overflow-y: auto;
+  animation: slideDownFade 0.22s ease forwards;
+}
+
+.opp-history-content.show {
+  display: block;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.opp-history-round-group {
+  margin-bottom: 0.45rem;
+}
+
+.opp-history-round-group:last-child {
+  margin-bottom: 0;
+}
+
+.opp-history-round-title {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #facc15;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid rgba(250, 204, 21, 0.2);
+}
+
+.opp-history-match-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 0.2rem;
+  font-size: 0.64rem;
+  transition: background 0.15s ease;
+}
+
+.opp-history-match-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.opp-history-teams {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #e2e8f0;
+}
+
+.opp-history-score {
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #f8fafc;
+  margin-left: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.opp-history-ht {
+  font-size: 0.55rem;
+  color: #94a3b8;
+  margin-left: 0.3rem;
+}
+
+.opp-history-loading {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 0.6rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+
 
 
 

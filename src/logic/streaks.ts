@@ -10,6 +10,8 @@ export interface MatchData {
     status: string; // 'NS', '1H', 'HT', '2H', 'FT'
     elapsed: number;
     receivedAt?: number;
+    round?: string;
+    date?: string;
     goalsHome: number;
     goalsAway: number;
     halftimeHome: number;

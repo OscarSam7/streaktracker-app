@@ -58,6 +58,11 @@ export interface Translations {
     noLiveMatches: string;
     upcomingPrefix: string;
     oneClickBankrollBtn: string;
+    recentRoundsTitle: string;
+    viewHistoryBtn: string;
+    hideHistoryBtn: string;
+    loadingHistory: string;
+    noHistoryAvailable: string;
   };
   counters: {
     orange: string;
@@ -186,7 +191,12 @@ export const I18N: Record<Language, Translations> = {
       lockedBadge: "🔒 Desbloquear en PRO",
       noLiveMatches: "Actualmente no hay partidos en directo.",
       upcomingPrefix: "Próximos:",
-      oneClickBankrollBtn: "⚡ Operar en Banca"
+      oneClickBankrollBtn: "⚡ Operar en Banca",
+      recentRoundsTitle: "Últimas Jornadas (Resultados Anteriores)",
+      viewHistoryBtn: "📊 Ver Últimas 3 Jornadas",
+      hideHistoryBtn: "▲ Ocultar Resultados",
+      loadingHistory: "Cargando resultados de la liga...",
+      noHistoryAvailable: "No hay resultados registrados en las últimas jornadas."
     },
     counters: {
       orange: "Naranjas",
@@ -314,7 +324,12 @@ export const I18N: Record<Language, Translations> = {
       lockedBadge: "🔒 Unlock with PRO",
       noLiveMatches: "No live matches currently in progress.",
       upcomingPrefix: "Upcoming:",
-      oneClickBankrollBtn: "⚡ Trade in Bankroll"
+      oneClickBankrollBtn: "⚡ Trade in Bankroll",
+      recentRoundsTitle: "Recent Matchdays (Previous Results)",
+      viewHistoryBtn: "📊 View Last 3 Matchdays",
+      hideHistoryBtn: "▲ Hide Results",
+      loadingHistory: "Loading league results...",
+      noHistoryAvailable: "No past match results recorded for recent matchdays."
     },
     counters: {
       orange: "Orange",
@@ -442,7 +457,12 @@ export const I18N: Record<Language, Translations> = {
       lockedBadge: "🔒 Desbloquear no PRO",
       noLiveMatches: "Nenhuma partida ao vivo no momento.",
       upcomingPrefix: "Próximos:",
-      oneClickBankrollBtn: "⚡ Operar na Banca"
+      oneClickBankrollBtn: "⚡ Operar na Banca",
+      recentRoundsTitle: "Últimas Rodadas (Resultados Anteriores)",
+      viewHistoryBtn: "📊 Ver Últimas 3 Rodadas",
+      hideHistoryBtn: "▲ Ocultar Resultados",
+      loadingHistory: "Carregando resultados da liga...",
+      noHistoryAvailable: "Nenhum resultado registrado nas últimas rodadas."
     },
     counters: {
       orange: "Laranjas",

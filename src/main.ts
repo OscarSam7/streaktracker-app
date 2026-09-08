@@ -979,6 +979,107 @@ interface OpportunityItem {
   sortTimestamp: number;
 }
 
+/**
+ * Agrupa los partidos finalizados en sus últimas 3 jornadas oficiales (o en bloques de 3 fechas de disputa)
+ * y genera el HTML dinámico para el menú desplegable en las alertas de oportunidad.
+ */
+async function renderLeagueRecentRoundsHistory(leagueId: number, containerEl: HTMLElement, lang: Translations) {
+  try {
+    const matches = await fetchRecentMatches(leagueId);
+    if (!matches || matches.length === 0) {
+      containerEl.innerHTML = `
+        <div style="font-size: 0.62rem; color: #94a3b8; text-align: center; padding: 0.4rem;">
+          ${lang.streaks.noHistoryAvailable}
+        </div>
+      `;
+      return;
+    }
+
+    // Filtrar solo partidos finalizados (FT, AET, PEN)
+    const finishedMatches = matches.filter(m => m.status === 'FT' || m.status === 'AET' || m.status === 'PEN');
+    if (finishedMatches.length === 0) {
+      containerEl.innerHTML = `
+        <div style="font-size: 0.62rem; color: #94a3b8; text-align: center; padding: 0.4rem;">
+          ${lang.streaks.noHistoryAvailable}
+        </div>
+      `;
+      return;
+    }
+
+    // Agrupar por jornada (round) o agrupar por bloques temporales/fechas si round no está disponible
+    const roundGroups = new Map<string, typeof finishedMatches>();
+
+    // Recorrer los partidos en orden cronológico
+    finishedMatches.forEach(m => {
+      let roundKey = m.round ? m.round.trim() : '';
+      if (!roundKey && m.date) {
+        // Fallback: agrupar por fecha día (YYYY-MM-DD)
+        roundKey = `Fecha ${new Date(m.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}`;
+      }
+      if (!roundKey) {
+        roundKey = 'Jornada Anterior';
+      }
+
+      if (!roundGroups.has(roundKey)) {
+        roundGroups.set(roundKey, []);
+      }
+      roundGroups.get(roundKey)!.push(m);
+    });
+
+    // Obtener las últimas 3 jornadas
+    const allRoundKeys = Array.from(roundGroups.keys());
+    const last3RoundKeys = allRoundKeys.slice(-3).reverse(); // Las más recientes primero
+
+    let html = '';
+
+    last3RoundKeys.forEach((roundName, idx) => {
+      const roundMatches = roundGroups.get(roundName) || [];
+      const isLatest = idx === 0;
+
+      html += `
+        <div class="opp-history-round-group">
+          <div class="opp-history-round-title">
+            <span>📅 ${roundName}</span>
+            ${isLatest ? '<span style="font-size: 0.55rem; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.05rem 0.3rem; border-radius: 3px; font-weight: 900;">ÚLTIMA</span>' : ''}
+          </div>
+          <div class="opp-history-round-matches">
+            ${roundMatches.map(m => {
+              const htInfo = (m.halftimeHome !== undefined && m.halftimeAway !== undefined) 
+                ? `<span class="opp-history-ht">(HT ${m.halftimeHome}-${m.halftimeAway})</span>` 
+                : '';
+              return `
+                <div class="opp-history-match-item">
+                  <div class="opp-history-teams" title="${m.homeTeam} vs ${m.awayTeam}">
+                    <span>${m.homeTeam}</span>
+                    <span style="color: #64748b; font-size: 0.58rem; margin: 0 0.15rem;">vs</span>
+                    <span>${m.awayTeam}</span>
+                  </div>
+                  <div style="display: flex; align-items: center;">
+                    <span class="opp-history-score">${m.goalsHome} - ${m.goalsAway}</span>
+                    ${htInfo}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    });
+
+    containerEl.innerHTML = html || `
+      <div style="font-size: 0.62rem; color: #94a3b8; text-align: center; padding: 0.4rem;">
+        ${lang.streaks.noHistoryAvailable}
+      </div>
+    `;
+  } catch (err) {
+    containerEl.innerHTML = `
+      <div style="font-size: 0.62rem; color: #f87171; text-align: center; padding: 0.4rem;">
+        ⚠️ No se pudieron cargar los resultados anteriores.
+      </div>
+    `;
+  }
+}
+
 function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
   const oppGrid = document.getElementById('opportunities-grid');
   const countBadge = document.getElementById('opp-count-badge');
@@ -1317,6 +1418,19 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           🔔
         </button>
       </div>
+
+      <!-- Desplegable dinámico: Últimas 3 Jornadas de Resultados -->
+      <div class="opp-history-dropdown-wrapper">
+        <button class="opp-history-toggle-btn" data-league-id="${opp.leagueId}" title="${lang.streaks.recentRoundsTitle}">
+          <span>📊 ${lang.streaks.viewHistoryBtn}</span>
+          <span class="opp-history-chevron" style="font-size: 0.65rem; transition: transform 0.2s ease;">▼</span>
+        </button>
+        <div class="opp-history-content" id="opp-history-content-${opp.leagueId}-${opp.marketKey}">
+          <div class="opp-history-loading">
+            <span style="animation: spin 1s linear infinite; display: inline-block;">⏳</span> ${lang.streaks.loadingHistory}
+          </div>
+        </div>
+      </div>
     `;
 
     // Handle Push Notification Bell Button Click
@@ -1325,6 +1439,32 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       pushBellBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         openPushNotificationModal(opp);
+      });
+    }
+
+    // Handle Dynamic History Dropdown Toggle (Últimas 3 jornadas)
+    const historyToggleBtn = card.querySelector('.opp-history-toggle-btn');
+    const historyContent = card.querySelector(`#opp-history-content-${opp.leagueId}-${opp.marketKey}`) as HTMLElement;
+    const historyChevron = card.querySelector('.opp-history-chevron') as HTMLElement;
+
+    if (historyToggleBtn && historyContent) {
+      historyToggleBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const isShowing = historyContent.classList.contains('show');
+        if (isShowing) {
+          historyContent.classList.remove('show');
+          historyToggleBtn.classList.remove('expanded');
+          if (historyChevron) historyChevron.style.transform = 'rotate(0deg)';
+        } else {
+          historyContent.classList.add('show');
+          historyToggleBtn.classList.add('expanded');
+          if (historyChevron) historyChevron.style.transform = 'rotate(180deg)';
+
+          // Fetch recent matches dynamically and render previous 3 rounds
+          await renderLeagueRecentRoundsHistory(opp.leagueId, historyContent, lang);
+        }
       });
     }
 
@@ -1430,11 +1570,13 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
 
     // Smooth Scroll to League Card in Dashboard when clicking anywhere on the opportunity card
     card.addEventListener('click', (e) => {
-      // Ignore if clicking the action buttons
+      // Ignore if clicking the action buttons or history dropdown
       if ((e.target as HTMLElement).closest('.btn-1click-bankroll') || 
           (e.target as HTMLElement).closest('.btn-push-alert') ||
           (e.target as HTMLElement).closest('.btn-toggle-manual-trade') ||
-          (e.target as HTMLElement).closest('.btn-trigger-trade-entry')) return;
+          (e.target as HTMLElement).closest('.btn-trigger-trade-entry') ||
+          (e.target as HTMLElement).closest('.opp-history-dropdown-wrapper') ||
+          (e.target as HTMLElement).closest('.opp-history-toggle-btn')) return;
 
       const targetLid = opp.leagueId;
       

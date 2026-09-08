@@ -278,6 +278,8 @@ function mapResponseToMatchData(fixtureItem: any): MatchData {
     status: fixtureItem.fixture.status.short,
     elapsed: fixtureItem.fixture.status.elapsed || 0,
     receivedAt: Date.now(),
+    round: fixtureItem.league?.round || '',
+    date: fixtureItem.fixture?.date || '',
     goalsHome: fixtureItem.goals.home ?? 0,
     goalsAway: fixtureItem.goals.away ?? 0,
     halftimeHome: fixtureItem.score?.halftime?.home ?? 0,
