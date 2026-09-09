@@ -1938,10 +1938,77 @@ button[id^="close-"]:hover,
   transition: all 0.2s ease;
 }
 
-.btn-opp-fullscreen:hover {
-  background: rgba(56, 189, 248, 0.3);
-  color: #fff;
-  border-color: #38bdf8;
+.brand-header-capsule {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(11, 19, 32, 0.95);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.brand-logo-pill {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  flex-shrink: 0;
+}
+
+.brand-logo-img {
+  height: 34px;
+  max-width: 150px;
+  object-fit: contain;
+  filter: contrast(1.08) saturate(1.15);
+}
+
+.brand-title-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 1;
+}
+
+.brand-title-text {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+@media (max-width: 650px) {
+  .brand-header-capsule {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.3rem 0.5rem;
+    gap: 0.4rem;
+  }
+  .brand-logo-pill {
+    padding: 0.2rem 0.45rem;
+  }
+  .brand-logo-img {
+    height: 26px;
+    max-width: 110px;
+  }
+  .brand-title-text {
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
+  }
+  .landing-nav-header {
+    padding: 0.6rem 0.8rem !important;
+    gap: 0.6rem !important;
+  }
 }
 
 
