@@ -17,11 +17,15 @@
 <body>
   <div class="container">
     <header>
-      <h1 style="display: flex; align-items: center; gap: 0.65rem;">
-        <img src="/logo.png" alt="Streak Tracker" style="width: 38px; height: 38px; border-radius: 8px; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); border: 1px solid rgba(56, 189, 248, 0.3);" />
-        <span class="live-indicator"></span>
-        <span>Rastreador de Rachas</span>
-      </h1>
+      <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.35rem;">
+          <span class="live-indicator"></span>
+          <span>Rastreador de Rachas</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <img src="/enrachas-logo.png" alt="EnRachas" style="height: 38px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.35));" />
+        </div>
+      </div>
       <div id="global-counters" class="global-counters">
         <span class="indicators-header-label">Indicadores:</span>
         <div class="counter-badge counter-orange"><span id="count-orange">0</span> <span class="counter-label">Naranjas</span></div>
