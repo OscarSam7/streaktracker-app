@@ -1903,9 +1903,10 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       });
     });
 
-    // Helper to open Bankroll modal and prefill operation
+    // Helper to open Nueva Operación modal directly and prefill operation
     const handleTriggerTrade = (e: Event) => {
       e.stopPropagation();
+      e.preventDefault();
 
       // Auto-activate tracked trade if not already active
       if (!state.activeTrades[opKey]) {
@@ -1924,34 +1925,61 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         saveActiveTrades(state.activeTrades);
       }
 
-      const bankrollModal = document.getElementById('bankroll-modal') as HTMLDialogElement;
-      if (bankrollModal) {
-        bankrollModal.showModal();
-        const tabCalcBtn = bankrollModal.querySelector('[data-tab="tab-calculator"]') as HTMLButtonElement;
-        if (tabCalcBtn) tabCalcBtn.click();
-        
-        const oddsInput = document.getElementById('calc-odds-input') as HTMLInputElement;
-        if (oddsInput) {
-          oddsInput.value = opp.suggestedOdds.toFixed(2);
-          triggerStakeCalc();
-        }
+      // Check Plan Limit if FREE
+      if (state.currentPlan === 'FREE' && state.bankrollRawOps.length >= 5) {
+        alert('🔒 En el Plan FREE puedes registrar hasta 5 operaciones de prueba. ¡Actualiza a PRO o VIP para operaciones ilimitadas!');
+        const pricingModal = document.getElementById('pricing-modal') as HTMLDialogElement;
+        if (pricingModal) pricingModal.showModal();
+        return;
+      }
 
-        // Also prefill the New Operation form fields
-        const opFormDesc = document.getElementById('op-form-desc') as HTMLInputElement;
-        const opFormMarket = document.getElementById('op-form-market') as HTMLInputElement;
-        const opFormOdds = document.getElementById('op-form-odds') as HTMLInputElement;
-        const opFormCategory = document.getElementById('op-form-category') as HTMLSelectElement;
+      const today = new Date().toISOString().split('T')[0];
+      const nowTime = new Date().toTimeString().slice(0, 5);
 
-        if (opFormDesc) opFormDesc.value = `${opp.leagueName} (${opp.country}) - ${opp.fixtureName}`;
-        if (opFormMarket) opFormMarket.value = `${opp.actionMarketLabel} (Racha: ${opp.marketLabel})`;
-        if (opFormOdds) opFormOdds.value = opp.suggestedOdds.toFixed(2);
-        if (opFormCategory) opFormCategory.value = 'Fútbol Cuantitativo';
+      const opFormDate = document.getElementById('op-form-date') as HTMLInputElement;
+      const opFormTime = document.getElementById('op-form-time') as HTMLInputElement;
+      const opFormDesc = document.getElementById('op-form-desc') as HTMLInputElement;
+      const opFormMarket = document.getElementById('op-form-market') as HTMLInputElement;
+      const opFormOdds = document.getElementById('op-form-odds') as HTMLInputElement;
+      const opFormStake = document.getElementById('op-form-stake') as HTMLInputElement;
+      const opFormCategory = document.getElementById('op-form-category') as HTMLSelectElement;
+      const opFormType = document.getElementById('op-form-type') as HTMLSelectElement;
+
+      if (opFormDate) opFormDate.value = today;
+      if (opFormTime) opFormTime.value = nowTime;
+      if (opFormDesc) opFormDesc.value = `${opp.leagueName} (${opp.country}) - ${opp.fixtureName}`;
+      if (opFormMarket) opFormMarket.value = `${opp.actionMarketLabel} (Racha: ${opp.marketLabel})`;
+      if (opFormOdds) opFormOdds.value = opp.suggestedOdds ? opp.suggestedOdds.toFixed(2) : '1.90';
+      if (opFormCategory) opFormCategory.value = 'Fútbol';
+      if (opFormType) opFormType.value = opp.isLive ? 'En vivo (Live)' : 'Pre-partido';
+
+      // Pre-calculate suggested stake based on bankroll settings
+      const cap = (state.bankrollConfig.initialCapital || 1000) + state.bankrollRawOps.reduce((sum, op) => {
+        if (op.status === 'Ganada') return sum + (op.stake * (op.odds - 1));
+        if (op.status === 'Perdida') return sum - op.stake;
+        return sum;
+      }, 0);
+      const stakePct = (state.bankrollConfig.recommendedStakePct || 0.02);
+      const suggestedStake = Math.max(5, Math.round(cap * stakePct));
+      if (opFormStake) opFormStake.value = suggestedStake.toString();
+
+      const newOpModal = document.getElementById('new-op-modal') as HTMLDialogElement;
+      if (newOpModal) {
+        newOpModal.showModal();
       }
     };
 
     const triggerTradeBtn = card.querySelector('.btn-trigger-trade-entry');
     if (triggerTradeBtn) {
       triggerTradeBtn.addEventListener('click', handleTriggerTrade);
+    }
+
+    const bannerActive = card.querySelector('.opp-active-trade-banner');
+    if (bannerActive) {
+      bannerActive.addEventListener('click', (e) => {
+        if ((e.target as HTMLElement).closest('.btn-toggle-manual-trade')) return;
+        handleTriggerTrade(e);
+      });
     }
 
     const opBtn = card.querySelector('.btn-1click-bankroll');
@@ -1966,6 +1994,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           (e.target as HTMLElement).closest('.btn-push-alert') ||
           (e.target as HTMLElement).closest('.btn-toggle-manual-trade') ||
           (e.target as HTMLElement).closest('.btn-trigger-trade-entry') ||
+          (e.target as HTMLElement).closest('.opp-active-trade-banner') ||
           (e.target as HTMLElement).closest('.opp-history-dropdown-wrapper') ||
           (e.target as HTMLElement).closest('.opp-history-toggle-btn') ||
           (e.target as HTMLElement).closest('.btn-opp-fullscreen')) return;
