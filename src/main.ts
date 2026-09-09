@@ -2121,9 +2121,9 @@ function updateStaticLanguageTexts() {
   const lang = t();
 
   // App Title
-  const titleEl = document.querySelector('header h1');
-  if (titleEl) {
-    titleEl.innerHTML = `<img src="/logo.png" alt="Streak Tracker" style="width: 38px; height: 38px; border-radius: 8px; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); border: 1px solid rgba(56, 189, 248, 0.3);" /> <span class="live-indicator"></span> <span>${lang.appTitle}</span>`;
+  const brandTitleEl = document.querySelector<HTMLElement>('.brand-title-text');
+  if (brandTitleEl) {
+    brandTitleEl.innerText = lang.appTitle || 'Rastreador de Rachas';
   }
 
   // Buttons
