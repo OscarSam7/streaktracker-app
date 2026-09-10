@@ -1,4 +1,4 @@
-export type Language = 'es' | 'en' | 'pt';
+export type Language = 'es' | 'en' | 'pt' | 'gn';
 
 export interface Translations {
   appTitle: string;
@@ -870,6 +870,224 @@ export const I18N: Record<Language, Translations> = {
       calcDesc: "Calcula o tamanho ideal de posição com base no capital disponível e perfil de risco.",
       suggestedStake: "Monto Sugerido (Stake)",
       riskValidation: "Validação de Risco"
+    }
+  },
+
+  gn: {
+    appTitle: "Rastreador de Rachas",
+    planLabel: "Plán:",
+    plans: {
+      BASIC: "Plán FREE ($0) — Básico",
+      PRO: "Plán PRO ($19) — Kuantitativo",
+      VIP: "Plán VIP ($39) — Oparupiete"
+    },
+    header: {
+      indicators: "Techaukaha:",
+      logout: "🚪 Sẽ",
+      whichMarket: "📖 Mba'e Mercado Jaiporuta?",
+      backtest: "📈 Backtesting",
+      audit: "🛡️ Auditoría Pública",
+      academy: "🎓 Academia",
+      bankroll: "💼 Banca Ñangareko",
+      exportCsv: "📥 Exportar CSV",
+      telegram: "🤖 Bot Telegram",
+      pricing: "💎 Ehecha Plan-kuéra",
+      refreshTitle: "Embopyahu ligakuéra ko'ápe",
+      manageLeagues: "Ligas Ñangareko",
+      dailyReport: "📊 Jornada Informe",
+      transparency: "🔍 Transparencia ha Resultados",
+      portalWeb: "🌐 Portal Web",
+      adminPanel: "⚙️ Panel Admin"
+    },
+    trialBanner: {
+      title: "Prueba Gratuita Oĩva Hína",
+      countdown: "Nde prueba opáta {days} ára pukukue ryepýpe.",
+      upgradePro: "⚡ Embotuicha PRO-pe ($19/m)",
+      upgradeVip: "👑 Embotuicha VIP-pe ($39/m)"
+    },
+    actions: {
+      exportCsv: "📥 Exportar CSV",
+      pricing: "💎 Ehecha Plan-kuéra",
+      refresh: "🔄 Embopyahu",
+      manageLeagues: "Ligas Ñangareko",
+      telegramBot: "🤖 Bot Telegram",
+      bankroll: "💼 Banca Ñangareko",
+      backtest: "📈 Backtesting",
+      audit: "🛡️ Auditoría Pública",
+      academy: "🎓 Academia",
+      close: "✓ Mboaje"
+    },
+    filters: {
+      searchPlaceholder: "🔍 Eheka liga térã tetã...",
+      searchBtn: "🔍 Eheka",
+      all: "🔘 Opaite Ligakuéra",
+      highAlerts: "🟢 Alertas Hovy / Hovyũ (Opaite)",
+      highToday: "🟢🔵 Ko'ág̃agua Alerta Hovy / Hovyũ",
+      liveOnly: "🔴 En Vivo Añoite",
+      upcomingOnly: "📅 Partidokuéra Oúva",
+      operating: "⚡ Jaoperahína",
+      todayOnly: "🔥 Ko'árape Oñeha'ãva",
+      todayBadge: "🔥 OHA'Ã KO'ÁG̃A"
+    },
+    opportunitiesCenter: {
+      title: "OPORTUNIDADES RENDA",
+      subtitle: "Ranking algorítmico multicriterio (Signal Score, Jerovia, Muestra, Liga Calidad ha Horario).",
+      detectedBadge: "ojetopa",
+      fAll: "🔘 OPAITE",
+      fPremium: "🟢 PREMIUM",
+      fStrong: "🔵 IMBARETE",
+      fLive: "🔴 EN VIVO",
+      fUpcoming: "📅 OÚVA",
+      fOperating: "⚡ JAOPERAHÍNA",
+      operatingTag: "JAOPERAHÍNA:",
+      inProgressBadge: "OJEHÚHINA",
+      monitoringBreak: "⚡ Ñama'ẽ hese opa peve (Racha: {streak})",
+      deactivateBtn: "⏸️ Embopa",
+      startTradeHeader: "EÑEPYRŨ OPERACIÓN:",
+      validatedSignal: "✅ Señal Validada (Racha: {streak}) • Cuota sugerida: @{odds}",
+      activateBtn: "⚡ Emohenda",
+      startBtn: "🚀 Eñepyrũ",
+      currentStreakLabel: "RACHA KO'ÁG̃AGUA",
+      matchesSuffix: "partido",
+      sampleSizeLabel: "MUESTRA HISTÓRICA",
+      casesSuffix: "kaso",
+      winrateLabel: "WIN RATE HIST.",
+      roiLabel: "ROI HISTÓRICO",
+      suggestedOddsLabel: "CUOTA ESTIMADA",
+      leagueQualityLabel: "LIGA CALIDAD",
+      pushAlertTitle: "🔔 Emohenda Push Alerta (10 min mboyve)",
+      noOpportunities: "Ndaipóri oportunidad ko filtro rupive."
+    },
+    dashboard: {
+      title: "RASTREADORES",
+      subtitle: "Monitoreo en Vivo Liga-rehe",
+      clickToOpp: "👉 Epoko rehecha haguã {league} oportunidades",
+      waitingSchedule: "Oñeha'arõ hína horario",
+      noLiveMatches: "Ko'ág̃a ndaipóri partido en vivo.",
+      noUpcoming: "Ndaipóri partido oñeprogramáva"
+    },
+    operationalMarkets: {
+      draw: "🎯 Operar: Empate (FT)",
+      over35: "🎯 Operar: 3.5 Gol Ári",
+      htDraw: "🎯 Operar: Empate (1T)",
+      bttsOver25: "🎯 Operar: Mokõivéva Omoinge + >2.5",
+      btts1H: "🎯 Operar: Mokõivéva Omoinge (1T)"
+    },
+    actionGuide: {
+      title: "Mba'e Mercado Jaiporuta: Guía de Ejecución",
+      subtitle: "Mba'éichapa jahechakuaáta Alertas de Oportunidad ha mba'e mercado jaiporúta?",
+      rule: "Principio Estadístico: Peteĩ liga ohasávo heta partido peteĩ suceso oiko'ỹre (anomalía), probabilidad tuicha ojupi opa haguã pe racha, ha mercado jaiporúva ha'e pe evento opávo pe racha."
+    },
+    markets: {
+      draw: "Empate'ỹre (FT)",
+      over35: "3.5 Goles Mboyve",
+      htDraw: "Empate'ỹre (1T)",
+      bttsOver25: "Mokõivéva Omba'apo'ỹre + >2.5",
+      btts1H: "Mokõivéva Omba'apo'ỹre (1T)"
+    },
+    streaks: {
+      negativeStreaksTitle: "Rastreadores • Oportunidades Alertas:",
+      brokenAt: "Opáma ko'ápe:",
+      matchesUnit: "partido",
+      lockedBadge: "🔒 Eipe'a PRO-pe",
+      noLiveMatches: "Ko'ág̃a ndaipóri partido en directo.",
+      upcomingPrefix: "Oúva hína:",
+      oneClickBankrollBtn: "⚡ Emoinge Bancape",
+      recentRoundsTitle: "Jornadas Mboyvegua (Resultados)",
+      viewHistoryBtn: "📊 Ehecha 3 Jornadas Mboyve",
+      hideHistoryBtn: "▲ Emoñemi Resultados",
+      loadingHistory: "Oñemboguejy hína liga resultados...",
+      noHistoryAvailable: "Ndaipóri resultado ko'ã jornadas-pe.",
+      fullscreenBtn: "⛶ Pantalla Completa",
+      sortAscBtn: "▲ Fecha: Ymaguare guive Ko'ág̃agua peve",
+      sortDescBtn: "▼ Fecha: Ko'ág̃agua guive Ymaguare peve",
+      closeFullscreenBtn: "✕ Mboty",
+      closeDropdownBtn: "✕ Mboty Jornadas",
+      nextRoundTitle: "Jornada Oúva Oñeha'ãta",
+      nextRoundBadge: "JORNADA OÚVA",
+      previousRoundsBadge: "JORNADA MBOYVE"
+    },
+    counters: {
+      orange: "Narãmby",
+      yellow: "Sa'yju",
+      blue: "Hovy",
+      green: "Hovyũ"
+    },
+    newOpModal: {
+      title: "➕ Emoinge Operación Pyahu",
+      date: "Ára (Fecha)",
+      time: "Hora",
+      category: "Categoría",
+      operationType: "Tipo Operación",
+      desc: "Descripción / Partidokuéra",
+      market: "Mercado / Segmento",
+      stake: "Monto Jaipurúva ($)",
+      odds: "Cuota / Multiplicador",
+      status: "Estado Inicial",
+      notes: "Observaciones (Opcional)",
+      cancelBtn: "Embogue",
+      saveBtn: "💾 Eñongatu Operación"
+    },
+    leaguesModal: {
+      title: "Ligakuéra Oĩva Activo",
+      selectAll: "Eiporavo Opaite",
+      requireElite: "(🔒 Oikotevẽ VIP)",
+      limitBasicAlert: "🔒 FREE Plan-pe ikatu emoĩ 5 ligas añoite. Embotuicha PRO-pe 15 ligas térã VIP-pe opa 51 ligas oficiales!",
+      limitProAlert: "🔒 PRO Plan-pe oreko 15 ligas límite. Embotuicha VIP-pe emoĩ hag̃ua opaite 51 ligas oficiales!",
+      requireEliteAlert: "🔒 \"Eiporavo Opaite\" oĩ exclusivamente Plan VIP-pe (51 ligas oficiales)."
+    },
+    telegramModal: {
+      title: "Telegram VIP Bot Simulador",
+      subtitle: "Ehecha mba'éichapa og̃uahẽ señales automáticas nde canal suscriptor-kuérape.",
+      botStatus: "Bot Oĩ Conectado • 24/7 en tiempo real",
+      channelTitle: "🏆 StreakTracker VIP Signals",
+      generateBtn: "🔔 Emoheñói Alerta en Vivo",
+      copyBtn: "📋 Ecopia Señal",
+      copiedNotice: "Oñecopia portapapeles-pe!",
+      alertTitleGreen: "🚨 ALERTA HOVYŨ (PROBABILIDAD TUICHAITE)",
+      alertTitleBlue: "⚡ ALERTA HOVY (MERCADO SEGURO)",
+      leagueLabel: "⚽ Liga:",
+      marketLabel: "📊 Mercado:",
+      streakLabel: "🔥 Racha:",
+      nextMatchLabel: "⏰ Partido oúva:",
+      suggestionLabel: "💡 Mba'épa jajapóta:",
+      suggestionGreen: "Probabilidad estadística tuichaite opávo racha (reversión a la media).",
+      suggestionBlue: "Racha hi'ajuetéva. Ema'ẽ porã cuotas de valor-rehe.",
+      footerNote: "🤖 Alerta omoheñói automáticamente StreakTracker Engine"
+    },
+    pricingModal: {
+      title: "Planes ha Suscripciones",
+      subtitle: "Eipe'a análisis estadístico mbarete en tiempo real ha embotuicha nde ganancias."
+    },
+    bankroll: {
+      btnTitle: "💼 Banca Ñangareko",
+      modalTitle: "OPERACIONES CUADERNO — BANCA ÑANGAREKO",
+      modalSubtitle: "Sistema profesional pirapire ñangarekópe, estadística ha riesgo control strict-pe.",
+      tabDashboard: "📊 Dashboard Financiero",
+      tabOperations: "📝 Operaciones Kuatia",
+      tabCalculator: "🧮 Stake Calculadora",
+      tabConfig: "⚙️ Banca Parámetros",
+      newOpBtn: "➕ Operación Pyahu",
+      exportExcelBtn: "📥 Emboguejy Excel (.xlsx)",
+      exportCsvBtn: "📄 Exportar CSV",
+      capitalInitial: "Capital Inicial",
+      capitalCurrent: "Capital Ko'ág̃agua",
+      totalPnl: "Resultado Neto (P&L)",
+      totalProfit: "Ganancias Oparupigua",
+      totalLoss: "Pérdidas Oparupigua",
+      roi: "ROI Global",
+      yield: "Yield Total",
+      winrate: "Win Rate (Acierto %)",
+      exposure: "Exposición Ko'ág̃a",
+      availableCap: "Capital Oĩva Libre",
+      committedCap: "Capital Oñeha'ãva",
+      maxDrawdown: "Drawdown Máximo",
+      profitFactor: "Profit Factor",
+      ev: "Expectativa Matemática (EV)",
+      calcTitle: "Calculadora de Stake & Regla Anti-Martingala",
+      calcDesc: "Eikuaa mboy pirapire reipuru va'erã nde capital ha riesgo perfil rupive.",
+      suggestedStake: "Monto Sugerido (Stake)",
+      riskValidation: "Riesgo Validación"
     }
   }
 };
