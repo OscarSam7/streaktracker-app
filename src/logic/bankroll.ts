@@ -1,4 +1,4 @@
-export type OperationStatus = 'Ganada' | 'Perdida' | 'Pendiente' | 'Cancelada' | 'Reembolsada';
+export type OperationStatus = 'Ganada' | 'Perdida' | 'Pendiente' | 'Cancelada' | 'Reembolsada' | 'Nula';
 
 export interface CurrencyConfig {
   code: string;
@@ -44,6 +44,8 @@ export interface BankrollOperation {
   cumulativePnl: number;
   discipline: '🟢 DENTRO LÍMITE' | '🟡 PRECAUCIÓN' | '🔴 EXCESO RIESGO';
   notes: string;
+  is_locked: boolean;
+  locked_at: string | null;
 }
 
 export interface BankrollConfig {
@@ -103,15 +105,15 @@ export const DEFAULT_CONFIG: BankrollConfig = {
 };
 
 export const INITIAL_SAMPLE_OPERATIONS: Array<Omit<BankrollOperation, 'capitalBefore' | 'stakePct' | 'potentialReturn' | 'potentialProfit' | 'pnl' | 'capitalAfter' | 'roi' | 'riskPct' | 'cumulativePnl' | 'discipline'>> = [
-  { id: 'OP-001', date: '2026-08-01', time: '15:30', category: 'Fútbol Cuantitativo', description: 'Real Madrid vs Sevilla', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Ganada', stake: 20, odds: 3.20, notes: 'Operación por racha Sin Empate (FT)' },
-  { id: 'OP-002', date: '2026-08-02', time: '18:00', category: 'Fútbol Cuantitativo', description: 'Inter vs Monza', operationType: 'Pre-partido', market: 'Empate (HT)', status: 'Ganada', stake: 20, odds: 2.10, notes: 'Operación por racha Sin Empate (HT)' },
-  { id: 'OP-003', date: '2026-08-03', time: '20:45', category: 'Fútbol Cuantitativo', description: 'Sporting CP vs Braga', operationType: 'En vivo (Live)', market: 'Más de 3.5 goles', status: 'Perdida', stake: 20, odds: 2.80, notes: 'Operación por racha Menos de 3.5 goles' },
-  { id: 'OP-004', date: '2026-08-04', time: '19:00', category: 'Fútbol Cuantitativo', description: 'Flamengo vs Palmeiras', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Ganada', stake: 20, odds: 3.10, notes: 'Operación por racha Sin Empate (FT)' },
-  { id: 'OP-005', date: '2026-08-05', time: '17:15', category: 'Fútbol Cuantitativo', description: 'Arsenal vs Chelsea', operationType: 'Pre-partido', market: 'Ambos Marcan + >2.5', status: 'Ganada', stake: 25, odds: 2.20, notes: 'Operación por racha Sin BTTS + >2.5' },
-  { id: 'OP-006', date: '2026-08-06', time: '21:00', category: 'Fútbol Cuantitativo', description: 'Boca Juniors vs River Plate', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Perdida', stake: 20, odds: 3.00, notes: 'Operación por racha Sin Empate (FT)' },
-  { id: 'OP-007', date: '2026-08-07', time: '16:00', category: 'Fútbol Cuantitativo', description: 'Bayern vs Dortmund', operationType: 'En vivo (Live)', market: 'Más de 3.5 goles', status: 'Ganada', stake: 20, odds: 2.65, notes: 'Operación por racha Menos de 3.5 goles' },
-  { id: 'OP-008', date: '2026-08-08', time: '18:30', category: 'Fútbol Cuantitativo', description: 'PSG vs Marseille', operationType: 'Pre-partido', market: 'Ambos Marcan (HT)', status: 'Ganada', stake: 20, odds: 4.20, notes: 'Operación por racha Sin BTTS (1er Tiempo)' },
-  { id: 'OP-009', date: '2026-08-09', time: '20:00', category: 'Fútbol Cuantitativo', description: 'Juventus vs Roma', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Pendiente', stake: 20, odds: 3.25, notes: 'Operación en curso' }
+  { id: 'OP-001', date: '2026-08-01', time: '15:30', category: 'Fútbol Cuantitativo', description: 'Real Madrid vs Sevilla', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Ganada', stake: 20, odds: 3.20, notes: 'Operación por racha Sin Empate (FT)', is_locked: true, locked_at: '2026-08-01T17:30:00.000Z' },
+  { id: 'OP-002', date: '2026-08-02', time: '18:00', category: 'Fútbol Cuantitativo', description: 'Inter vs Monza', operationType: 'Pre-partido', market: 'Empate (HT)', status: 'Ganada', stake: 20, odds: 2.10, notes: 'Operación por racha Sin Empate (HT)', is_locked: true, locked_at: '2026-08-02T19:00:00.000Z' },
+  { id: 'OP-003', date: '2026-08-03', time: '20:45', category: 'Fútbol Cuantitativo', description: 'Sporting CP vs Braga', operationType: 'En vivo (Live)', market: 'Más de 3.5 goles', status: 'Perdida', stake: 20, odds: 2.80, notes: 'Operación por racha Menos de 3.5 goles', is_locked: true, locked_at: '2026-08-03T22:45:00.000Z' },
+  { id: 'OP-004', date: '2026-08-04', time: '19:00', category: 'Fútbol Cuantitativo', description: 'Flamengo vs Palmeiras', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Ganada', stake: 20, odds: 3.10, notes: 'Operación por racha Sin Empate (FT)', is_locked: true, locked_at: '2026-08-04T21:00:00.000Z' },
+  { id: 'OP-005', date: '2026-08-05', time: '17:15', category: 'Fútbol Cuantitativo', description: 'Arsenal vs Chelsea', operationType: 'Pre-partido', market: 'Ambos Marcan + >2.5', status: 'Ganada', stake: 25, odds: 2.20, notes: 'Operación por racha Sin BTTS + >2.5', is_locked: true, locked_at: '2026-08-05T19:15:00.000Z' },
+  { id: 'OP-006', date: '2026-08-06', time: '21:00', category: 'Fútbol Cuantitativo', description: 'Boca Juniors vs River Plate', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Perdida', stake: 20, odds: 3.00, notes: 'Operación por racha Sin Empate (FT)', is_locked: true, locked_at: '2026-08-06T23:00:00.000Z' },
+  { id: 'OP-007', date: '2026-08-07', time: '16:00', category: 'Fútbol Cuantitativo', description: 'Bayern vs Dortmund', operationType: 'En vivo (Live)', market: 'Más de 3.5 goles', status: 'Ganada', stake: 20, odds: 2.65, notes: 'Operación por racha Menos de 3.5 goles', is_locked: true, locked_at: '2026-08-07T18:00:00.000Z' },
+  { id: 'OP-008', date: '2026-08-08', time: '18:30', category: 'Fútbol Cuantitativo', description: 'PSG vs Marseille', operationType: 'Pre-partido', market: 'Ambos Marcan (HT)', status: 'Ganada', stake: 20, odds: 4.20, notes: 'Operación por racha Sin BTTS (1er Tiempo)', is_locked: true, locked_at: '2026-08-08T19:30:00.000Z' },
+  { id: 'OP-009', date: '2026-08-09', time: '20:00', category: 'Fútbol Cuantitativo', description: 'Juventus vs Roma', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Pendiente', stake: 20, odds: 3.25, notes: 'Operación en curso', is_locked: false, locked_at: null }
 ];
 
 export function getCurrencyConfig(code: string = 'USD'): CurrencyConfig {
@@ -182,8 +184,12 @@ export function calculateProcessedOperations(rawOps: any[], config: BankrollConf
     } else if (op.status === 'Perdida') {
       realPnl = -stake;
     } else {
-      realPnl = 0; // Pendiente, Cancelada, Reembolsada
+      realPnl = 0; // Pendiente, Nula, Cancelada, Reembolsada
     }
+
+    const isResolved = op.status === 'Ganada' || op.status === 'Perdida' || op.status === 'Nula' || op.status === 'Cancelada' || op.status === 'Reembolsada';
+    const isLocked = op.is_locked !== undefined ? Boolean(op.is_locked) : isResolved;
+    const lockedAt = isLocked ? (op.locked_at || new Date().toISOString()) : null;
 
     const capAfter = op.status === 'Pendiente' ? capBefore : capBefore + realPnl;
     if (op.status !== 'Pendiente') {
@@ -221,7 +227,9 @@ export function calculateProcessedOperations(rawOps: any[], config: BankrollConf
       riskPct: stakePct,
       cumulativePnl: runningPnl,
       discipline: discipline,
-      notes: op.notes || ''
+      notes: op.notes || '',
+      is_locked: isLocked,
+      locked_at: lockedAt
     };
   });
 }

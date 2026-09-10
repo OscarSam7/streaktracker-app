@@ -4167,6 +4167,8 @@ function setupBankrollModule() {
       const status = (document.getElementById('op-form-status') as HTMLSelectElement).value as OperationStatus;
       const notes = (document.getElementById('op-form-notes') as HTMLInputElement).value;
 
+      const isLocked = status !== 'Pendiente';
+      const lockedAt = isLocked ? new Date().toISOString() : null;
       const nextId = `OP-${String(state.bankrollRawOps.length + 1).padStart(3, '0')}`;
 
       state.bankrollRawOps.push({
@@ -4180,7 +4182,9 @@ function setupBankrollModule() {
         stake,
         odds,
         status,
-        notes
+        notes,
+        is_locked: isLocked,
+        locked_at: lockedAt
       });
 
       saveRawOperations(state.bankrollRawOps);
@@ -4352,65 +4356,109 @@ function refreshBankrollUI() {
       `;
     } else {
       processedOps.forEach((op, idx) => {
-      const tr = document.createElement('tr');
-      const discColor = op.discipline.includes('🔴') ? '#f87171' : op.discipline.includes('🟡') ? '#facc15' : '#4ade80';
+        const tr = document.createElement('tr');
+        const discColor = op.discipline.includes('🔴') ? '#f87171' : op.discipline.includes('🟡') ? '#facc15' : '#4ade80';
+        const isLocked = Boolean(op.is_locked);
 
-      tr.innerHTML = `
-        <td style="font-weight: 700; color: #38bdf8;">${op.id}</td>
-        <td>${op.date}</td>
-        <td style="color: var(--text-muted);">${op.time}</td>
-        <td><strong>${op.description}</strong></td>
-        <td><span style="font-size: 0.72rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 0.2rem;">${op.market}</span></td>
-        <td>
-          <select class="op-status-select" data-idx="${idx}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 0.3rem; padding: 0.15rem 0.3rem; font-size: 0.75rem;">
+        const statusCellHtml = isLocked ? `
+          <div style="display: flex; align-items: center; gap: 0.3rem;">
+            <span class="status-locked-pill" title="Registro auditado y bloqueado (${op.locked_at ? new Date(op.locked_at).toLocaleString() : 'Inmutable'})" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; font-weight: 700; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.15rem 0.45rem; border-radius: 0.35rem; color: #fff;">
+              <span>🔒</span>
+              <span>${op.status === 'Ganada' ? '🟢 Ganada' : op.status === 'Perdida' ? '🔴 Perdida' : op.status === 'Nula' ? '⚪ Nula' : '⚪ ' + op.status}</span>
+            </span>
+          </div>
+        ` : `
+          <select class="op-status-select" data-idx="${idx}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(56,189,248,0.3); color: #fff; border-radius: 0.3rem; padding: 0.15rem 0.3rem; font-size: 0.75rem; cursor: pointer;">
+            <option value="Pendiente" ${op.status === 'Pendiente' ? 'selected' : ''}>⏳ Pendiente</option>
             <option value="Ganada" ${op.status === 'Ganada' ? 'selected' : ''}>🟢 Ganada</option>
             <option value="Perdida" ${op.status === 'Perdida' ? 'selected' : ''}>🔴 Perdida</option>
-            <option value="Pendiente" ${op.status === 'Pendiente' ? 'selected' : ''}>⏳ Pendiente</option>
+            <option value="Nula" ${op.status === 'Nula' ? 'selected' : ''}>⚪ Nula</option>
             <option value="Cancelada" ${op.status === 'Cancelada' ? 'selected' : ''}>⚪ Cancelada</option>
             <option value="Reembolsada" ${op.status === 'Reembolsada' ? 'selected' : ''}>🟡 Reembolsada</option>
           </select>
-        </td>
-        <td>${formatCurrency(op.capitalBefore, currCode)}</td>
-        <td style="font-weight: 700; color: #fff;">${formatCurrency(op.stake, currCode)}</td>
-        <td style="color: var(--text-muted);">${(op.stakePct * 100).toFixed(1)}%</td>
-        <td style="font-weight: 600;">${op.odds.toFixed(2)}</td>
-        <td style="font-weight: 700; color: ${op.pnl > 0 ? '#4ade80' : op.pnl < 0 ? '#f87171' : 'var(--text-muted)'}">
-          ${formatCurrency(op.pnl, currCode, true)}
-        </td>
-        <td style="font-weight: 700;">${formatCurrency(op.capitalAfter, currCode)}</td>
-        <td style="color: ${op.roi >= 0 ? '#4ade80' : '#f87171'}">${(op.roi * 100).toFixed(1)}%</td>
-        <td style="font-size: 0.72rem; font-weight: 700; color: ${discColor};">${op.discipline}</td>
-        <td>
-          <button class="btn op-delete-btn" data-idx="${idx}" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);" title="Eliminar registro">✕</button>
-        </td>
-      `;
+        `;
 
-      tbody.appendChild(tr);
-    });
+        const actionCellHtml = isLocked ? `
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <span class="badge-locked" title="Registro auditado y bloqueado (${op.locked_at ? new Date(op.locked_at).toLocaleString() : 'Inmutable'})" style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.68rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.15rem 0.45rem; border-radius: 0.35rem; cursor: default; white-space: nowrap;">
+              <span>🔒</span>
+              <span>Registro auditado y bloqueado</span>
+            </span>
+          </div>
+        ` : `
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <button class="btn op-delete-btn" data-idx="${idx}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); cursor: pointer;" title="Eliminar registro pendiente">✕</button>
+          </div>
+        `;
 
-    // Listeners for status dropdown changes
-    tbody.querySelectorAll('.op-status-select').forEach(sel => {
-      sel.addEventListener('change', (e) => {
-        const target = e.target as HTMLSelectElement;
-        const opIdx = parseInt(target.dataset.idx || '0', 10);
-        state.bankrollRawOps[opIdx].status = target.value;
-        saveRawOperations(state.bankrollRawOps);
-        refreshBankrollUI();
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: #38bdf8;">${op.id}</td>
+          <td>${op.date}</td>
+          <td style="color: var(--text-muted);">${op.time}</td>
+          <td><strong>${op.description}</strong></td>
+          <td><span style="font-size: 0.72rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 0.2rem;">${op.market}</span></td>
+          <td>${statusCellHtml}</td>
+          <td>${formatCurrency(op.capitalBefore, currCode)}</td>
+          <td style="font-weight: 700; color: #fff;">${formatCurrency(op.stake, currCode)}</td>
+          <td style="color: var(--text-muted);">${(op.stakePct * 100).toFixed(1)}%</td>
+          <td style="font-weight: 600;">${op.odds.toFixed(2)}</td>
+          <td style="font-weight: 700; color: ${op.pnl > 0 ? '#4ade80' : op.pnl < 0 ? '#f87171' : 'var(--text-muted)'}">
+            ${formatCurrency(op.pnl, currCode, true)}
+          </td>
+          <td style="font-weight: 700;">${formatCurrency(op.capitalAfter, currCode)}</td>
+          <td style="color: ${op.roi >= 0 ? '#4ade80' : '#f87171'}">${(op.roi * 100).toFixed(1)}%</td>
+          <td style="font-size: 0.72rem; font-weight: 700; color: ${discColor};">${op.discipline}</td>
+          <td>${actionCellHtml}</td>
+        `;
+
+        tbody.appendChild(tr);
       });
-    });
 
-    // Listeners for delete buttons
-    tbody.querySelectorAll('.op-delete-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const target = e.currentTarget as HTMLButtonElement;
-        const opIdx = parseInt(target.dataset.idx || '0', 10);
-        if (confirm(`¿Seguro que deseas eliminar la operación ${state.bankrollRawOps[opIdx].id}?`)) {
-          state.bankrollRawOps.splice(opIdx, 1);
+      // Listeners for status dropdown changes
+      tbody.querySelectorAll('.op-status-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+          const target = e.target as HTMLSelectElement;
+          const opIdx = parseInt(target.dataset.idx || '0', 10);
+          const rawOp = state.bankrollRawOps[opIdx];
+          if (!rawOp || rawOp.is_locked) {
+            alert('🔒 Este registro está auditado y bloqueado. No se puede modificar.');
+            refreshBankrollUI();
+            return;
+          }
+          const newStatus = target.value as OperationStatus;
+          rawOp.status = newStatus;
+          if (newStatus === 'Ganada' || newStatus === 'Perdida' || newStatus === 'Nula' || newStatus === 'Cancelada' || newStatus === 'Reembolsada') {
+            rawOp.is_locked = true;
+            rawOp.locked_at = new Date().toISOString();
+            triggerPushNotification(
+              `🔒 Operación Auditada y Bloqueada`,
+              `La operación ${rawOp.id} ha sido liquidada como "${newStatus}" y archivada inmutablemente.`,
+              'toast-push-alert'
+            );
+          }
           saveRawOperations(state.bankrollRawOps);
           refreshBankrollUI();
-        }
+        });
       });
-    });
+
+      // Listeners for delete buttons
+      tbody.querySelectorAll('.op-delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget as HTMLButtonElement;
+          const opIdx = parseInt(target.dataset.idx || '0', 10);
+          const rawOp = state.bankrollRawOps[opIdx];
+          if (!rawOp) return;
+          if (rawOp.is_locked) {
+            alert('🔒 Este registro está auditado y bloqueado. No se puede eliminar.');
+            return;
+          }
+          if (confirm(`¿Seguro que deseas eliminar la operación pendiente ${rawOp.id}?`)) {
+            state.bankrollRawOps.splice(opIdx, 1);
+            saveRawOperations(state.bankrollRawOps);
+            refreshBankrollUI();
+          }
+        });
+      });
     }
   }
 

@@ -123,8 +123,8 @@ export function getTransparencySuite(): TransparencySuite {
     lastUpdatedFormatted: lastUpdated
   };
 
-  // 3. RESULTADOS REALES TRACK (Operaciones auditadas del Ledger Inmutable)
-  const resolvedSignalsList = ledger.filter(s => s.estado === 'GANADA' || s.estado === 'PERDIDA');
+  // 3. RESULTADOS REALES TRACK (Operaciones auditadas y bloqueadas del Ledger Inmutable)
+  const resolvedSignalsList = ledger.filter(s => (s.estado === 'GANADA' || s.estado === 'PERDIDA') && (s as any).is_locked !== false);
   const realSample = resolvedSignalsList.length;
   const isRealSampleAdequate = realSample >= 5; // Umbral mínimo de muestra
 
@@ -180,9 +180,9 @@ export function getTransparencySuite(): TransparencySuite {
   const realTrack: PerformanceTrackMetrics = {
     track: 'REAL_RESULTS',
     trackTitle: 'RESULTADOS REALES VERIFICADOS (LEDGER INMUTABLE)',
-    trackBadge: '🛡️ RESULTADOS REALES VERIFICADOS',
+    trackBadge: '🛡️ RESULTADOS REALES VERIFICADOS (IS_LOCKED = TRUE)',
     trackColor: '#4ade80',
-    trackDescription: 'Señales auditadas y liquidadas directamente en el Ledger Inmutable oficial de StreakTracker.',
+    trackDescription: 'Operaciones auditadas y bloqueadas inmutablemente (is_locked = true) en el registro oficial de StreakTracker.',
     sampleSize: realSample,
     sampleAdequate: isRealSampleAdequate,
     minSampleRequired: 5,
