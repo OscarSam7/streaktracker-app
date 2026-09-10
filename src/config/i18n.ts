@@ -8,6 +8,30 @@ export interface Translations {
     PRO: string;
     VIP: string;
   };
+  header: {
+    indicators: string;
+    logout: string;
+    whichMarket: string;
+    backtest: string;
+    audit: string;
+    academy: string;
+    bankroll: string;
+    exportCsv: string;
+    telegram: string;
+    pricing: string;
+    refreshTitle: string;
+    manageLeagues: string;
+    dailyReport: string;
+    transparency: string;
+    portalWeb: string;
+    adminPanel: string;
+  };
+  trialBanner: {
+    title: string;
+    countdown: string;
+    upgradePro: string;
+    upgradeVip: string;
+  };
   actions: {
     exportCsv: string;
     pricing: string;
@@ -22,6 +46,7 @@ export interface Translations {
   };
   filters: {
     searchPlaceholder: string;
+    searchBtn: string;
     all: string;
     highAlerts: string;
     highToday: string;
@@ -31,6 +56,43 @@ export interface Translations {
     todayBadge: string;
     operating: string;
   };
+  opportunitiesCenter: {
+    title: string;
+    subtitle: string;
+    detectedBadge: string;
+    fAll: string;
+    fPremium: string;
+    fStrong: string;
+    fLive: string;
+    fUpcoming: string;
+    fOperating: string;
+    operatingTag: string;
+    inProgressBadge: string;
+    monitoringBreak: string;
+    deactivateBtn: string;
+    startTradeHeader: string;
+    validatedSignal: string;
+    activateBtn: string;
+    startBtn: string;
+    currentStreakLabel: string;
+    matchesSuffix: string;
+    sampleSizeLabel: string;
+    casesSuffix: string;
+    winrateLabel: string;
+    roiLabel: string;
+    suggestedOddsLabel: string;
+    leagueQualityLabel: string;
+    pushAlertTitle: string;
+    noOpportunities: string;
+  };
+  dashboard: {
+    title: string;
+    subtitle: string;
+    clickToOpp: string;
+    waitingSchedule: string;
+    noLiveMatches: string;
+    noUpcoming: string;
+  };
   markets: {
     draw: string;
     over35: string;
@@ -38,14 +100,14 @@ export interface Translations {
     bttsOver25: string;
     btts1H: string;
   };
-  operationalMarkets?: {
+  operationalMarkets: {
     draw: string;
     over35: string;
     htDraw: string;
     bttsOver25: string;
     btts1H: string;
   };
-  actionGuide?: {
+  actionGuide: {
     title: string;
     subtitle: string;
     rule: string;
@@ -77,6 +139,21 @@ export interface Translations {
     yellow: string;
     blue: string;
     green: string;
+  };
+  newOpModal: {
+    title: string;
+    date: string;
+    time: string;
+    category: string;
+    operationType: string;
+    desc: string;
+    market: string;
+    stake: string;
+    odds: string;
+    status: string;
+    notes: string;
+    cancelBtn: string;
+    saveBtn: string;
   };
   leaguesModal: {
     title: string;
@@ -150,6 +227,30 @@ export const I18N: Record<Language, Translations> = {
       PRO: "Plan PRO ($19)",
       VIP: "Plan VIP ($39)"
     },
+    header: {
+      indicators: "Indicadores:",
+      logout: "🚪 Salir",
+      whichMarket: "📖 ¿Qué Mercado Operar?",
+      backtest: "📈 Backtesting",
+      audit: "🛡️ Auditoría",
+      academy: "🎓 Academia",
+      bankroll: "💼 Control de Banca",
+      exportCsv: "📥 Exportar CSV",
+      telegram: "🤖 Bot Telegram",
+      pricing: "💎 Ver Planes",
+      refreshTitle: "Actualizar datos de las ligas ahora",
+      manageLeagues: "Gestionar Ligas",
+      dailyReport: "📊 Informe de Jornada",
+      transparency: "🔍 Transparencia & Resultados",
+      portalWeb: "🌐 Portal Web",
+      adminPanel: "⚙️ Panel Admin"
+    },
+    trialBanner: {
+      title: "Período de Prueba Gratuita Activo",
+      countdown: "Tu prueba termina en {days} días.",
+      upgradePro: "⚡ Actualizar a PRO ($19/m)",
+      upgradeVip: "👑 Actualizar a VIP ($39/m)"
+    },
     actions: {
       exportCsv: "📥 Exportar CSV",
       pricing: "💎 Ver Planes",
@@ -158,12 +259,13 @@ export const I18N: Record<Language, Translations> = {
       telegramBot: "🤖 Bot Telegram",
       bankroll: "💼 Control de Banca",
       backtest: "📈 Backtesting",
-      audit: "🛡️ Auditoria Pública",
-      academy: "🎓 Academia Anti-Ruina",
+      audit: "🛡️ Auditoría",
+      academy: "🎓 Academia",
       close: "✓ Aceptar"
     },
     filters: {
       searchPlaceholder: "🔍 Buscar liga o país...",
+      searchBtn: "🔍 Buscar",
       all: "🔘 Todas las Ligas",
       highAlerts: "🟢 Alertas Verdes / Azules (Todas)",
       highToday: "🟢🔵 Alertas Verdes / Azules de Hoy",
@@ -173,12 +275,49 @@ export const I18N: Record<Language, Translations> = {
       todayOnly: "🔥 Partidos de Hoy",
       todayBadge: "🔥 JUEGA HOY"
     },
+    opportunitiesCenter: {
+      title: "CENTRO DE OPORTUNIDADES",
+      subtitle: "Ranking algorítmico multicriterio (Signal Score, Confianza, Muestra, Calidad de Liga y Horario).",
+      detectedBadge: "detectadas",
+      fAll: "🔘 TODAS",
+      fPremium: "🟢 PREMIUM",
+      fStrong: "🔵 FUERTES",
+      fLive: "🔴 EN VIVO",
+      fUpcoming: "📅 PRÓXIMAS",
+      fOperating: "⚡ OPERANDO",
+      operatingTag: "OPERANDO:",
+      inProgressBadge: "EN CURSO",
+      monitoringBreak: "⚡ Monitoreando hasta el quiebre (Racha: {streak})",
+      deactivateBtn: "⏸️ Desactivar",
+      startTradeHeader: "INICIAR OPERACIÓN:",
+      validatedSignal: "✅ Señal Validada (Racha: {streak}) • Cuota sugerida: @{odds}",
+      activateBtn: "⚡ Activar",
+      startBtn: "🚀 Iniciar",
+      currentStreakLabel: "RACHA ACTUAL",
+      matchesSuffix: "partidos",
+      sampleSizeLabel: "MUESTRA HISTÓRICA",
+      casesSuffix: "casos",
+      winrateLabel: "WIN RATE HIST.",
+      roiLabel: "ROI HISTÓRICO",
+      suggestedOddsLabel: "CUOTA ESTIMADA",
+      leagueQualityLabel: "CALIDAD LIGA",
+      pushAlertTitle: "🔔 Configurar Alerta Push (10 min antes)",
+      noOpportunities: "No hay oportunidades que coincidan con el filtro seleccionado."
+    },
+    dashboard: {
+      title: "RASTREADORES",
+      subtitle: "Monitoreo en Vivo por Liga",
+      clickToOpp: "👉 Clic para ver las oportunidades de {league} en el Centro de Oportunidades",
+      waitingSchedule: "En espera de programación",
+      noLiveMatches: "Actualmente no hay partidos en directo.",
+      noUpcoming: "Sin partidos programados"
+    },
     operationalMarkets: {
       draw: "🎯 Operar: Empate (FT)",
       over35: "🎯 Operar: Más de 3.5 goles",
-      htDraw: "🎯 Operar: Empate (HT)",
+      htDraw: "🎯 Operar: Empate (1T)",
       bttsOver25: "🎯 Operar: Ambos Marcan + >2.5",
-      btts1H: "🎯 Operar: Ambos Marcan (HT)"
+      btts1H: "🎯 Operar: Ambos Marcan (1T)"
     },
     actionGuide: {
       title: "Guía de Ejecución: Mercados de Operación",
@@ -219,6 +358,21 @@ export const I18N: Record<Language, Translations> = {
       yellow: "Amarillos",
       blue: "Azules",
       green: "Verdes"
+    },
+    newOpModal: {
+      title: "➕ Registrar Nueva Operación",
+      date: "Fecha",
+      time: "Hora",
+      category: "Categoría",
+      operationType: "Tipo Operación",
+      desc: "Descripción / Evento",
+      market: "Mercado / Segmento",
+      stake: "Monto Utilizado ($)",
+      odds: "Cuota / Multiplicador",
+      status: "Estado Inicial",
+      notes: "Observaciones (Opcional)",
+      cancelBtn: "Cancelar",
+      saveBtn: "💾 Guardar Operación"
     },
     leaguesModal: {
       title: "Ligas Activas",
@@ -291,6 +445,30 @@ export const I18N: Record<Language, Translations> = {
       PRO: "PRO Plan ($19)",
       VIP: "VIP Plan ($39)"
     },
+    header: {
+      indicators: "Indicators:",
+      logout: "🚪 Logout",
+      whichMarket: "📖 Which Market to Trade?",
+      backtest: "📈 Backtesting",
+      audit: "🛡️ Public Audit",
+      academy: "🎓 Academy",
+      bankroll: "💼 Bankroll Control",
+      exportCsv: "📥 Export CSV",
+      telegram: "🤖 Telegram Bot",
+      pricing: "💎 View Plans",
+      refreshTitle: "Refresh league data now",
+      manageLeagues: "Manage Leagues",
+      dailyReport: "📊 Matchday Report",
+      transparency: "🔍 Transparency & Results",
+      portalWeb: "🌐 Web Portal",
+      adminPanel: "⚙️ Admin Panel"
+    },
+    trialBanner: {
+      title: "Active Free Trial Period",
+      countdown: "Your trial ends in {days} days.",
+      upgradePro: "⚡ Upgrade to PRO ($19/mo)",
+      upgradeVip: "👑 Upgrade to VIP ($39/mo)"
+    },
     actions: {
       exportCsv: "📥 Export CSV",
       pricing: "💎 View Plans",
@@ -305,6 +483,7 @@ export const I18N: Record<Language, Translations> = {
     },
     filters: {
       searchPlaceholder: "🔍 Search league or country...",
+      searchBtn: "🔍 Search",
       all: "🔘 All Leagues",
       highToday: "🟢🔵 Today's Green / Blue Alerts",
       highAlerts: "🟢 Green / Blue Alerts (All)",
@@ -313,6 +492,43 @@ export const I18N: Record<Language, Translations> = {
       operating: "⚡ Active Trades",
       todayOnly: "🔥 Matches Today",
       todayBadge: "🔥 PLAYS TODAY"
+    },
+    opportunitiesCenter: {
+      title: "OPPORTUNITIES CENTER",
+      subtitle: "Multicriteria algorithmic ranking (Signal Score, Confidence, Sample, League Quality and Schedule).",
+      detectedBadge: "detected",
+      fAll: "🔘 ALL",
+      fPremium: "🟢 PREMIUM",
+      fStrong: "🔵 STRONG",
+      fLive: "🔴 LIVE",
+      fUpcoming: "📅 UPCOMING",
+      fOperating: "⚡ OPERATING",
+      operatingTag: "OPERATING:",
+      inProgressBadge: "IN PROGRESS",
+      monitoringBreak: "⚡ Monitoring until streak breaks (Streak: {streak})",
+      deactivateBtn: "⏸️ Deactivate",
+      startTradeHeader: "START TRADE:",
+      validatedSignal: "✅ Validated Signal (Streak: {streak}) • Suggested odds: @{odds}",
+      activateBtn: "⚡ Activate",
+      startBtn: "🚀 Start",
+      currentStreakLabel: "CURRENT STREAK",
+      matchesSuffix: "matches",
+      sampleSizeLabel: "HISTORICAL SAMPLE",
+      casesSuffix: "cases",
+      winrateLabel: "HIST. WIN RATE",
+      roiLabel: "HISTORICAL ROI",
+      suggestedOddsLabel: "ESTIMATED ODDS",
+      leagueQualityLabel: "LEAGUE QUALITY",
+      pushAlertTitle: "🔔 Configure Push Alert (10 min before)",
+      noOpportunities: "No opportunities match the selected filter."
+    },
+    dashboard: {
+      title: "TRACKERS",
+      subtitle: "Live Monitoring by League",
+      clickToOpp: "👉 Click to see opportunities for {league} in Opportunities Center",
+      waitingSchedule: "Waiting for schedule",
+      noLiveMatches: "No live matches currently in progress.",
+      noUpcoming: "No fixtures scheduled"
     },
     operationalMarkets: {
       draw: "🎯 Action: Draw (FT)",
@@ -360,6 +576,21 @@ export const I18N: Record<Language, Translations> = {
       yellow: "Yellow",
       blue: "Blue",
       green: "Green"
+    },
+    newOpModal: {
+      title: "➕ Register New Operation",
+      date: "Date",
+      time: "Time",
+      category: "Category",
+      operationType: "Operation Type",
+      desc: "Description / Event",
+      market: "Market / Segment",
+      stake: "Stake Amount ($)",
+      odds: "Odds / Multiplier",
+      status: "Initial Status",
+      notes: "Notes (Optional)",
+      cancelBtn: "Cancel",
+      saveBtn: "💾 Save Operation"
     },
     leaguesModal: {
       title: "Active Leagues",
@@ -432,6 +663,30 @@ export const I18N: Record<Language, Translations> = {
       PRO: "Plano PRO ($19)",
       VIP: "Plano VIP ($39)"
     },
+    header: {
+      indicators: "Indicadores:",
+      logout: "🚪 Sair",
+      whichMarket: "📖 Qual Mercado Operar?",
+      backtest: "📈 Backtesting",
+      audit: "🛡️ Auditoria Pública",
+      academy: "🎓 Academia",
+      bankroll: "💼 Gestão de Banca",
+      exportCsv: "📥 Exportar CSV",
+      telegram: "🤖 Bot Telegram",
+      pricing: "💎 Ver Planos",
+      refreshTitle: "Atualizar dados das ligas agora",
+      manageLeagues: "Gerenciar Ligas",
+      dailyReport: "📊 Relatório de Rodada",
+      transparency: "🔍 Transparência & Resultados",
+      portalWeb: "🌐 Portal Web",
+      adminPanel: "⚙️ Painel Admin"
+    },
+    trialBanner: {
+      title: "Período de Teste Grátis Ativo",
+      countdown: "Seu teste termina em {days} dias.",
+      upgradePro: "⚡ Atualizar para PRO ($19/m)",
+      upgradeVip: "👑 Atualizar para VIP ($39/m)"
+    },
     actions: {
       exportCsv: "📥 Exportar CSV",
       pricing: "💎 Ver Planos",
@@ -446,6 +701,7 @@ export const I18N: Record<Language, Translations> = {
     },
     filters: {
       searchPlaceholder: "🔍 Buscar liga ou país...",
+      searchBtn: "🔍 Buscar",
       all: "🔘 Todas as Ligas",
       highAlerts: "🟢 Alertas Verdes / Azuis (Todas)",
       highToday: "🟢🔵 Alertas Verdes / Azuis de Hoje",
@@ -454,6 +710,43 @@ export const I18N: Record<Language, Translations> = {
       operating: "⚡ Operando",
       todayOnly: "🔥 Jogos de Hoje",
       todayBadge: "🔥 JOGA HOJE"
+    },
+    opportunitiesCenter: {
+      title: "CENTRO DE OPORTUNIDADES",
+      subtitle: "Ranking algorítmico multicritério (Signal Score, Confiança, Amostra, Qualidade da Liga e Horário).",
+      detectedBadge: "detectadas",
+      fAll: "🔘 TODAS",
+      fPremium: "🟢 PREMIUM",
+      fStrong: "🔵 FORTES",
+      fLive: "🔴 AO VIVO",
+      fUpcoming: "📅 PRÓXIMAS",
+      fOperating: "⚡ OPERANDO",
+      operatingTag: "OPERANDO:",
+      inProgressBadge: "EM ANDAMENTO",
+      monitoringBreak: "⚡ Monitorando até quebrar a sequência (Sequência: {streak})",
+      deactivateBtn: "⏸️ Desativar",
+      startTradeHeader: "INICIAR OPERAÇÃO:",
+      validatedSignal: "✅ Sinal Validado (Sequência: {streak}) • Odd sugerida: @{odds}",
+      activateBtn: "⚡ Ativar",
+      startBtn: "🚀 Iniciar",
+      currentStreakLabel: "SEQUÊNCIA ATUAL",
+      matchesSuffix: "jogos",
+      sampleSizeLabel: "AMOSTRA HISTÓRICA",
+      casesSuffix: "casos",
+      winrateLabel: "WIN RATE HIST.",
+      roiLabel: "ROI HISTÓRICO",
+      suggestedOddsLabel: "ODD ESTIMADA",
+      leagueQualityLabel: "QUALIDADE LIGA",
+      pushAlertTitle: "🔔 Configurar Alerta Push (10 min antes)",
+      noOpportunities: "Nenhuma oportunidade corresponde ao filtro selecionado."
+    },
+    dashboard: {
+      title: "RASTREADORES",
+      subtitle: "Monitoramento Ao Vivo por Liga",
+      clickToOpp: "👉 Clique para ver as oportunidades de {league} no Centro de Oportunidades",
+      waitingSchedule: "Aguardando programação",
+      noLiveMatches: "Nenhuma partida ao vivo no momento.",
+      noUpcoming: "Sem jogos programados"
     },
     operationalMarkets: {
       draw: "🎯 Operar: Empate (FT)",
@@ -501,6 +794,21 @@ export const I18N: Record<Language, Translations> = {
       yellow: "Amarelos",
       blue: "Azuis",
       green: "Verdes"
+    },
+    newOpModal: {
+      title: "➕ Registrar Nova Operação",
+      date: "Data",
+      time: "Hora",
+      category: "Categoria",
+      operationType: "Tipo Operação",
+      desc: "Descrição / Evento",
+      market: "Mercado / Segmento",
+      stake: "Montante Utilizado ($)",
+      odds: "Odd / Multiplicador",
+      status: "Status Inicial",
+      notes: "Observações (Opcional)",
+      cancelBtn: "Cancelar",
+      saveBtn: "💾 Salvar Operação"
     },
     leaguesModal: {
       title: "Ligas Ativas",
@@ -565,3 +873,4 @@ export const I18N: Record<Language, Translations> = {
     }
   }
 };
+

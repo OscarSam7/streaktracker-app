@@ -1444,14 +1444,18 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       const isPastOrAtHT = lm.status === 'HT' || lm.status === '2H' || lm.status === 'FT' || lm.status === 'AET' || lm.status === 'PEN';
       const htScoreSuffix = isPastOrAtHT ? ` (HT ${lm.halftimeHome ?? 0}-${lm.halftimeAway ?? 0})` : '';
       fixtureName = `🔴 ${lm.homeTeam} ${lm.goalsHome} - ${lm.goalsAway} ${lm.awayTeam}${htScoreSuffix}`;
-      matchTimeStr = `EN VIVO • ${liveTimeFormatted}`;
+      matchTimeStr = `${lang.opportunitiesCenter.fLive} • ${liveTimeFormatted}`;
       sortTimestamp = Date.now(); // Máxima prioridad de inmediatez
     } else if (hasUpcoming) {
       const um = validUpcoming[0];
       const matchDate = new Date(um.date);
       fixtureName = `${um.homeTeam} vs ${um.awayTeam}`;
-      matchTimeStr = matchDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) + ' (' + matchDate.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }) + ')';
+      const dateLocale = state.currentLang === 'en' ? 'en-US' : (state.currentLang === 'pt' ? 'pt-BR' : 'es-ES');
+      matchTimeStr = matchDate.toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' }) + ' (' + matchDate.toLocaleDateString(dateLocale, { weekday: 'short', day: 'numeric', month: 'short' }) + ')';
       sortTimestamp = matchDate.getTime();
+    } else {
+      fixtureName = lang.dashboard.waitingSchedule;
+      matchTimeStr = lang.opportunitiesCenter.noOpportunities ? (state.currentLang === 'en' ? 'TBD' : 'Por confirmar') : 'Por confirmar';
     }
 
     const marketList = [
@@ -1571,7 +1575,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
   if (elCLive) elCLive.innerText = cLive.toString();
   if (elCUpc) elCUpc.innerText = cUpc.toString();
   if (elCOperating) elCOperating.innerText = cOperating.toString();
-  if (countBadge) countBadge.innerText = `${cAll} detectadas`;
+  if (countBadge) countBadge.innerText = `${cAll} ${lang.opportunitiesCenter.detectedBadge}`;
 
   // Apply oppFilter
   const filtered = allOpportunities.filter(o => {
@@ -1589,7 +1593,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     oppGrid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; background: rgba(0,0,0,0.25); border-radius: 0.75rem; border: 1px dashed rgba(255,255,255,0.1);">
         <span style="font-size: 1.2rem;">⚡</span>
-        <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.4rem; margin-bottom: 0;">No hay oportunidades que coincidan con el filtro seleccionado.</p>
+        <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.4rem; margin-bottom: 0;">${lang.opportunitiesCenter.noOpportunities}</p>
       </div>
     `;
     return;
@@ -1644,16 +1648,16 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
             <span style="font-size: 1.1rem; filter: drop-shadow(0 0 4px #06b6d4);">⚡</span>
             <div>
               <div style="font-size: 0.72rem; font-weight: 900; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
-                OPERANDO: ${opp.actionMarketLabel}
-                <span class="opp-operating-pill">EN CURSO</span>
+                ${lang.opportunitiesCenter.operatingTag} ${opp.actionMarketLabel}
+                <span class="opp-operating-pill">${lang.opportunitiesCenter.inProgressBadge}</span>
               </div>
               <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.1rem;">
-                ⚡ Monitoreando hasta el quiebre (Racha: ${opp.marketLabel})
+                ${lang.opportunitiesCenter.monitoringBreak.replace('{streak}', opp.marketLabel)}
               </div>
             </div>
           </div>
-          <button class="btn-toggle-manual-trade btn-trade-deactivate" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" title="Desactivar seguimiento de esta operación">
-            ⏸️ Desactivar
+          <button class="btn-toggle-manual-trade btn-trade-deactivate" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" title="${lang.opportunitiesCenter.deactivateBtn}">
+            ${lang.opportunitiesCenter.deactivateBtn}
           </button>
         </div>
       `;
@@ -1663,16 +1667,16 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           <div style="display: flex; align-items: center; gap: 0.4rem;">
             <span style="font-size: 0.85rem;">🎯</span>
             <div>
-              <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80;">INICIAR OPERACIÓN: ${opp.actionMarketLabel}</div>
-              <div style="font-size: 0.6rem; color: #e2e8f0;">✅ Señal Validada (Racha: ${opp.marketLabel}) • Cuota sugerida: @${opp.suggestedOdds.toFixed(2)}</div>
+              <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80;">${lang.opportunitiesCenter.startTradeHeader} ${opp.actionMarketLabel}</div>
+              <div style="font-size: 0.6rem; color: #e2e8f0;">${lang.opportunitiesCenter.validatedSignal.replace('{streak}', opp.marketLabel).replace('{odds}', opp.suggestedOdds.toFixed(2))}</div>
             </div>
           </div>
           <div style="display: flex; gap: 0.3rem; align-items: center;">
-            <button class="btn-toggle-manual-trade btn-trade-activate" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" title="Activar operación en seguimiento">
-              ⚡ Activar
+            <button class="btn-toggle-manual-trade btn-trade-activate" data-league-id="${opp.leagueId}" data-market-key="${opp.marketKey}" title="${lang.opportunitiesCenter.activateBtn}">
+              ${lang.opportunitiesCenter.activateBtn}
             </button>
-            <button class="opp-btn-action-trade btn-trigger-trade-entry" title="Registrar entrada en la gestión de banca">
-              🚀 Iniciar
+            <button class="opp-btn-action-trade btn-trigger-trade-entry" title="${lang.opportunitiesCenter.startBtn}">
+              ${lang.opportunitiesCenter.startBtn}
             </button>
           </div>
         </div>
@@ -1719,27 +1723,27 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       <!-- Statistical Grid: Racha, Muestra, WinRate, ROI, Cuota -->
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; background: rgba(255,255,255,0.02); padding: 0.4rem; border-radius: 5px; font-size: 0.65rem; text-align: center; margin-top: 0.35rem;">
         <div>
-          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">RACHA ACTUAL</span>
-          <strong style="color: #fff; font-size: 0.76rem;">${opp.streakCurrent} partidos</strong>
+          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.currentStreakLabel}</span>
+          <strong style="color: #fff; font-size: 0.76rem;">${opp.streakCurrent} ${lang.opportunitiesCenter.matchesSuffix}</strong>
         </div>
         <div>
-          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">MUESTRA HISTÓRICA</span>
-          <strong style="color: #38bdf8; font-size: 0.76rem;">${opp.sampleSize} casos</strong>
+          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.sampleSizeLabel}</span>
+          <strong style="color: #38bdf8; font-size: 0.76rem;">${opp.sampleSize} ${lang.opportunitiesCenter.casesSuffix}</strong>
         </div>
         <div>
-          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">WIN RATE HIST.</span>
+          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.winrateLabel}</span>
           <strong style="color: #4ade80; font-size: 0.76rem;">${opp.winratePct}%</strong>
         </div>
         <div>
-          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">ROI HISTÓRICO</span>
+          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.roiLabel}</span>
           <strong style="color: #4ade80; font-size: 0.76rem;">+${opp.historicalRoiPct}%</strong>
         </div>
         <div>
-          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">CUOTA ESTIMADA</span>
+          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.suggestedOddsLabel}</span>
           <strong style="color: #facc15; font-size: 0.76rem;">@${opp.suggestedOdds.toFixed(2)}</strong>
         </div>
         <div>
-          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">CALIDAD LIGA</span>
+          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.leagueQualityLabel}</span>
           <strong style="color: #38bdf8; font-size: 0.76rem;">${opp.leagueQualityScore} pts</strong>
         </div>
       </div>
@@ -1749,7 +1753,7 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         <span style="font-size: 0.6rem; color: #cbd5e1; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;" title="${opp.confidenceExplanation}">
           "${opp.confidenceExplanation}"
         </span>
-        <button class="btn-push-alert" data-league-id="${opp.leagueId}" title="🔔 Configurar Alerta Push (10 min antes)" style="font-size: 0.68rem; padding: 0.25rem 0.45rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 4px; cursor: pointer; flex-shrink: 0;">
+        <button class="btn-push-alert" data-league-id="${opp.leagueId}" title="${lang.opportunitiesCenter.pushAlertTitle}" style="font-size: 0.68rem; padding: 0.25rem 0.45rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 4px; cursor: pointer; flex-shrink: 0;">
           🔔
         </button>
       </div>
@@ -2140,6 +2144,8 @@ function setupLanguageSelector() {
     state.currentLang = langSelect.value as Language;
     updateStaticLanguageTexts();
     renderDashboard();
+    renderOpportunitiesCenter();
+    refreshBankrollUI();
     updateLeagueModalToggles();
   });
 
@@ -2155,21 +2161,82 @@ function updateStaticLanguageTexts() {
     brandTitleEl.innerText = lang.appTitle || 'Rastreador de Rachas';
   }
 
-  // Buttons
-  if (pricingBtn) pricingBtn.innerText = lang.actions.pricing;
-  if (refreshBtn) refreshBtn.title = lang.actions.refresh;
-  if (leagueBtn) leagueBtn.innerText = lang.actions.manageLeagues;
-  if (telegramBtn) telegramBtn.innerText = lang.actions.telegramBot;
-  if (exportCsvBtn) exportCsvBtn.innerText = lang.actions.exportCsv;
+  // Header Indicators Label
+  const indHeaderLabel = document.querySelector<HTMLElement>('.indicators-header-label');
+  if (indHeaderLabel) {
+    indHeaderLabel.innerText = lang.header.indicators;
+  }
 
-  // Plan Label
+  // Header Buttons
+  const logoutBtn = document.getElementById('logout-header-btn');
+  if (logoutBtn) logoutBtn.innerText = lang.header.logout;
+
+  const guideBtn = document.getElementById('guide-btn');
+  if (guideBtn) guideBtn.innerText = lang.header.whichMarket;
+
+  const backtestBtn = document.getElementById('backtest-btn');
+  if (backtestBtn) backtestBtn.innerText = lang.header.backtest;
+
+  const auditBtn = document.getElementById('audit-btn');
+  if (auditBtn) auditBtn.innerText = lang.header.audit;
+
+  const academyBtn = document.getElementById('academy-btn');
+  if (academyBtn) academyBtn.innerText = lang.header.academy;
+
+  const bankrollBtn = document.getElementById('bankroll-btn');
+  if (bankrollBtn) bankrollBtn.innerText = lang.header.bankroll;
+
+  if (exportCsvBtn) exportCsvBtn.innerText = lang.header.exportCsv;
+  if (telegramBtn) telegramBtn.innerText = lang.header.telegram;
+  if (pricingBtn) pricingBtn.innerText = lang.header.pricing;
+  if (refreshBtn) refreshBtn.title = lang.header.refreshTitle;
+  if (leagueBtn) leagueBtn.innerText = lang.header.manageLeagues;
+
+  const dailyReportBtn = document.getElementById('daily-report-btn');
+  if (dailyReportBtn) dailyReportBtn.innerText = lang.header.dailyReport;
+
+  const transparencyBtn = document.getElementById('transparency-btn');
+  if (transparencyBtn) transparencyBtn.innerText = lang.header.transparency;
+
+  const adminPanelBtn = document.getElementById('admin-panel-btn');
+  if (adminPanelBtn) adminPanelBtn.innerText = lang.header.adminPanel;
+
+  const landingPortalLink = document.querySelector<HTMLElement>('header a[href="/landing.html"]');
+  if (landingPortalLink) landingPortalLink.innerText = lang.header.portalWeb;
+
+  // Plan Label & Plan Options
   const planLabelEl = document.getElementById('plan-label');
   if (planLabelEl) planLabelEl.innerText = lang.planLabel;
 
-  // Search input placeholder
-  if (searchInput) searchInput.placeholder = lang.filters.searchPlaceholder;
+  const planSelectEl = document.getElementById('plan-select') as HTMLSelectElement;
+  if (planSelectEl) {
+    const optFree = planSelectEl.querySelector('option[value="FREE"]');
+    const optTrial = planSelectEl.querySelector('option[value="TRIAL"]');
+    const optPro = planSelectEl.querySelector('option[value="PRO"]');
+    const optVip = planSelectEl.querySelector('option[value="VIP"]');
 
-  // Filter pills
+    if (optFree) optFree.textContent = state.currentLang === 'en' ? '⚪ FREE (Basic)' : (state.currentLang === 'pt' ? '⚪ FREE (Básico)' : '⚪ FREE (Básico)');
+    if (optTrial) optTrial.textContent = state.currentLang === 'en' ? '🧪 TRIAL (3-Day Trial)' : (state.currentLang === 'pt' ? '🧪 TRIAL (Teste 3 Dias)' : '🧪 TRIAL (Prueba 3 Días)');
+    if (optPro) optPro.textContent = state.currentLang === 'en' ? '🔵 PRO (Quantitative)' : (state.currentLang === 'pt' ? '🔵 PRO (Quantitativo)' : '🔵 PRO (Cuantitativo)');
+    if (optVip) optVip.textContent = state.currentLang === 'en' ? '🟢 VIP (All Inclusive)' : (state.currentLang === 'pt' ? '🟢 VIP (Tudo Incluído)' : '🟢 VIP (Todo Incluido)');
+  }
+
+  // Trial Active Banner
+  const trialBannerTitle = document.getElementById('trial-banner-title');
+  if (trialBannerTitle) trialBannerTitle.innerText = lang.trialBanner.title;
+
+  const trialProBtn = document.getElementById('trial-upgrade-pro-btn');
+  if (trialProBtn) trialProBtn.innerText = lang.trialBanner.upgradePro;
+
+  const trialVipBtn = document.getElementById('trial-upgrade-vip-btn');
+  if (trialVipBtn) trialVipBtn.innerText = lang.trialBanner.upgradeVip;
+
+  // Search input & Action button
+  if (searchInput) searchInput.placeholder = lang.filters.searchPlaceholder;
+  const searchActionBtn = document.getElementById('search-action-btn');
+  if (searchActionBtn) searchActionBtn.innerText = lang.filters.searchBtn;
+
+  // Dashboard Filter pills
   const pillAll = document.querySelector('[data-filter="all"]') as HTMLElement;
   const pillHighToday = document.querySelector('[data-filter="high_today"]') as HTMLElement;
   const pillHigh = document.querySelector('[data-filter="high_alerts"]') as HTMLElement;
@@ -2194,6 +2261,109 @@ function updateStaticLanguageTexts() {
     countLabels[2].textContent = lang.counters.blue;
     countLabels[3].textContent = lang.counters.green;
   }
+
+  // Opportunities Center Static Elements
+  const oppSectionTitle = document.querySelector<HTMLElement>('#opportunities-center-section h2');
+  if (oppSectionTitle) {
+    const badgeHtml = `<span id="opp-count-badge" style="font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">${document.getElementById('opp-count-badge')?.innerText || '0 ' + lang.opportunitiesCenter.detectedBadge}</span>`;
+    oppSectionTitle.innerHTML = `${lang.opportunitiesCenter.title} ${badgeHtml}`;
+  }
+
+  const oppSectionSubtitle = document.querySelector<HTMLElement>('#opportunities-center-section p');
+  if (oppSectionSubtitle) {
+    oppSectionSubtitle.innerText = lang.opportunitiesCenter.subtitle;
+  }
+
+  // Opportunities Quick Filter Pills
+  const oppPillAll = document.querySelector('[data-opp-filter="all"]') as HTMLElement;
+  const oppPillPrem = document.querySelector('[data-opp-filter="premium"]') as HTMLElement;
+  const oppPillStrong = document.querySelector('[data-opp-filter="strong"]') as HTMLElement;
+  const oppPillLive = document.querySelector('[data-opp-filter="live"]') as HTMLElement;
+  const oppPillUpc = document.querySelector('[data-opp-filter="upcoming"]') as HTMLElement;
+  const oppPillOper = document.querySelector('[data-opp-filter="operating"]') as HTMLElement;
+
+  if (oppPillAll) oppPillAll.innerHTML = `🔘 ${lang.opportunitiesCenter.fAll} (<span id="opp-fcount-all">${document.getElementById('opp-fcount-all')?.innerText || '0'}</span>)`;
+  if (oppPillPrem) oppPillPrem.innerHTML = `🟢 ${lang.opportunitiesCenter.fPremium} (<span id="opp-fcount-premium">${document.getElementById('opp-fcount-premium')?.innerText || '0'}</span>)`;
+  if (oppPillStrong) oppPillStrong.innerHTML = `🔵 ${lang.opportunitiesCenter.fStrong} (<span id="opp-fcount-strong">${document.getElementById('opp-fcount-strong')?.innerText || '0'}</span>)`;
+  if (oppPillLive) oppPillLive.innerHTML = `🔴 ${lang.opportunitiesCenter.fLive} (<span id="opp-fcount-live">${document.getElementById('opp-fcount-live')?.innerText || '0'}</span>)`;
+  if (oppPillUpc) oppPillUpc.innerHTML = `📅 ${lang.opportunitiesCenter.fUpcoming} (<span id="opp-fcount-upcoming">${document.getElementById('opp-fcount-upcoming')?.innerText || '0'}</span>)`;
+  if (oppPillOper) oppPillOper.innerHTML = `⚡ ${lang.opportunitiesCenter.fOperating} (<span id="opp-fcount-operating">${document.getElementById('opp-fcount-operating')?.innerText || '0'}</span>)`;
+
+  // Dashboard Section Heading
+  const dashboardHeading = document.querySelector<HTMLElement>('main > div > h2');
+  if (dashboardHeading) {
+    dashboardHeading.innerHTML = `
+      <span style="color: #38bdf8;">📊</span> ${lang.dashboard.title}
+      <span style="font-size: 0.7rem; font-weight: 700; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
+        ${lang.dashboard.subtitle}
+      </span>
+    `;
+  }
+
+  // Bankroll Modal Static Texts
+  const bkTitle = document.getElementById('bankroll-modal-title');
+  if (bkTitle) bkTitle.innerText = `💼 ${lang.bankroll.modalTitle}`;
+
+  const bkSub = document.getElementById('bankroll-modal-subtitle');
+  if (bkSub) bkSub.innerText = lang.bankroll.modalSubtitle;
+
+  const bkNewBtn = document.getElementById('bankroll-new-op-btn');
+  if (bkNewBtn) bkNewBtn.innerText = lang.bankroll.newOpBtn;
+
+  const bkXlsxBtn = document.getElementById('bankroll-download-xlsx-btn');
+  if (bkXlsxBtn) bkXlsxBtn.innerText = lang.bankroll.exportExcelBtn;
+
+  const bkCsvBtn = document.getElementById('bankroll-export-csv-btn');
+  if (bkCsvBtn) bkCsvBtn.innerText = lang.bankroll.exportCsvBtn;
+
+  // Bankroll Tab Buttons
+  const tabDash = document.querySelector('[data-tab="tab-dashboard"]') as HTMLElement;
+  const tabOps = document.querySelector('[data-tab="tab-operations"]') as HTMLElement;
+  const tabCalc = document.querySelector('[data-tab="tab-calculator"]') as HTMLElement;
+  const tabCfg = document.querySelector('[data-tab="tab-config"]') as HTMLElement;
+
+  if (tabDash) tabDash.innerText = lang.bankroll.tabDashboard;
+  if (tabOps) tabOps.innerText = lang.bankroll.tabOperations;
+  if (tabCalc) tabCalc.innerText = lang.bankroll.tabCalculator;
+  if (tabCfg) tabCfg.innerText = lang.bankroll.tabConfig;
+
+  // Bankroll KPI Cards labels
+  const kpiLabels = document.querySelectorAll('.bankroll-kpi-card .kpi-label');
+  if (kpiLabels.length >= 9) {
+    kpiLabels[0].textContent = lang.bankroll.capitalInitial;
+    kpiLabels[1].textContent = lang.bankroll.capitalCurrent;
+    kpiLabels[2].textContent = lang.bankroll.totalPnl;
+    kpiLabels[3].textContent = lang.bankroll.roi;
+    kpiLabels[4].textContent = lang.bankroll.winrate;
+    kpiLabels[5].textContent = lang.bankroll.exposure;
+    kpiLabels[6].textContent = lang.bankroll.maxDrawdown;
+    kpiLabels[7].textContent = lang.bankroll.profitFactor;
+    kpiLabels[8].textContent = lang.bankroll.ev;
+  }
+
+  // New Operation Modal Texts
+  const newOpTitle = document.querySelector('#new-op-modal h3');
+  if (newOpTitle) newOpTitle.textContent = lang.newOpModal.title;
+
+  const newOpLabels = document.querySelectorAll('#new-op-modal label');
+  if (newOpLabels.length >= 8) {
+    newOpLabels[0].textContent = lang.newOpModal.date;
+    newOpLabels[1].textContent = lang.newOpModal.time;
+    newOpLabels[2].textContent = lang.newOpModal.category;
+    newOpLabels[3].textContent = lang.newOpModal.operationType;
+    newOpLabels[4].textContent = lang.newOpModal.desc;
+    newOpLabels[5].textContent = lang.newOpModal.market;
+    newOpLabels[6].textContent = lang.newOpModal.stake;
+    newOpLabels[7].textContent = lang.newOpModal.odds;
+    if (newOpLabels[8]) newOpLabels[8].textContent = lang.newOpModal.status;
+    if (newOpLabels[9]) newOpLabels[9].textContent = lang.newOpModal.notes;
+  }
+
+  const cancelNewOpBtn = document.getElementById('cancel-new-op-btn');
+  if (cancelNewOpBtn) cancelNewOpBtn.innerText = lang.newOpModal.cancelBtn;
+
+  const submitNewOpBtn = document.querySelector('#new-op-form button[type="submit"]') as HTMLElement;
+  if (submitNewOpBtn) submitNewOpBtn.innerText = lang.newOpModal.saveBtn;
 
   // Modals Titles
   const lmTitle = document.getElementById('league-modal-title');
