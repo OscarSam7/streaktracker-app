@@ -334,6 +334,8 @@ export interface Translations {
     chartTitle: string;
     chartSub: string;
     disclaimer: string;
+    kpiSimulatedDisclaimer?: string;
+    kpiSimulatedTooltip?: string;
   };
   auditModal: {
     title: string;
@@ -815,7 +817,7 @@ export const I18N: Record<Language, Translations> = {
       "noAlerts": "Sin alertas registradas en este período"
     },
     "backtestModal": {
-      "title": "📈 BACKTESTING & RENDIMIENTO HISTÓRICO",
+      "title": "📈 Simulación Histórica (Backtest) - 3 Temporadas",
       "subtitle": "Simulación cuantitativa y validación empírica sobre más de 3 temporadas completas en las 50+ ligas oficiales.",
       "tagHistorical": "RESULTADO HISTÓRICO / BACKTEST",
       "lblLeague": "1. Liga",
@@ -837,7 +839,9 @@ export const I18N: Record<Language, Translations> = {
       "optStake1": "1.00% (Conservador)",
       "optStake2": "2.00% (Moderado)",
       "optStake3": "3.00% (Agresivo)",
-      "kpiAccumYield": "Rendimiento Acumulado",
+      "kpiAccumYield": "Resultado Simulado",
+      "kpiSimulatedDisclaimer": "Este es un resultado de simulación sobre datos pasados. No constituye garantía de rendimiento futuro. El rendimiento pasado no predice el futuro.",
+      "kpiSimulatedTooltip": "Backtest cuantitativo sobre 248 señales históricas. Cálculo con stake fijo 2%.",
       "kpiWinRate": "Tasa de Acierto (Win Rate)",
       "kpiAvgOdds": "Cuota Media Ponderada",
       "kpiTotalRoi": "ROI Total %",
@@ -1903,7 +1907,9 @@ export const I18N: Record<Language, Translations> = {
       "optStake1": "1.00% (Conservador)",
       "optStake2": "2.00% (Moderado)",
       "optStake3": "3.00% (Agressivo)",
-      "kpiAccumYield": "Rendimento Acumulado",
+      "kpiAccumYield": "Resultado Simulado",
+      "kpiSimulatedDisclaimer": "Este é um resultado de simulação sobre dados passados. Não constitui garantia de desempenho futuro. O desempenho passado não prevê o futuro.",
+      "kpiSimulatedTooltip": "Backtest quantitativo em 248 sinais históricos. Cálculo com stake fixo de 2%.",
       "kpiWinRate": "Taxa de Acerto (Win Rate)",
       "kpiAvgOdds": "Odd Média Ponderada",
       "kpiTotalRoi": "ROI Total %",

@@ -1177,6 +1177,33 @@ dialog::backdrop {
   z-index: 10;
 }
 
+.info-tooltip-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.info-tooltip-badge:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 130%;
+  right: 0;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  white-space: normal;
+  width: 220px;
+  line-height: 1.35;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  pointer-events: none;
+}
+
 
 /* Prominent Today Match Badge & Card Glow */
 .today-badge-chip {

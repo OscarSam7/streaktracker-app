@@ -670,7 +670,7 @@
           <div>
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <h2 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem; margin: 0;">
-                📈 BACKTESTING & RENDIMIENTO HISTÓRICO
+                📈 Simulación Histórica (Backtest) - 3 Temporadas
               </h2>
               <span style="font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
                 RESULTADO HISTÓRICO / BACKTEST
@@ -741,9 +741,18 @@
         <!-- 13 Comprehensive Backtest Metrics Cards -->
         <div class="bankroll-kpi-grid" style="margin-bottom: 1.25rem;">
           <div class="bankroll-kpi-card highlight-card">
-            <span class="kpi-label">Rendimiento Acumulado</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.25rem;">
+              <span class="kpi-label">Resultado Simulado</span>
+              <span class="info-tooltip-badge" style="position: relative; display: inline-flex; align-items: center; cursor: pointer; color: #94a3b8;" title="Backtest cuantitativo sobre 248 señales históricas. Cálculo con stake fijo 2%." data-tooltip="Backtest cuantitativo sobre 248 señales históricas. Cálculo con stake fijo 2%.">
+                <span style="font-size: 0.85rem;">ℹ️</span>
+              </span>
+            </div>
             <span class="kpi-value positive" id="bt-yield">+41.20%</span>
             <span class="kpi-sub" id="bt-signals-count">184 Señales Históricas</span>
+            <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 0.35rem; line-height: 1.3; display: flex; align-items: flex-start; gap: 0.25rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.3rem;" id="bt-simulated-legal-note">
+              <span style="font-size: 0.7rem; color: #38bdf8; flex-shrink: 0;">ℹ️</span>
+              <span>Este es un resultado de simulación sobre datos pasados. No constituye garantía de rendimiento futuro. El rendimiento pasado no predice el futuro.</span>
+            </div>
           </div>
           <div class="bankroll-kpi-card">
             <span class="kpi-label">Tasa de Acierto (Win Rate)</span>

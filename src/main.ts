@@ -2522,6 +2522,15 @@ function updateBacktestModalTexts() {
   const kpiCards = modal.querySelectorAll('.bankroll-kpi-grid .bankroll-kpi-card');
   if (kpiCards.length >= 9) {
     kpiCards[0].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiAccumYield;
+    const infoBadge = kpiCards[0].querySelector('.info-tooltip-badge');
+    if (infoBadge && lang.backtestModal.kpiSimulatedTooltip) {
+      infoBadge.setAttribute('title', lang.backtestModal.kpiSimulatedTooltip);
+      infoBadge.setAttribute('data-tooltip', lang.backtestModal.kpiSimulatedTooltip);
+    }
+    const noteEl = kpiCards[0].querySelector('#bt-simulated-legal-note span:last-child');
+    if (noteEl && lang.backtestModal.kpiSimulatedDisclaimer) {
+      noteEl.textContent = lang.backtestModal.kpiSimulatedDisclaimer;
+    }
     kpiCards[1].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiWinRate;
     kpiCards[2].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiAvgOdds;
     kpiCards[2].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subOdds;
