@@ -418,25 +418,46 @@
         <p class="section-subtitle">
           Comienza gratis para explorar el sistema y escala a herramientas de nivel profesional cuando lo desees.
         </p>
-        <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));">
-          <!-- FREE -->
+        <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); max-width: 860px; margin: 0 auto;">
+          <!-- Tarjeta 1: Plan INICIO -->
           <div class="pricing-card">
             <div class="pricing-card-header">
-              <h3 class="plan-name" style="color:#94a3b8;">⚪ FREE</h3>
+              <h3 class="plan-name" style="color:#cbd5e1;">⚪ Plan INICIO</h3>
               <div class="plan-price">$0 <span>/ mes</span></div>
-              <p class="plan-desc">Para explorar la plataforma y aprender gestión de riesgo.</p>
+              <p class="plan-desc">Acceso introductorio para explorar la plataforma.</p>
             </div>
             <ul class="plan-features">
-              <li><span class="check">✓</span> Hasta 5 ligas activas</li>
+              <li><span class="check">✓</span> 3 Ligas activas simultáneas</li>
               <li><span class="check">✓</span> Estadísticas y rachas básicas</li>
               <li><span class="check">✓</span> 2 oportunidades diarias observables</li>
               <li><span class="check">✓</span> Calculadora de stake proporcional</li>
-              <li><span class="cross">✕</span> <span class="muted">Alertas PREMIUM y FUERTES bloqueadas</span></li>
+              <li><span class="cross">✕</span> <span class="muted">Sin Bot de Telegram VIP</span></li>
             </ul>
-            <button class="btn btn-tier-action btn-plan-trigger" data-plan="FREE" style="text-decoration:none; text-align:center; cursor:pointer; width:100%;">Registrarme Gratis</button>
+            <button class="btn btn-tier-action btn-plan-trigger" data-plan="FREE" style="text-decoration:none; text-align:center; cursor:pointer; width:100%; background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.2);">Empezar Gratis</button>
           </div>
 
-          <!-- PRO -->
+          <!-- Tarjeta 2: Plan VIP (Destacado) -->
+          <div class="pricing-card pricing-card-elite" style="border-color: rgba(56, 189, 248, 0.5); box-shadow: 0 0 40px rgba(56, 189, 248, 0.25);">
+            <div class="badge-tag badge-elite" style="background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); color: #fff; font-weight: 800;">MÁS ELEGIDO</div>
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color:#38bdf8;">👑 Plan VIP</h3>
+              <div class="plan-price">$2 <span style="font-size:0.85rem; color:#94a3b8; font-weight:normal;">por 7 días, luego $39/mes</span></div>
+              <p class="plan-desc">La suite cuantitativa completa para maximizar tu ventaja matemática.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> <strong>61 Ligas mundiales completas desbloqueadas</strong></li>
+              <li><span class="check">✓</span> <strong>🤖 Integración con Bot de Telegram VIP en vivo</strong></li>
+              <li><span class="check">✓</span> <strong>📈 Backtesting cuantitativo (+3 Temporadas)</strong></li>
+              <li><span class="check">✓</span> <strong>100% Señales PREMIUM desbloqueadas (🟢 Verde)</strong></li>
+              <li><span class="check">✓</span> <strong>Control de banca y registro inmutable ilimitado</strong></li>
+            </ul>
+            <button class="btn btn-tier-action btn-tier-elite btn-plan-trigger" data-plan="VIP" style="text-decoration:none; text-align:center; background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); color: #fff; font-weight: 800; cursor:pointer; width:100%; box-shadow: 0 4px 20px rgba(37,99,235,0.4);">Probar 7 días por $2</button>
+          </div>
+
+          <!-- 
+          =======================================================
+          PLANES PRO Y TRIAL (Desactivados temporalmente en Frontend):
+          =======================================================
           <div class="pricing-card pricing-card-pro">
             <div class="badge-tag">POPULAR</div>
             <div class="pricing-card-header">
@@ -453,24 +474,8 @@
             </ul>
             <button class="btn btn-tier-action btn-tier-pro btn-plan-trigger" data-plan="PRO" style="text-decoration:none; text-align:center; cursor:pointer; width:100%;">Suscribirme a PRO</button>
           </div>
-
-          <!-- VIP -->
-          <div class="pricing-card pricing-card-elite" style="border-color: rgba(74, 222, 128, 0.4); box-shadow: 0 0 35px rgba(34, 197, 94, 0.25);">
-            <div class="badge-tag badge-elite" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">TODO INCLUIDO</div>
-            <div class="pricing-card-header">
-              <h3 class="plan-name" style="color:#4ade80;">🟢 VIP</h3>
-              <div class="plan-price">$39.00 <span>/ mes</span></div>
-              <p class="plan-desc">La suite definitiva para traders profesionales y sindicatos.</p>
-            </div>
-            <ul class="plan-features">
-              <li><span class="check">✓</span> <strong>Todas las 51 ligas mundiales desbloqueadas</strong></li>
-              <li><span class="check">✓</span> <strong>100% Señales PREMIUM desbloqueadas (🟢 Verde)</strong></li>
-              <li><span class="check">✓</span> <strong>🤖 Integración con Bot de Telegram VIP en vivo</strong></li>
-              <li><span class="check">✓</span> <strong>Control de banca y registro ILIMITADO</strong></li>
-              <li><span class="check">✓</span> <strong>📊 Balance e Informes de Jornada automáticos</strong></li>
-            </ul>
-            <button class="btn btn-tier-action btn-tier-elite btn-plan-trigger" data-plan="VIP" style="text-decoration:none; text-align:center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); cursor:pointer; width:100%;">Suscribirme a VIP</button>
-          </div>
+          =======================================================
+          -->
         </div>
       </div>
     </section>
@@ -565,13 +570,62 @@
 
       <!-- Plan Seleccionado (solo en registro) -->
       <div id="auth-group-plan" class="form-group" style="margin-bottom: 1.25rem;">
-        <label style="display: block; font-size: 0.78rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.35rem;">Plan Inicial:</label>
-        <select id="auth-user-plan" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 800; padding: 0.6rem 0.8rem; border-radius: 0.45rem; font-size: 0.88rem; box-sizing: border-box;">
-          <option value="FREE">⚪ Plan FREE ($0 / mes — 5 Ligas)</option>
-          <option value="TRIAL">🧪 Plan TRIAL (3 Días de Prueba Guiada)</option>
-          <option value="PRO">🔵 Plan PRO ($19.00 / mes — 15 Ligas + Backtest)</option>
-          <option value="VIP">🟢 Plan VIP ($39.00 / mes — 51 Ligas + Telegram VIP)</option>
-        </select>
+        <label style="display: block; font-size: 0.78rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.5rem;">Elige tu Plan:</label>
+        
+        <!-- Input oculto para mantener compatibilidad con la lógica de registro existente -->
+        <input type="hidden" id="auth-user-plan" value="FREE" />
+
+        <!-- 2 Tarjetas de Selección de Plan Inicial -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <!-- Tarjeta 1: Plan INICIO -->
+          <div id="card-select-free" class="plan-choice-card active" data-choice-plan="FREE" style="border: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.08); border-radius: 0.65rem; padding: 0.85rem; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem;">
+                <strong style="font-size: 0.88rem; color: #fff;">Plan INICIO</strong>
+                <span class="plan-radio-dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #38bdf8; background: #38bdf8; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 1.05rem; font-weight: 900; color: #cbd5e1; margin-bottom: 0.35rem;">$0<span style="font-size: 0.7rem; font-weight: normal; color: #94a3b8;">/mes</span></div>
+              <p style="font-size: 0.72rem; color: #cbd5e1; margin: 0; line-height: 1.35;">
+                • 3 Ligas<br/>
+                • Sin Telegram
+              </p>
+            </div>
+            <button type="button" class="btn-card-choice" style="margin-top: 0.6rem; width: 100%; padding: 0.35rem 0.5rem; font-size: 0.72rem; font-weight: 700; background: rgba(255, 255, 255, 0.1); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.35rem; cursor: pointer; pointer-events: none;">
+              Empezar Gratis
+            </button>
+          </div>
+
+          <!-- Tarjeta 2: Plan VIP (Destacado) -->
+          <div id="card-select-vip" class="plan-choice-card" data-choice-plan="VIP" style="position: relative; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.6); border-radius: 0.65rem; padding: 0.85rem; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+            <div style="position: absolute; top: -9px; right: 8px; background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); color: #fff; font-size: 0.58rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px; box-shadow: 0 2px 8px rgba(37,99,235,0.5);">
+              MÁS ELEGIDO
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem;">
+                <strong style="font-size: 0.88rem; color: #38bdf8;">Plan VIP</strong>
+                <span class="plan-radio-dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); background: transparent; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 1.05rem; font-weight: 900; color: #38bdf8; margin-bottom: 0.35rem;">$2 <span style="font-size: 0.68rem; font-weight: normal; color: #94a3b8;">/ 7 días</span></div>
+              <p style="font-size: 0.72rem; color: #cbd5e1; margin: 0; line-height: 1.35;">
+                • 61 Ligas + Backtest<br/>
+                • Telegram VIP<br/>
+                <span style="font-size: 0.65rem; color: #94a3b8;">(luego $39/mes)</span>
+              </p>
+            </div>
+            <button type="button" class="btn-card-choice" style="margin-top: 0.6rem; width: 100%; padding: 0.35rem 0.5rem; font-size: 0.72rem; font-weight: 800; background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); color: #fff; border: none; border-radius: 0.35rem; cursor: pointer; pointer-events: none;">
+              Probar 7 días por $2
+            </button>
+          </div>
+        </div>
+
+        <!-- 
+        =======================================================
+        PLANES TRIAL Y PRO (Comentados para reactivación futura):
+        =======================================================
+        <option value="TRIAL">Plan TRIAL (3 Días de Prueba Guiada)</option>
+        <option value="PRO">Plan PRO ($19.00 / mes — 15 Ligas + Backtest)</option>
+        =======================================================
+        -->
       </div>
 
       <!-- Usuarios Rápidos Demo (en modo login) -->
@@ -624,10 +678,53 @@
 
     let authMode = 'REGISTER'; // 'REGISTER' | 'LOGIN'
 
+    function selectModalPlan(selectedPlan) {
+      const targetPlan = selectedPlan === 'VIP' ? 'VIP' : 'FREE';
+      if (planSelect) {
+        planSelect.value = targetPlan;
+      }
+      const cardFree = document.getElementById('card-select-free');
+      const cardVip = document.getElementById('card-select-vip');
+
+      if (targetPlan === 'VIP') {
+        if (cardVip) {
+          cardVip.style.borderColor = '#38bdf8';
+          cardVip.style.background = 'rgba(56, 189, 248, 0.12)';
+          cardVip.style.boxShadow = '0 0 15px rgba(56, 189, 248, 0.25)';
+          const dot = cardVip.querySelector('.plan-radio-dot');
+          if (dot) { dot.style.borderColor = '#38bdf8'; dot.style.background = '#38bdf8'; }
+        }
+        if (cardFree) {
+          cardFree.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+          cardFree.style.background = 'rgba(15, 23, 42, 0.6)';
+          cardFree.style.boxShadow = 'none';
+          const dot = cardFree.querySelector('.plan-radio-dot');
+          if (dot) { dot.style.borderColor = 'rgba(255,255,255,0.3)'; dot.style.background = 'transparent'; }
+        }
+      } else {
+        if (cardFree) {
+          cardFree.style.borderColor = '#38bdf8';
+          cardFree.style.background = 'rgba(56, 189, 248, 0.08)';
+          cardFree.style.boxShadow = '0 0 15px rgba(56, 189, 248, 0.25)';
+          const dot = cardFree.querySelector('.plan-radio-dot');
+          if (dot) { dot.style.borderColor = '#38bdf8'; dot.style.background = '#38bdf8'; }
+        }
+        if (cardVip) {
+          cardVip.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+          cardVip.style.background = 'rgba(15, 23, 42, 0.6)';
+          cardVip.style.boxShadow = 'none';
+          const dot = cardVip.querySelector('.plan-radio-dot');
+          if (dot) { dot.style.borderColor = 'rgba(255,255,255,0.3)'; dot.style.background = 'transparent'; }
+        }
+      }
+    }
+
     function openModal(mode, preferredPlan) {
       authMode = mode || 'REGISTER';
-      if (preferredPlan && planSelect) {
-        planSelect.value = preferredPlan;
+      if (preferredPlan) {
+        selectModalPlan(preferredPlan);
+      } else {
+        selectModalPlan('FREE');
       }
       if (authMode === 'REGISTER') {
         tabRegister.classList.add('active');
@@ -650,6 +747,13 @@
       }
       authModal.showModal();
     }
+
+    document.querySelectorAll('.plan-choice-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        const plan = e.currentTarget.getAttribute('data-choice-plan') || 'FREE';
+        selectModalPlan(plan);
+      });
+    });
 
     if (closeAuthModal) closeAuthModal.addEventListener('click', () => authModal.close());
     authModal.addEventListener('click', (e) => { if (e.target === authModal) authModal.close(); });
