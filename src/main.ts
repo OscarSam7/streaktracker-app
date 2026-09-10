@@ -39,7 +39,7 @@ import {
 import { I18N, type Language, type Translations } from './config/i18n';
 import { runHistoricalBacktest } from './logic/backtest';
 import { getAuditStats } from './logic/audit';
-import { ACADEMY_LESSONS } from './logic/academy';
+import { getAcademyLessons } from './logic/academy';
 import { validateLeagueEligibility, getAuthorizedActiveLeagues } from './logic/leagueValidation';
 import { computeSignalScore } from './logic/signalEngine';
 import { 
@@ -189,7 +189,10 @@ async function run() {
   const guideModal = document.getElementById('guide-modal') as HTMLDialogElement;
   const closeGuideModal = document.getElementById('close-guide-modal');
   if (guideBtn && guideModal) {
-    guideBtn.addEventListener('click', () => guideModal.showModal());
+    guideBtn.addEventListener('click', () => {
+      updateGuideModalTexts();
+      guideModal.showModal();
+    });
   }
   if (closeGuideModal && guideModal) {
     closeGuideModal.addEventListener('click', () => guideModal.close());
@@ -2152,7 +2155,638 @@ function setupLanguageSelector() {
   updateStaticLanguageTexts();
 }
 
+
+function updateGuideModalTexts() {
+  const lang = t();
+  const guideModal = document.getElementById('guide-modal');
+  if (!guideModal || !lang.guideModal) return;
+
+  const titleEl = guideModal.querySelector<HTMLElement>('h2');
+  if (titleEl) titleEl.innerText = lang.guideModal.title;
+
+  const subEl = guideModal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.guideModal.subtitle;
+
+  const principleStrong = guideModal.querySelector<HTMLElement>('strong[style*="color: #38bdf8"]');
+  if (principleStrong) principleStrong.innerText = lang.guideModal.principleTitle;
+
+  const principleP = guideModal.querySelector('div[style*="border: 1px solid rgba(56, 189, 248"] p');
+  if (principleP) principleP.innerHTML = lang.guideModal.principleDesc;
+
+  const stepCards = guideModal.querySelectorAll('.guide-step-card');
+  stepCards.forEach((card, index) => {
+    const step = lang.guideModal.steps[index];
+    if (!step) return;
+    const strongTitle = card.querySelector<HTMLElement>('strong');
+    const badgeSpan = card.querySelector<HTMLElement>('.badge-status');
+    const descP = card.querySelector<HTMLElement>('p');
+
+    if (strongTitle) strongTitle.innerText = step.title;
+    if (badgeSpan) badgeSpan.innerText = step.badge;
+    if (descP) descP.innerText = step.desc;
+  });
+
+  const closeBtn = guideModal.querySelector('button.btn-premium') as HTMLButtonElement;
+  if (closeBtn) closeBtn.innerText = lang.guideModal.understandBtn;
+}
+
+function updatePricingModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('pricing-modal');
+  if (!modal || !lang.pricingModalDetails) return;
+
+  const h2 = modal.querySelector('h2');
+  if (h2) h2.innerText = lang.pricingModalDetails.title;
+
+  const sub = modal.querySelector('p');
+  if (sub) sub.innerText = lang.pricingModalDetails.subtitle;
+
+  // FREE card
+  const freeCard = modal.querySelector('.pricing-card:not(.pricing-card-pro):not(.pricing-card-elite)');
+  if (freeCard) {
+    const name = freeCard.querySelector('.plan-name');
+    if (name) name.textContent = lang.pricingModalDetails.free.name;
+    const price = freeCard.querySelector('.plan-price');
+    if (price) price.innerHTML = `${lang.pricingModalDetails.free.price} <span>${lang.pricingModalDetails.free.period}</span>`;
+    const desc = freeCard.querySelector('.plan-desc');
+    if (desc) desc.textContent = lang.pricingModalDetails.free.desc;
+    const list = freeCard.querySelector('.plan-features');
+    if (list) {
+      list.innerHTML = lang.pricingModalDetails.free.features.map(f => {
+        if (f.startsWith('✓')) {
+          return `<li><span class="check">✓</span> <strong>${f.slice(2)}</strong></li>`;
+        } else {
+          return `<li><span class="cross">✕</span> <span class="muted">${f.slice(2)}</span></li>`;
+        }
+      }).join('');
+    }
+    const btn = freeCard.querySelector('button[data-tier="FREE"]') as HTMLButtonElement;
+    if (btn) btn.innerText = lang.pricingModalDetails.free.btn;
+  }
+
+  // PRO card
+  const proCard = modal.querySelector('.pricing-card-pro');
+  if (proCard) {
+    const badge = proCard.querySelector('.badge-tag');
+    if (badge) badge.textContent = lang.pricingModalDetails.badgePopular;
+    const name = proCard.querySelector('.plan-name');
+    if (name) name.textContent = lang.pricingModalDetails.pro.name;
+    const price = proCard.querySelector('.plan-price');
+    if (price) price.innerHTML = `${lang.pricingModalDetails.pro.price} <span>${lang.pricingModalDetails.pro.period}</span>`;
+    const desc = proCard.querySelector('.plan-desc');
+    if (desc) desc.textContent = lang.pricingModalDetails.pro.desc;
+    const list = proCard.querySelector('.plan-features');
+    if (list) {
+      list.innerHTML = lang.pricingModalDetails.pro.features.map(f => {
+        if (f.startsWith('✓')) {
+          return `<li><span class="check">✓</span> <strong>${f.slice(2)}</strong></li>`;
+        } else {
+          return `<li><span class="cross">✕</span> <span class="muted">${f.slice(2)}</span></li>`;
+        }
+      }).join('');
+    }
+    const btn = proCard.querySelector('button[data-tier="PRO"]') as HTMLButtonElement;
+    if (btn) btn.innerText = lang.pricingModalDetails.pro.btn;
+  }
+
+  // VIP card
+  const vipCard = modal.querySelector('.pricing-card-elite');
+  if (vipCard) {
+    const badge = vipCard.querySelector('.badge-tag');
+    if (badge) badge.textContent = lang.pricingModalDetails.badgeAllIncluded;
+    const name = vipCard.querySelector('.plan-name');
+    if (name) name.textContent = lang.pricingModalDetails.vip.name;
+    const price = vipCard.querySelector('.plan-price');
+    if (price) price.innerHTML = `${lang.pricingModalDetails.vip.price} <span>${lang.pricingModalDetails.vip.period}</span>`;
+    const desc = vipCard.querySelector('.plan-desc');
+    if (desc) desc.textContent = lang.pricingModalDetails.vip.desc;
+    const list = vipCard.querySelector('.plan-features');
+    if (list) {
+      list.innerHTML = lang.pricingModalDetails.vip.features.map(f => {
+        if (f.startsWith('✓')) {
+          return `<li><span class="check">✓</span> <strong>${f.slice(2)}</strong></li>`;
+        } else {
+          return `<li><span class="cross">✕</span> <span class="muted">${f.slice(2)}</span></li>`;
+        }
+      }).join('');
+    }
+    const btn = vipCard.querySelector('button[data-tier="VIP"]') as HTMLButtonElement;
+    if (btn) btn.innerText = lang.pricingModalDetails.vip.btn;
+  }
+}
+
+function updateCheckoutModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('checkout-modal');
+  if (!modal || !lang.checkoutModal) return;
+
+  const titleEl = document.getElementById('checkout-modal-title');
+  if (titleEl) titleEl.innerText = lang.checkoutModal.title;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.checkoutModal.subtitle;
+
+  const lblPlan = modal.querySelector('span[style*="text-transform: uppercase"]');
+  if (lblPlan) lblPlan.textContent = lang.checkoutModal.planSelectedLabel;
+
+  const lblTotal = modal.querySelector('div[style*="text-align: right"] > span');
+  if (lblTotal) lblTotal.textContent = lang.checkoutModal.totalToPayLabel;
+
+  const labels = modal.querySelectorAll('.form-group label');
+  if (labels.length >= 2) {
+    labels[0].textContent = lang.checkoutModal.fullNameLabel;
+    labels[1].textContent = lang.checkoutModal.emailLabel;
+  }
+
+  const nameInput = document.getElementById('checkout-user-name') as HTMLInputElement;
+  if (nameInput) nameInput.placeholder = lang.checkoutModal.fullNamePlaceholder;
+
+  const emailInput = document.getElementById('checkout-user-email') as HTMLInputElement;
+  if (emailInput) emailInput.placeholder = lang.checkoutModal.emailPlaceholder;
+
+  const stripeSpan = modal.querySelector('input[value="STRIPE"] ~ span');
+  if (stripeSpan) stripeSpan.textContent = lang.checkoutModal.stripeLabel;
+
+  const mpSpan = modal.querySelector('input[value="MERCADOPAGO"] ~ span');
+  if (mpSpan) mpSpan.textContent = lang.checkoutModal.mercadopagoLabel;
+
+  const sslSpan = modal.querySelector('#checkout-card-fields span');
+  if (sslSpan) sslSpan.textContent = lang.checkoutModal.sslNotice;
+
+  const submitBtn = document.getElementById('btn-submit-checkout');
+  if (submitBtn) submitBtn.innerText = lang.checkoutModal.submitBtn;
+
+  const successTitle = modal.querySelector('#checkout-success-view h3');
+  if (successTitle) successTitle.textContent = lang.checkoutModal.successTitle;
+
+  const successCloseBtn = document.getElementById('checkout-success-close-btn');
+  if (successCloseBtn) successCloseBtn.innerText = lang.checkoutModal.goToDashboardBtn;
+}
+
+function updatePushNotifyModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('push-notify-modal');
+  if (!modal || !lang.pushNotifyModal) return;
+
+  const titleEl = document.getElementById('push-notify-title');
+  if (titleEl) titleEl.innerText = lang.pushNotifyModal.title;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.pushNotifyModal.subtitle;
+
+  const nextLbl = modal.querySelector('div[style*="font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.2rem"]');
+  if (nextLbl) nextLbl.textContent = lang.pushNotifyModal.nextFixtureLabel;
+
+  const opt10Strong = modal.querySelector<HTMLElement>('label:has(#push-opt-10min) strong');
+  const opt10Span = modal.querySelector<HTMLElement>('label:has(#push-opt-10min) span');
+  if (opt10Strong) opt10Strong.innerText = lang.pushNotifyModal.opt10minTitle;
+  if (opt10Span) opt10Span.innerText = lang.pushNotifyModal.opt10minDesc;
+
+  const optLiveStrong = modal.querySelector<HTMLElement>('label:has(#push-opt-live) strong');
+  const optLiveSpan = modal.querySelector<HTMLElement>('label:has(#push-opt-live) span');
+  if (optLiveStrong) optLiveStrong.innerText = lang.pushNotifyModal.optLiveTitle;
+  if (optLiveSpan) optLiveSpan.innerText = lang.pushNotifyModal.optLiveDesc;
+
+  const optGoalStrong = modal.querySelector<HTMLElement>('label:has(#push-opt-goal) strong');
+  const optGoalSpan = modal.querySelector<HTMLElement>('label:has(#push-opt-goal) span');
+  if (optGoalStrong) optGoalStrong.innerText = lang.pushNotifyModal.optGoalTitle;
+  if (optGoalSpan) optGoalSpan.innerText = lang.pushNotifyModal.optGoalDesc;
+
+  const optFtStrong = modal.querySelector<HTMLElement>('label:has(#push-opt-ft) strong');
+  const optFtSpan = modal.querySelector<HTMLElement>('label:has(#push-opt-ft) span');
+  if (optFtStrong) optFtStrong.innerText = lang.pushNotifyModal.optFtTitle;
+  if (optFtSpan) optFtSpan.innerText = lang.pushNotifyModal.optFtDesc;
+
+  const cancelBtn = document.getElementById('btn-cancel-push-notify');
+  if (cancelBtn) cancelBtn.innerText = lang.pushNotifyModal.cancelBtn;
+
+  const saveBtn = document.getElementById('btn-save-push-notify');
+  if (saveBtn) saveBtn.innerText = lang.pushNotifyModal.saveBtn;
+}
+
+function updateDailyReportModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('daily-report-modal');
+  if (!modal || !lang.dailyReportModal) return;
+
+  const titleEl = modal.querySelector<HTMLElement>('h2');
+  if (titleEl) titleEl.innerText = lang.dailyReportModal.title;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.dailyReportModal.subtitle;
+
+  const btnDay = document.getElementById('dr-btn-day');
+  if (btnDay) btnDay.innerText = lang.dailyReportModal.periodDay;
+
+  const btnWeek = document.getElementById('dr-btn-week');
+  if (btnWeek) btnWeek.innerText = lang.dailyReportModal.periodWeek;
+
+  const btnMonth = document.getElementById('dr-btn-month');
+  if (btnMonth) btnMonth.innerText = lang.dailyReportModal.periodMonth;
+
+  const btnCustom = document.getElementById('dr-btn-custom');
+  if (btnCustom) btnCustom.innerText = lang.dailyReportModal.periodCustom;
+
+  const exportBtn = document.getElementById('dr-export-btn');
+  if (exportBtn) exportBtn.innerText = lang.dailyReportModal.exportBtn;
+
+  const dateLabels = modal.querySelectorAll('#dr-custom-date-bar label');
+  if (dateLabels.length >= 2) {
+    dateLabels[0].textContent = lang.dailyReportModal.dateFrom;
+    dateLabels[1].textContent = lang.dailyReportModal.dateTo;
+  }
+
+  const dateApplyBtn = document.getElementById('dr-date-apply-btn');
+  if (dateApplyBtn) dateApplyBtn.innerText = lang.dailyReportModal.dateFilterBtn;
+
+  const dateClearBtn = document.getElementById('dr-date-clear-btn');
+  if (dateClearBtn) dateClearBtn.innerText = lang.dailyReportModal.dateClearBtn;
+
+  const snapHeaders = modal.querySelectorAll('div[style*="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))"] span[style*="text-transform: uppercase"]');
+  if (snapHeaders.length >= 4) {
+    snapHeaders[0].textContent = lang.dailyReportModal.snapOpen;
+    snapHeaders[1].textContent = lang.dailyReportModal.snapGen;
+    snapHeaders[2].textContent = lang.dailyReportModal.snapCut;
+    snapHeaders[3].textContent = lang.dailyReportModal.snapClose;
+  }
+
+  const kpiHeading = modal.querySelector('h4[style*="text-transform: uppercase"] span:first-child');
+  if (kpiHeading) kpiHeading.textContent = lang.dailyReportModal.kpiTitle;
+  const kpiSub = modal.querySelector('h4[style*="text-transform: uppercase"] span:last-child');
+  if (kpiSub) kpiSub.textContent = lang.dailyReportModal.kpiSub;
+
+  const kpiLabels = modal.querySelectorAll('div[style*="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr))"] span[style*="font-size: 0.65rem"]');
+  if (kpiLabels.length >= 8) {
+    kpiLabels[0].textContent = lang.dailyReportModal.kpiTotal;
+    kpiLabels[1].textContent = lang.dailyReportModal.kpiWinLoss;
+    kpiLabels[2].textContent = lang.dailyReportModal.kpiWinrate;
+    kpiLabels[3].textContent = lang.dailyReportModal.kpiRoi;
+    kpiLabels[4].textContent = lang.dailyReportModal.kpiProfit;
+    kpiLabels[5].textContent = lang.dailyReportModal.kpiPf;
+    kpiLabels[6].textContent = lang.dailyReportModal.kpiDd;
+    kpiLabels[7].textContent = lang.dailyReportModal.kpiPremium;
+  }
+
+  const tableHeading = modal.querySelector<HTMLElement>('h3');
+  if (tableHeading) tableHeading.innerText = lang.dailyReportModal.tableHeading;
+
+  const ths = modal.querySelectorAll('table thead th');
+  if (ths.length >= 6) {
+    ths[0].textContent = lang.dailyReportModal.thDate;
+    ths[1].textContent = lang.dailyReportModal.thLeague;
+    ths[2].textContent = lang.dailyReportModal.thOpen;
+    ths[3].textContent = lang.dailyReportModal.thGen;
+    ths[4].textContent = lang.dailyReportModal.thCut;
+    ths[5].textContent = lang.dailyReportModal.thClose;
+  }
+}
+
+function updateBacktestModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('backtest-modal');
+  if (!modal || !lang.backtestModal) return;
+
+  const titleEl = modal.querySelector<HTMLElement>('h2');
+  if (titleEl) titleEl.innerText = lang.backtestModal.title;
+
+  const tagEl = modal.querySelector('div > span[style*="border-radius: 4px"]');
+  if (tagEl) tagEl.textContent = lang.backtestModal.tagHistorical;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.backtestModal.subtitle;
+
+  const filterLabels = modal.querySelectorAll('div[style*="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"] label');
+  if (filterLabels.length >= 6) {
+    filterLabels[0].textContent = lang.backtestModal.lblLeague;
+    filterLabels[1].textContent = lang.backtestModal.lblMarket;
+    filterLabels[2].textContent = lang.backtestModal.lblSeason;
+    filterLabels[3].textContent = lang.backtestModal.lblOdds;
+    filterLabels[4].textContent = lang.backtestModal.lblTier;
+    filterLabels[5].textContent = lang.backtestModal.lblStake;
+  }
+
+  const optLeagueAll = modal.querySelector('#bt-filter-league option[value="all"]');
+  if (optLeagueAll) optLeagueAll.textContent = lang.backtestModal.optAllLeagues;
+
+  const optSeasonAll = modal.querySelector('#bt-filter-season option[value="all"]');
+  if (optSeasonAll) optSeasonAll.textContent = lang.backtestModal.optAllSeasons;
+
+  const oddsSel = document.getElementById('bt-filter-odds') as HTMLSelectElement;
+  if (oddsSel) {
+    const oAll = oddsSel.querySelector('option[value="all"]');
+    const oLow = oddsSel.querySelector('option[value="low"]');
+    const oMid = oddsSel.querySelector('option[value="mid"]');
+    const oHigh = oddsSel.querySelector('option[value="high"]');
+    if (oAll) oAll.textContent = lang.backtestModal.optAllOdds;
+    if (oLow) oLow.textContent = lang.backtestModal.optLowOdds;
+    if (oMid) oMid.textContent = lang.backtestModal.optMidOdds;
+    if (oHigh) oHigh.textContent = lang.backtestModal.optHighOdds;
+  }
+
+  const tierSel = document.getElementById('bt-filter-tier') as HTMLSelectElement;
+  if (tierSel) {
+    const tAll = tierSel.querySelector('option[value="all"]');
+    const tPrem = tierSel.querySelector('option[value="PREMIUM"]');
+    const tStrong = tierSel.querySelector('option[value="FUERTE"]');
+    const tObs = tierSel.querySelector('option[value="OBSERVABLE"]');
+    if (tAll) tAll.textContent = lang.backtestModal.optAllTiers;
+    if (tPrem) tPrem.textContent = lang.backtestModal.optPremTier;
+    if (tStrong) tStrong.textContent = lang.backtestModal.optStrongTier;
+    if (tObs) tObs.textContent = lang.backtestModal.optObsTier;
+  }
+
+  const stakeSel = document.getElementById('backtest-stake-select') as HTMLSelectElement;
+  if (stakeSel) {
+    const s1 = stakeSel.querySelector('option[value="0.01"]');
+    const s2 = stakeSel.querySelector('option[value="0.02"]');
+    const s3 = stakeSel.querySelector('option[value="0.03"]');
+    if (s1) s1.textContent = lang.backtestModal.optStake1;
+    if (s2) s2.textContent = lang.backtestModal.optStake2;
+    if (s3) s3.textContent = lang.backtestModal.optStake3;
+  }
+
+  const marketSel = document.getElementById('backtest-market-select') as HTMLSelectElement;
+  if (marketSel) {
+    const mDraw = marketSel.querySelector('option[value="draw"]');
+    const mOver = marketSel.querySelector('option[value="over35"]');
+    const mHt = marketSel.querySelector('option[value="htDraw"]');
+    const mBtts25 = marketSel.querySelector('option[value="bttsOver25"]');
+    const mBtts1h = marketSel.querySelector('option[value="btts1H"]');
+    if (mDraw) mDraw.textContent = lang.operationalMarkets.draw;
+    if (mOver) mOver.textContent = lang.operationalMarkets.over35;
+    if (mHt) mHt.textContent = lang.operationalMarkets.htDraw;
+    if (mBtts25) mBtts25.textContent = lang.operationalMarkets.bttsOver25;
+    if (mBtts1h) mBtts1h.textContent = lang.operationalMarkets.btts1H;
+  }
+
+  const kpiCards = modal.querySelectorAll('.bankroll-kpi-grid .bankroll-kpi-card');
+  if (kpiCards.length >= 9) {
+    kpiCards[0].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiAccumYield;
+    kpiCards[1].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiWinRate;
+    kpiCards[2].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiAvgOdds;
+    kpiCards[2].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subOdds;
+    kpiCards[3].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiTotalRoi;
+    kpiCards[3].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subRoi;
+    kpiCards[4].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiPf;
+    kpiCards[4].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subPf;
+    kpiCards[5].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiEv;
+    kpiCards[5].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subEv;
+    kpiCards[6].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiDrawdown;
+    kpiCards[6].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subDd;
+    kpiCards[7].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiStreaks;
+    kpiCards[7].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subStreaks;
+    kpiCards[8].querySelector('.kpi-label')!.textContent = lang.backtestModal.kpiCapFlow;
+    kpiCards[8].querySelector('.kpi-sub')!.textContent = lang.backtestModal.subCapFlow;
+  }
+
+  const robH4 = modal.querySelector('h4[style*="font-weight: 800; color: #fff"]');
+  if (robH4) robH4.textContent = lang.backtestModal.robTitle;
+
+  const robCards = modal.querySelectorAll('div[style*="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))"] > div');
+  if (robCards.length >= 4) {
+    robCards[0].querySelector('span:first-child')!.textContent = lang.backtestModal.robSample;
+    robCards[1].querySelector('span:first-child')!.textContent = lang.backtestModal.robSeason;
+    robCards[1].querySelector('span:last-child')!.textContent = lang.backtestModal.robSeasonSub;
+    robCards[2].querySelector('span:first-child')!.textContent = lang.backtestModal.robLeague;
+    robCards[2].querySelector('span:last-child')!.textContent = lang.backtestModal.robLeagueSub;
+    robCards[3].querySelector('span:first-child')!.textContent = lang.backtestModal.robOdds;
+    robCards[3].querySelector('span:last-child')!.textContent = lang.backtestModal.robOddsSub;
+  }
+
+  const chartH4Title = modal.querySelector('div[style*="padding: 1.25rem"] h4 span:first-child');
+  if (chartH4Title) chartH4Title.textContent = lang.backtestModal.chartTitle;
+  const chartH4Sub = modal.querySelector('div[style*="padding: 1.25rem"] h4 span:last-child');
+  if (chartH4Sub) chartH4Sub.textContent = lang.backtestModal.chartSub;
+
+  const disclaimerP = modal.querySelector('div[style*="padding: 1.25rem"] p');
+  if (disclaimerP) disclaimerP.textContent = lang.backtestModal.disclaimer;
+}
+
+function updateAuditModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('audit-modal');
+  if (!modal || !lang.auditModal) return;
+
+  const titleEl = modal.querySelector<HTMLElement>('h2');
+  if (titleEl) titleEl.innerText = lang.auditModal.title;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.auditModal.subtitle;
+
+  const bannerLabels = modal.querySelectorAll('div[style*="linear-gradient"] span[style*="font-weight: 700"]');
+  if (bannerLabels.length >= 4) {
+    bannerLabels[0].textContent = lang.auditModal.statTotal;
+    bannerLabels[1].textContent = lang.auditModal.statWon;
+    bannerLabels[2].textContent = lang.auditModal.statLost;
+    bannerLabels[3].textContent = lang.auditModal.statYield;
+  }
+
+  const btnAll = document.getElementById('audit-filter-all');
+  if (btnAll) btnAll.innerHTML = `🔘 ${lang.auditModal.filterAll} (<span id="audit-count-all">${document.getElementById('audit-count-all')?.innerText || '0'}</span>)`;
+
+  const btnWon = document.getElementById('audit-filter-won');
+  if (btnWon) btnWon.innerHTML = `✅ ${lang.auditModal.filterWon} (<span id="audit-count-won">${document.getElementById('audit-count-won')?.innerText || '0'}</span>)`;
+
+  const btnLost = document.getElementById('audit-filter-lost');
+  if (btnLost) btnLost.innerHTML = `❌ ${lang.auditModal.filterLost} (<span id="audit-count-lost">${document.getElementById('audit-count-lost')?.innerText || '0'}</span>)`;
+
+  const footnote = modal.querySelector('div[style*="justify-content: space-between"] > span[style*="color: #94a3b8"]');
+  if (footnote) footnote.textContent = lang.auditModal.footnote;
+
+  const ths = modal.querySelectorAll('#audit-table thead th');
+  if (ths.length >= 15) {
+    ths[0].textContent = lang.auditModal.thSignalId;
+    ths[1].textContent = lang.auditModal.thTimestamp;
+    ths[2].textContent = lang.auditModal.thLeague;
+    ths[3].textContent = lang.auditModal.thSeason;
+    ths[4].textContent = lang.auditModal.thMatch;
+    ths[5].textContent = lang.auditModal.thMarket;
+    ths[6].textContent = lang.auditModal.thStreak;
+    ths[7].textContent = lang.auditModal.thScore;
+    ths[8].textContent = lang.auditModal.thConfidence;
+    ths[9].textContent = lang.auditModal.thOdds;
+    ths[10].textContent = lang.auditModal.thProbability;
+    ths[11].textContent = lang.auditModal.thFinalResult;
+    ths[12].textContent = lang.auditModal.thSignalResult;
+    ths[13].textContent = lang.auditModal.thRoi;
+    ths[14].textContent = lang.auditModal.thStatus;
+  }
+}
+
+function updateAcademyModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('academy-modal');
+  if (!modal || !lang.academyModal) return;
+
+  const titleEl = modal.querySelector<HTMLElement>('h2');
+  if (titleEl) titleEl.innerText = lang.academyModal.title;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.academyModal.subtitle;
+}
+
+function updateTransparencyModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('transparency-modal');
+  if (!modal || !lang.transparencyModal) return;
+
+  const titleEl = modal.querySelector<HTMLElement>('h2');
+  if (titleEl) titleEl.innerText = lang.transparencyModal.title;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.transparencyModal.subtitle;
+
+  const btnReal = document.getElementById('tr-track-real');
+  if (btnReal) btnReal.innerText = lang.transparencyModal.trackReal;
+
+  const btnPaper = document.getElementById('tr-track-paper');
+  if (btnPaper) btnPaper.innerText = lang.transparencyModal.trackPaper;
+
+  const btnBt = document.getElementById('tr-track-backtest');
+  if (btnBt) btnBt.innerText = lang.transparencyModal.trackBacktest;
+
+  const kpiLabels = modal.querySelectorAll('div[style*="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"] span[style*="font-weight: 700"]');
+  if (kpiLabels.length >= 6) {
+    kpiLabels[0].textContent = lang.transparencyModal.kpiTotal;
+    kpiLabels[1].textContent = lang.transparencyModal.kpiResolved;
+    kpiLabels[2].textContent = lang.transparencyModal.kpiWinrate;
+    kpiLabels[3].textContent = lang.transparencyModal.kpiRoi;
+    kpiLabels[4].textContent = lang.transparencyModal.kpiDd;
+    kpiLabels[5].textContent = lang.transparencyModal.kpiSample;
+  }
+
+  const tblHeadings = modal.querySelectorAll('div[style*="grid-template-columns: repeat(auto-fit, minmax(310px, 1fr))"] h4 span:first-child');
+  if (tblHeadings.length >= 3) {
+    tblHeadings[0].textContent = lang.transparencyModal.tableLeaguesTitle;
+    tblHeadings[1].textContent = lang.transparencyModal.tableMarketsTitle;
+    tblHeadings[2].textContent = lang.transparencyModal.tableMonthlyTitle;
+  }
+
+  const discTitle = modal.querySelector('div[style*="border-left: 4px solid #38bdf8"] strong');
+  if (discTitle) discTitle.textContent = lang.transparencyModal.disclaimerTitle;
+  const discText = modal.querySelector('div[style*="border-left: 4px solid #38bdf8"]');
+  if (discText) discText.innerHTML = `<strong style="color: #38bdf8;">${lang.transparencyModal.disclaimerTitle}</strong><br />${lang.transparencyModal.disclaimerText}`;
+}
+
+function updateBankrollModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('bankroll-modal');
+  if (!modal || !lang.bankroll) return;
+
+  const titleEl = document.getElementById('bankroll-modal-title');
+  if (titleEl) titleEl.innerText = `💼 ${lang.bankroll.modalTitle}`;
+
+  const subEl = document.getElementById('bankroll-modal-subtitle');
+  if (subEl) subEl.innerText = lang.bankroll.modalSubtitle;
+
+  const newOpBtn = document.getElementById('bankroll-new-op-btn');
+  if (newOpBtn) newOpBtn.innerText = lang.bankroll.newOpBtn;
+
+  const xlsxBtn = document.getElementById('bankroll-download-xlsx-btn');
+  if (xlsxBtn) xlsxBtn.innerText = lang.bankroll.exportExcelBtn;
+
+  const csvBtn = document.getElementById('bankroll-export-csv-btn');
+  if (csvBtn) csvBtn.innerText = lang.bankroll.exportCsvBtn;
+
+  const tabDash = document.querySelector('[data-tab="tab-dashboard"]') as HTMLElement;
+  const tabOps = document.querySelector('[data-tab="tab-operations"]') as HTMLElement;
+  const tabCalc = document.querySelector('[data-tab="tab-calculator"]') as HTMLElement;
+  const tabCfg = document.querySelector('[data-tab="tab-config"]') as HTMLElement;
+  if (tabDash) tabDash.innerText = lang.bankroll.tabDashboard;
+  if (tabOps) tabOps.innerText = lang.bankroll.tabOperations;
+  if (tabCalc) tabCalc.innerText = lang.bankroll.tabCalculator;
+  if (tabCfg) tabCfg.innerText = lang.bankroll.tabConfig;
+
+  const calcH3 = modal.querySelector('#tab-calculator h3');
+  if (calcH3) calcH3.textContent = lang.bankroll.calcTitle;
+  const calcP = modal.querySelector('#tab-calculator p');
+  if (calcP) calcP.textContent = lang.bankroll.calcDesc;
+
+  const calcLabels = modal.querySelectorAll('#tab-calculator .form-group label');
+  if (calcLabels.length >= 3) {
+    calcLabels[0].textContent = lang.bankroll.calcCapLabel;
+    calcLabels[1].textContent = lang.bankroll.calcRiskLabel;
+    calcLabels[2].textContent = lang.bankroll.calcOddsLabel;
+  }
+
+  const calcProfileSelect = document.getElementById('calc-profile-select') as HTMLSelectElement;
+  if (calcProfileSelect) {
+    const p1 = calcProfileSelect.querySelector('option[value="0.02"]');
+    const p2 = calcProfileSelect.querySelector('option[value="0.01"]');
+    const p3 = calcProfileSelect.querySelector('option[value="0.03"]');
+    const p4 = calcProfileSelect.querySelector('option[value="0.04"]');
+    const p5 = calcProfileSelect.querySelector('option[value="custom"]');
+    if (p1) p1.textContent = lang.bankroll.calcProfileConservative;
+    if (p2) p2.textContent = lang.bankroll.calcProfileUltra;
+    if (p3) p3.textContent = lang.bankroll.calcProfileModerate;
+    if (p4) p4.textContent = lang.bankroll.calcProfileModerateHigh;
+    if (p5) p5.textContent = lang.bankroll.calcProfileCustom;
+  }
+
+  const calcResLabels = modal.querySelectorAll('.calc-results-box span[style*="font-size: 0.7rem"]');
+  if (calcResLabels.length >= 4) {
+    calcResLabels[0].textContent = lang.bankroll.suggestedStake;
+    calcResLabels[1].textContent = lang.bankroll.calcRetPotential;
+    calcResLabels[2].textContent = lang.bankroll.calcNetProfit;
+    calcResLabels[3].textContent = lang.bankroll.calcMaxLoss;
+  }
+
+  const cfgH3 = modal.querySelector('#tab-config h3');
+  if (cfgH3) cfgH3.textContent = lang.bankroll.cfgTitle;
+  const cfgP = modal.querySelector('#tab-config p');
+  if (cfgP) cfgP.textContent = lang.bankroll.cfgDesc;
+
+  const cfgLabels = modal.querySelectorAll('#tab-config label');
+  if (cfgLabels.length >= 7) {
+    cfgLabels[0].textContent = lang.bankroll.cfgCurrency;
+    cfgLabels[1].textContent = lang.bankroll.cfgInitialCap;
+    cfgLabels[2].textContent = lang.bankroll.cfgSecurityCap;
+    cfgLabels[3].textContent = lang.bankroll.cfgMaxStake;
+    cfgLabels[4].textContent = lang.bankroll.cfgRecStake;
+    cfgLabels[5].textContent = lang.bankroll.cfgDailyLimit;
+    cfgLabels[6].textContent = lang.bankroll.cfgWeeklyLimit;
+  }
+
+  const saveCfgBtn = document.getElementById('save-bankroll-cfg-btn');
+  if (saveCfgBtn) saveCfgBtn.innerText = lang.bankroll.cfgSaveBtn;
+}
+
+function updateAdminModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('admin-modal');
+  if (!modal || !lang.adminModal) return;
+
+  const titleEl = modal.querySelector<HTMLElement>('h2');
+  if (titleEl) titleEl.innerText = lang.adminModal.title;
+
+  const subEl = modal.querySelector<HTMLElement>('div > p');
+  if (subEl) subEl.innerText = lang.adminModal.subtitle;
+
+  const ths = modal.querySelectorAll('#adm-users-table thead th');
+  if (ths.length >= 7) {
+    ths[0].textContent = lang.adminModal.thId;
+    ths[1].textContent = lang.adminModal.thEmail;
+    ths[2].textContent = lang.adminModal.thName;
+    ths[3].textContent = lang.adminModal.thPlan;
+    ths[4].textContent = lang.adminModal.thStatus;
+    ths[5].textContent = lang.adminModal.thExpires;
+    ths[6].textContent = lang.adminModal.thAction;
+  }
+}
+
 function updateStaticLanguageTexts() {
+  updateGuideModalTexts();
+  updatePricingModalTexts();
+  updateCheckoutModalTexts();
+  updatePushNotifyModalTexts();
+  updateDailyReportModalTexts();
+  updateBacktestModalTexts();
+  updateAuditModalTexts();
+  updateAcademyModalTexts();
+  updateTransparencyModalTexts();
+  updateBankrollModalTexts();
+  updateAdminModalTexts();
+
   const lang = t();
 
   // App Title
@@ -2733,6 +3367,7 @@ function setupPricingModal() {
   if (!pricingBtn || !pricingModal || !closePricingModal) return;
 
   pricingBtn.addEventListener('click', () => {
+    updatePricingModalTexts();
     pricingModal.showModal();
   });
 
@@ -3963,6 +4598,7 @@ function setupBacktestModule() {
   };
 
   backtestBtn.addEventListener('click', () => {
+    updateBacktestModalTexts();
     const auth = authorizeAccess('PRO');
     if (!auth.allowed) {
       alert(`🔒 Acceso Restringido: ${auth.reason || 'Se requiere suscripción PRO o VIP activa para el módulo de Backtesting.'}`);
@@ -4075,6 +4711,7 @@ function setupAuditModule() {
   if (btnLost) btnLost.addEventListener('click', () => setAuditFilter('lost', btnLost));
 
   auditBtn.addEventListener('click', () => {
+    updateAuditModalTexts();
     renderAudit();
     auditModal.showModal();
   });
@@ -4098,7 +4735,8 @@ function setupAcademyModule() {
     if (!lessonsGrid) return;
     lessonsGrid.innerHTML = '';
 
-    ACADEMY_LESSONS.forEach(lesson => {
+    const lessons = getAcademyLessons(state.currentLang);
+    lessons.forEach(lesson => {
       const card = document.createElement('div');
       card.className = 'academy-card';
 
@@ -4124,6 +4762,7 @@ function setupAcademyModule() {
   };
 
   academyBtn.addEventListener('click', () => {
+    updateAcademyModalTexts();
     renderAcademy();
     academyModal.showModal();
   });
@@ -4323,6 +4962,7 @@ function setupDailyReportModule() {
       pricingModal.showModal();
       return;
     }
+    updateDailyReportModalTexts();
     recordDailySnapshot(state.streaks);
     renderDailyReportUI();
     drModal.showModal();
@@ -4523,6 +5163,7 @@ function setupTransparencyModule() {
   };
 
   transBtn.addEventListener('click', () => {
+    updateTransparencyModalTexts();
     renderTransparencyUI();
     transModal.showModal();
   });
