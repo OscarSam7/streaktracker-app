@@ -2925,12 +2925,12 @@ function updateStaticLanguageTexts() {
   const oppPillUpc = document.querySelector('[data-opp-filter="upcoming"]') as HTMLElement;
   const oppPillOper = document.querySelector('[data-opp-filter="operating"]') as HTMLElement;
 
-  if (oppPillAll) oppPillAll.innerHTML = `🔘 ${lang.opportunitiesCenter.fAll} (<span id="opp-fcount-all">${document.getElementById('opp-fcount-all')?.innerText || '0'}</span>)`;
-  if (oppPillPrem) oppPillPrem.innerHTML = `🟢 ${lang.opportunitiesCenter.fPremium} (<span id="opp-fcount-premium">${document.getElementById('opp-fcount-premium')?.innerText || '0'}</span>)`;
-  if (oppPillStrong) oppPillStrong.innerHTML = `🔵 ${lang.opportunitiesCenter.fStrong} (<span id="opp-fcount-strong">${document.getElementById('opp-fcount-strong')?.innerText || '0'}</span>)`;
-  if (oppPillLive) oppPillLive.innerHTML = `🔴 ${lang.opportunitiesCenter.fLive} (<span id="opp-fcount-live">${document.getElementById('opp-fcount-live')?.innerText || '0'}</span>)`;
-  if (oppPillUpc) oppPillUpc.innerHTML = `📅 ${lang.opportunitiesCenter.fUpcoming} (<span id="opp-fcount-upcoming">${document.getElementById('opp-fcount-upcoming')?.innerText || '0'}</span>)`;
-  if (oppPillOper) oppPillOper.innerHTML = `⚡ ${lang.opportunitiesCenter.fOperating} (<span id="opp-fcount-operating">${document.getElementById('opp-fcount-operating')?.innerText || '0'}</span>)`;
+  if (oppPillAll) oppPillAll.innerHTML = `${lang.opportunitiesCenter.fAll} (<span id="opp-fcount-all">${document.getElementById('opp-fcount-all')?.innerText || '0'}</span>)`;
+  if (oppPillPrem) oppPillPrem.innerHTML = `${lang.opportunitiesCenter.fPremium} (<span id="opp-fcount-premium">${document.getElementById('opp-fcount-premium')?.innerText || '0'}</span>)`;
+  if (oppPillStrong) oppPillStrong.innerHTML = `${lang.opportunitiesCenter.fStrong} (<span id="opp-fcount-strong">${document.getElementById('opp-fcount-strong')?.innerText || '0'}</span>)`;
+  if (oppPillLive) oppPillLive.innerHTML = `${lang.opportunitiesCenter.fLive} (<span id="opp-fcount-live">${document.getElementById('opp-fcount-live')?.innerText || '0'}</span>)`;
+  if (oppPillUpc) oppPillUpc.innerHTML = `${lang.opportunitiesCenter.fUpcoming} (<span id="opp-fcount-upcoming">${document.getElementById('opp-fcount-upcoming')?.innerText || '0'}</span>)`;
+  if (oppPillOper) oppPillOper.innerHTML = `${lang.opportunitiesCenter.fOperating} (<span id="opp-fcount-operating">${document.getElementById('opp-fcount-operating')?.innerText || '0'}</span>)`;
 
   // Dashboard Section Heading
   const dashboardHeading = document.querySelector<HTMLElement>('main > div > h2');
