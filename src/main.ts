@@ -1650,9 +1650,10 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           <div style="display: flex; align-items: center; gap: 0.45rem;">
             <span style="font-size: 1.1rem; filter: drop-shadow(0 0 4px #06b6d4);">⚡</span>
             <div>
-              <div style="font-size: 0.72rem; font-weight: 900; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
+              <div style="font-size: 0.72rem; font-weight: 900; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
                 ${lang.opportunitiesCenter.operatingTag} ${opp.actionMarketLabel}
                 <span class="opp-operating-pill">${lang.opportunitiesCenter.inProgressBadge}</span>
+                <span style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(239, 68, 68, 0.3)); color: #fdba74; border: 1px solid #f97316; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 900; font-size: 0.6rem; box-shadow: 0 0 8px rgba(249, 115, 22, 0.35);">🔥 Racha: ${opp.streakCurrent}</span>
               </div>
               <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.1rem;">
                 ${lang.opportunitiesCenter.monitoringBreak.replace('{streak}', opp.marketLabel)}
@@ -1670,8 +1671,11 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           <div style="display: flex; align-items: center; gap: 0.4rem;">
             <span style="font-size: 0.85rem;">🎯</span>
             <div>
-              <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80;">${lang.opportunitiesCenter.startTradeHeader} ${opp.actionMarketLabel}</div>
-              <div style="font-size: 0.6rem; color: #e2e8f0;">${lang.opportunitiesCenter.validatedSignal.replace('{streak}', opp.marketLabel).replace('{odds}', opp.suggestedOdds.toFixed(2))}</div>
+              <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                <span>${lang.opportunitiesCenter.startTradeHeader} ${opp.actionMarketLabel}</span>
+                <span style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(239, 68, 68, 0.3)); color: #fdba74; border: 1px solid #f97316; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 900; font-size: 0.6rem; box-shadow: 0 0 8px rgba(249, 115, 22, 0.35);">🔥 ${lang.opportunitiesCenter.currentStreakLabel}: ${opp.streakCurrent} ${lang.opportunitiesCenter.matchesSuffix}</span>
+              </div>
+              <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.05rem;">${lang.opportunitiesCenter.validatedSignal.replace('{streak}', opp.marketLabel).replace('{odds}', opp.suggestedOdds.toFixed(2))}</div>
             </div>
           </div>
           <div style="display: flex; gap: 0.3rem; align-items: center;">
@@ -1723,29 +1727,30 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         </span>
       </div>
 
-      <!-- Statistical Grid: Racha, Muestra, WinRate, ROI, Cuota -->
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; background: rgba(255,255,255,0.02); padding: 0.4rem; border-radius: 5px; font-size: 0.65rem; text-align: center; margin-top: 0.35rem;">
-        <div>
-          <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.currentStreakLabel}</span>
-          <strong style="color: #fff; font-size: 0.76rem;">${opp.streakCurrent} ${lang.opportunitiesCenter.matchesSuffix}</strong>
+      <!-- Statistical Grid: Racha (Resaltada), Muestra, WinRate, ROI, Cuota -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; background: rgba(255,255,255,0.02); padding: 0.4rem; border-radius: 6px; font-size: 0.65rem; text-align: center; margin-top: 0.35rem; align-items: stretch;">
+        <!-- Racha Actual destacada con alta visibilidad -->
+        <div style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.22) 0%, rgba(239, 68, 68, 0.28) 100%); border: 1.5px solid #f97316; border-radius: 6px; padding: 0.3rem 0.2rem; box-shadow: 0 0 12px rgba(249, 115, 22, 0.4); display: flex; flex-direction: column; justify-content: center;">
+          <span style="color: #fdba74; display: flex; align-items: center; justify-content: center; gap: 0.2rem; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3px;">🔥 ${lang.opportunitiesCenter.currentStreakLabel}</span>
+          <strong style="color: #fff7ed; font-size: 0.88rem; font-weight: 900; text-shadow: 0 0 10px rgba(249, 115, 22, 0.9); margin-top: 0.05rem;">${opp.streakCurrent} ${lang.opportunitiesCenter.matchesSuffix}</strong>
         </div>
-        <div>
+        <div style="display: flex; flex-direction: column; justify-content: center; padding: 0.2rem 0;">
           <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.sampleSizeLabel}</span>
           <strong style="color: #38bdf8; font-size: 0.76rem;">${opp.sampleSize} ${lang.opportunitiesCenter.casesSuffix}</strong>
         </div>
-        <div>
+        <div style="display: flex; flex-direction: column; justify-content: center; padding: 0.2rem 0;">
           <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.winrateLabel}</span>
           <strong style="color: #4ade80; font-size: 0.76rem;">${opp.winratePct}%</strong>
         </div>
-        <div>
+        <div style="display: flex; flex-direction: column; justify-content: center; padding: 0.2rem 0;">
           <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.roiLabel}</span>
           <strong style="color: #4ade80; font-size: 0.76rem;">+${opp.historicalRoiPct}%</strong>
         </div>
-        <div>
+        <div style="display: flex; flex-direction: column; justify-content: center; padding: 0.2rem 0;">
           <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.suggestedOddsLabel}</span>
           <strong style="color: #facc15; font-size: 0.76rem;">@${opp.suggestedOdds.toFixed(2)}</strong>
         </div>
-        <div>
+        <div style="display: flex; flex-direction: column; justify-content: center; padding: 0.2rem 0;">
           <span style="color: #94a3b8; display: block; font-size: 0.58rem;">${lang.opportunitiesCenter.leagueQualityLabel}</span>
           <strong style="color: #38bdf8; font-size: 0.76rem;">${opp.leagueQualityScore} pts</strong>
         </div>
