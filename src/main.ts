@@ -1623,6 +1623,9 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     const isCurrentlyOperating = isTradeActive || !!existingOp;
     const isOptimalEntry = opp.tier === 'PREMIUM' || opp.tier === 'FUERTE' || opp.isLive || isCurrentlyOperating;
 
+    const oppKey = getOpportunityPushKey(opp);
+    const isPushActive = isOpportunityPushActive(oppKey);
+
     const card = document.createElement('div');
     card.id = `opp-card-league-${opp.leagueId}`;
     card.setAttribute('data-league-id', opp.leagueId.toString());
@@ -1770,8 +1773,8 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         <span style="font-size: 0.6rem; color: #cbd5e1; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;" title="${opp.confidenceExplanation}">
           "${opp.confidenceExplanation}"
         </span>
-        <button class="btn-push-alert" data-league-id="${opp.leagueId}" title="${lang.opportunitiesCenter.pushAlertTitle}" style="font-size: 0.68rem; padding: 0.25rem 0.45rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 4px; cursor: pointer; flex-shrink: 0;">
-          🔔
+        <button class="btn-push-alert ${isPushActive ? 'active-push' : ''}" data-opp-key="${oppKey}" data-league-id="${opp.leagueId}" title="${isPushActive ? 'Alerta Push Activada para este partido (clic para desactivar)' : (lang.opportunitiesCenter?.pushAlertTitle || 'Activar Alerta Push')}">
+          ${isPushActive ? '🔔 Activado' : '🔔'}
         </button>
       </div>
 
@@ -1804,12 +1807,12 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       </div>
     `;
 
-    // Handle Push Notification Bell Button Click
+    // Handle Push Notification Bell Button Click (Toggle individual per banner)
     const pushBellBtn = card.querySelector('.btn-push-alert');
     if (pushBellBtn) {
       pushBellBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        openPushNotificationModal(opp);
+        toggleOpportunityPush(opp);
       });
     }
 
@@ -3596,6 +3599,119 @@ function setupCheckoutModal() {
   });
 }
 
+const STORAGE_KEY_PUSH_NOTIF = 'streaktracker_push_notifications_v1';
+
+interface PushConfigEntry {
+  oppKey: string;
+  leagueId: number;
+  marketKey?: string;
+  leagueName: string;
+  fixtureName: string;
+  marketLabel: string;
+  matchTimestamp: number;
+  notify10Min: boolean;
+  notifyLive: boolean;
+  notifyGoal?: boolean;
+  notifyFt?: boolean;
+  lastKnownScore?: string;
+  notified10Min: boolean;
+  notifiedLive: boolean;
+  notifiedFt?: boolean;
+  createdAt: number;
+}
+
+function getOpportunityPushKey(opp: any): string {
+  if (!opp) return '';
+  return `${opp.leagueId}_${opp.marketKey || 'all'}`;
+}
+
+function loadPushNotificationPreferences(): Record<string, PushConfigEntry> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PUSH_NOTIF);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function savePushNotificationPreferences(prefs: Record<string, PushConfigEntry>) {
+  try {
+    localStorage.setItem(STORAGE_KEY_PUSH_NOTIF, JSON.stringify(prefs));
+  } catch (e) {}
+}
+
+function isOpportunityPushActive(oppKey: string): boolean {
+  if (!oppKey) return false;
+  const prefs = loadPushNotificationPreferences();
+  return !!prefs[oppKey];
+}
+
+function updateOpportunityPushButtonsUI(oppKey: string, isActive: boolean) {
+  const btns = document.querySelectorAll<HTMLButtonElement>(`button.btn-push-alert[data-opp-key="${oppKey}"]`);
+  btns.forEach(btn => {
+    if (isActive) {
+      btn.classList.add('active-push');
+      btn.innerHTML = '🔔 Activado';
+      btn.title = 'Alerta Push Activada para este partido (clic para desactivar)';
+    } else {
+      btn.classList.remove('active-push');
+      btn.innerHTML = '🔔';
+      btn.title = 'Activar Alerta Push para este partido';
+    }
+  });
+}
+
+function toggleOpportunityPush(opp: any): void {
+  const oppKey = getOpportunityPushKey(opp);
+  if (!oppKey) return;
+  const prefs = loadPushNotificationPreferences();
+  const isCurrentlyActive = !!prefs[oppKey];
+
+  if (isCurrentlyActive) {
+    delete prefs[oppKey];
+    savePushNotificationPreferences(prefs);
+    updateOpportunityPushButtonsUI(oppKey, false);
+    triggerPushNotification(
+      '🔕 StreakTracker: Alerta Desactivada',
+      `Has desactivado las notificaciones push para ${opp.fixtureName} (${opp.leagueName}).`,
+      'toast-push-alert'
+    );
+  } else {
+    prefs[oppKey] = {
+      oppKey: oppKey,
+      leagueId: opp.leagueId,
+      marketKey: opp.marketKey,
+      leagueName: opp.leagueName,
+      fixtureName: opp.fixtureName,
+      marketLabel: opp.marketLabel,
+      matchTimestamp: opp.sortTimestamp || Date.now(),
+      notify10Min: true,
+      notifyLive: true,
+      notifyGoal: true,
+      notifyFt: true,
+      lastKnownScore: '0-0',
+      notified10Min: false,
+      notifiedLive: false,
+      notifiedFt: false,
+      createdAt: Date.now()
+    };
+    savePushNotificationPreferences(prefs);
+    updateOpportunityPushButtonsUI(oppKey, true);
+
+    if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+      try {
+        Notification.requestPermission();
+      } catch (e) {}
+    }
+
+    triggerPushNotification(
+      '🔔 StreakTracker: Alerta Push Activada',
+      `Monitoreando ${opp.fixtureName} (${opp.leagueName}). Te notificaremos 10 min antes, goles y al finalizar.`,
+      'toast-10min'
+    );
+  }
+}
+
 function setupPushNotificationModule() {
   const modal = document.getElementById('push-notify-modal') as HTMLDialogElement;
   const closeBtn = document.getElementById('close-push-notify-modal');
@@ -3628,12 +3744,15 @@ function setupPushNotificationModule() {
       const currentTarget = activePushModalOpportunity;
 
       if (currentTarget) {
-        activePush[currentTarget.leagueId] = {
+        const currentOppKey = getOpportunityPushKey(currentTarget);
+        activePush[currentOppKey] = {
+          oppKey: currentOppKey,
           leagueId: currentTarget.leagueId,
+          marketKey: currentTarget.marketKey,
           leagueName: currentTarget.leagueName,
           fixtureName: currentTarget.fixtureName,
           marketLabel: currentTarget.marketLabel,
-          matchTimestamp: currentTarget.sortTimestamp,
+          matchTimestamp: currentTarget.sortTimestamp || Date.now(),
           notify10Min: opt10Min ? opt10Min.checked : true,
           notifyLive: optLive ? optLive.checked : true,
           notifyGoal: optGoal ? optGoal.checked : true,
@@ -3646,6 +3765,7 @@ function setupPushNotificationModule() {
         };
 
         savePushNotificationPreferences(activePush);
+        updateOpportunityPushButtonsUI(currentOppKey, true);
 
         if (statusMsg) {
           statusMsg.style.display = 'block';
@@ -3697,40 +3817,7 @@ function openPushNotificationModal(opp: any) {
 
   modal.showModal();
 }
-
-const STORAGE_KEY_PUSH_NOTIF = 'streaktracker_push_notifications_v1';
-
-interface PushConfigEntry {
-  leagueId: number;
-  leagueName: string;
-  fixtureName: string;
-  marketLabel: string;
-  matchTimestamp: number;
-  notify10Min: boolean;
-  notifyLive: boolean;
-  notifyGoal?: boolean;
-  notifyFt?: boolean;
-  lastKnownScore?: string;
-  notified10Min: boolean;
-  notifiedLive: boolean;
-  notifiedFt?: boolean;
-  createdAt: number;
-}
-
-function loadPushNotificationPreferences(): Record<number, PushConfigEntry> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_PUSH_NOTIF);
-    return raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    return {};
-  }
-}
-
-function savePushNotificationPreferences(prefs: Record<number, PushConfigEntry>) {
-  try {
-    localStorage.setItem(STORAGE_KEY_PUSH_NOTIF, JSON.stringify(prefs));
-  } catch (e) {}
-}
+(window as any).openPushNotificationModal = openPushNotificationModal;
 
 function checkScheduledPushAlerts() {
   const prefs = loadPushNotificationPreferences();
