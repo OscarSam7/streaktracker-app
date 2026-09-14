@@ -177,7 +177,7 @@ const globalCounters = document.getElementById('global-counters') as HTMLDivElem
 const refreshBtn = document.getElementById('refresh-btn') as HTMLButtonElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
 const clearSearchBtn = document.getElementById('clear-search-btn') as HTMLButtonElement;
-const filterPills = document.querySelectorAll('.filter-pill') as NodeListOf<HTMLButtonElement>;
+const filterPills = document.querySelectorAll('#filter-pills .filter-pill') as NodeListOf<HTMLButtonElement>;
 
 function t(): Translations {
   return I18N[state.currentLang] || I18N.es;
@@ -929,9 +929,9 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
 
       // If opportunities filter is hiding this league, reset to 'all'
       if (state.oppFilter !== 'all') {
-        const oppFilterPills = document.querySelectorAll('.opp-filter-pill');
+        const oppFilterPills = document.querySelectorAll('#opp-filter-pills button');
         oppFilterPills.forEach(p => p.classList.remove('active'));
-        const allOppPill = document.querySelector('[data-opp-filter="all"]');
+        const allOppPill = document.querySelector('#opp-filter-pills [data-opp-filter="all"]');
         if (allOppPill) allOppPill.classList.add('active');
         state.oppFilter = 'all';
         renderOpportunitiesCenter();
@@ -2034,9 +2034,9 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       
       // Reset league filter/search to 'all' if the league might be hidden by a filter
       if (state.currentFilter !== 'all') {
-        const filterPills = document.querySelectorAll('.filter-pill');
-        filterPills.forEach(p => p.classList.remove('active'));
-        const allPill = document.querySelector('[data-filter="all"]');
+        const trackerFilterPills = document.querySelectorAll('#filter-pills .filter-pill');
+        trackerFilterPills.forEach(p => p.classList.remove('active'));
+        const allPill = document.querySelector('#filter-pills [data-filter="all"]');
         if (allPill) allPill.classList.add('active');
         state.currentFilter = 'all';
         renderDashboard();
@@ -2147,9 +2147,10 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
 }
 
 function setupOpportunitiesFilterHandlers() {
-  const pills = document.querySelectorAll('#opp-filter-pills .filter-pill');
+  const pills = document.querySelectorAll('#opp-filter-pills button');
   pills.forEach(pill => {
     pill.addEventListener('click', (e) => {
+      e.stopPropagation();
       pills.forEach(p => p.classList.remove('active'));
       const target = e.currentTarget as HTMLButtonElement;
       target.classList.add('active');
