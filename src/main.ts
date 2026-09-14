@@ -213,6 +213,8 @@ async function run() {
   setupOpportunitiesFilterHandlers();
   setupTransparencyModule();
   setupScrollToTop();
+  setupSportsDateStrip();
+  setupSportsBottomNav();
   setupPushNotificationModule();
   setupLeagueHistoryModal();
   updateTrialBannerUI();
@@ -1580,6 +1582,13 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
   if (elCOperating) elCOperating.innerText = cOperating.toString();
   if (countBadge) countBadge.innerText = `${cAll} ${lang.opportunitiesCenter.detectedBadge}`;
 
+  // Update AI Pulse Card Metrics
+  const pulseHighConf = document.getElementById('pulse-high-conf-count');
+  if (pulseHighConf) pulseHighConf.innerText = (cPrem + cStrong).toString();
+
+  const pulseStrongSig = document.getElementById('pulse-strong-signals-count');
+  if (pulseStrongSig) pulseStrongSig.innerText = cStrong.toString();
+
   // Apply oppFilter
   const filtered = allOpportunities.filter(o => {
     if (state.oppFilter === 'premium') return o.tier === 'PREMIUM';
@@ -1782,6 +1791,16 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
             <span style="animation: spin 1s linear infinite; display: inline-block;">⏳</span> ${lang.streaks.loadingHistory}
           </div>
         </div>
+      </div>
+
+      <!-- Social Proof & Live Watchers Footer -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.45rem; padding-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.62rem; color: #94a3b8;">
+        <span style="display: flex; align-items: center; gap: 0.25rem;">
+          <span>👁</span> <strong style="color: #cbd5e1;">${135 + ((opp.leagueId * 17 + opp.signalScore * 3) % 185)}</strong> personas analizando
+        </span>
+        <span style="color: #4ade80; font-weight: 800; display: inline-flex; align-items: center; gap: 0.25rem;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block; box-shadow: 0 0 6px #4ade80;"></span> Top Pick
+        </span>
       </div>
     `;
 
@@ -3104,6 +3123,92 @@ function setupSearchAndFilters() {
       scrollToFirstMatchingLeague();
     });
   });
+}
+
+function setupSportsDateStrip() {
+  const dateChips = document.querySelectorAll('.sports-date-chip');
+  dateChips.forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      dateChips.forEach(c => c.classList.remove('active'));
+      const target = e.currentTarget as HTMLElement;
+      target.classList.add('active');
+      const dateFilter = target.getAttribute('data-date-filter');
+
+      // Match with dashboard filter
+      if (dateFilter === 'today') {
+        state.currentFilter = 'today';
+      } else if (dateFilter === 'upcoming' || dateFilter === 'tomorrow') {
+        state.currentFilter = 'upcoming';
+      } else {
+        state.currentFilter = 'all';
+      }
+
+      // Synchronize filter pills
+      filterPills.forEach(p => {
+        if (p.getAttribute('data-filter') === state.currentFilter) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+
+      renderDashboard();
+    });
+  });
+}
+
+function setupSportsBottomNav() {
+  const bnavOpps = document.getElementById('bnav-opps');
+  const bnavTrackers = document.getElementById('bnav-trackers');
+  const bnavBankroll = document.getElementById('bnav-bankroll');
+  const bnavTelegram = document.getElementById('bnav-telegram');
+  const bnavPlans = document.getElementById('bnav-plans');
+
+  const bnavBtns = document.querySelectorAll('.bottom-nav-btn');
+  const setActiveBnav = (btn: HTMLElement | null) => {
+    bnavBtns.forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  };
+
+  if (bnavOpps) {
+    bnavOpps.addEventListener('click', () => {
+      setActiveBnav(bnavOpps);
+      const oppsSec = document.getElementById('opportunities-center-section');
+      if (oppsSec) oppsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  if (bnavTrackers) {
+    bnavTrackers.addEventListener('click', () => {
+      setActiveBnav(bnavTrackers);
+      const dashSec = document.getElementById('dashboard');
+      if (dashSec) dashSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  if (bnavBankroll) {
+    bnavBankroll.addEventListener('click', () => {
+      setActiveBnav(bnavBankroll);
+      const bkBtn = document.getElementById('bankroll-btn');
+      if (bkBtn) bkBtn.click();
+    });
+  }
+
+  if (bnavTelegram) {
+    bnavTelegram.addEventListener('click', () => {
+      setActiveBnav(bnavTelegram);
+      const tgBtn = document.getElementById('telegram-btn');
+      if (tgBtn) tgBtn.click();
+    });
+  }
+
+  if (bnavPlans) {
+    bnavPlans.addEventListener('click', () => {
+      setActiveBnav(bnavPlans);
+      const planBtn = document.getElementById('pricing-btn');
+      if (planBtn) planBtn.click();
+    });
+  }
 }
 
 function setupScrollToTop() {

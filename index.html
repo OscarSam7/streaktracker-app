@@ -16,64 +16,168 @@
 
 <body>
   <div class="container">
-    <header>
-      <div class="brand-header-capsule">
-        <div class="brand-logo-pill">
-          <img src="/enrachas-logo.png" alt="EnRachas" class="brand-logo-img" />
+    <!-- Modern Sports App Top Bar -->
+    <header class="sports-top-bar">
+      <div class="sports-brand-box">
+        <div class="brand-header-capsule">
+          <div class="brand-logo-pill">
+            <img src="/enrachas-logo.png" alt="EnRachas" class="brand-logo-img" />
+          </div>
+          <div class="brand-title-badge">
+            <span class="live-indicator" style="margin-right: 2px;"></span>
+            <span class="brand-title-text">Rastreador de Rachas</span>
+          </div>
         </div>
-        <div class="brand-title-badge">
-          <span class="live-indicator" style="margin-right: 2px;"></span>
-          <span class="brand-title-text">Rastreador de Rachas</span>
-        </div>
+        <span class="badge-pro-gold">PRO</span>
       </div>
-      <div id="global-counters" class="global-counters">
-        <span class="indicators-header-label">Indicadores:</span>
-        <div class="counter-badge counter-orange"><span id="count-orange">0</span> <span class="counter-label">Naranjas</span></div>
-        <div class="counter-badge counter-yellow"><span id="count-yellow">0</span> <span class="counter-label">Amarillos</span></div>
-        <div class="counter-badge counter-blue"><span id="count-blue">0</span> <span class="counter-label">Azules</span></div>
-        <div class="counter-badge counter-green"><span id="count-green">0</span> <span class="counter-label">Verdes</span></div>
-      </div>
-      <div id="header-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-        <div class="lang-selector-box">
-          <select id="lang-select" class="lang-select">
-            <option value="es" selected>🇪🇸 ES</option>
-            <option value="en">🇬🇧 EN</option>
-            <option value="pt">🇧🇷 PT</option>
-            <option value="gn">🇵🇾 GN (Jopara)</option>
-          </select>
+
+      <div class="sports-header-controls">
+        <div id="global-counters" class="global-counters sports-counters-pill">
+          <span class="indicators-header-label">Indicadores:</span>
+          <div class="counter-badge counter-orange"><span id="count-orange">0</span> <span class="counter-label">Naranjas</span></div>
+          <div class="counter-badge counter-yellow"><span id="count-yellow">0</span> <span class="counter-label">Amarillos</span></div>
+          <div class="counter-badge counter-blue"><span id="count-blue">0</span> <span class="counter-label">Azules</span></div>
+          <div class="counter-badge counter-green"><span id="count-green">0</span> <span class="counter-label">Verdes</span></div>
         </div>
-        <div class="plan-selector-box">
-          <label for="plan-select" id="plan-label" class="plan-selector-label">Plan:</label>
-          <select id="plan-select" class="plan-select" style="font-weight: 800;">
-            <option value="FREE">⚪ FREE (Básico)</option>
-            <option value="TRIAL">🧪 TRIAL (Prueba 3 Días)</option>
-            <option value="PRO">🔵 PRO (Cuantitativo)</option>
-            <option value="VIP" selected>🟢 VIP (Todo Incluido)</option>
-          </select>
+
+        <div class="sports-user-controls">
+          <div class="lang-selector-box">
+            <select id="lang-select" class="lang-select">
+              <option value="es" selected>🇪🇸 ES</option>
+              <option value="en">🇬🇧 EN</option>
+              <option value="pt">🇧🇷 PT</option>
+              <option value="gn">🇵🇾 GN (Jopara)</option>
+            </select>
+          </div>
+          <div class="plan-selector-box">
+            <label for="plan-select" id="plan-label" class="plan-selector-label" style="display: none;">Plan:</label>
+            <select id="plan-select" class="plan-select" style="font-weight: 800;">
+              <option value="FREE">⚪ FREE (Básico)</option>
+              <option value="TRIAL">🧪 TRIAL (Prueba 3 Días)</option>
+              <option value="PRO">🔵 PRO (Cuantitativo)</option>
+              <option value="VIP" selected>🟢 VIP (Todo Incluido)</option>
+            </select>
+          </div>
+          
+          <div id="user-badge-header" class="sports-user-badge">
+            <span style="color: #38bdf8;">👤</span>
+            <span id="header-user-name" style="font-weight: 700; color: #fff;">Usuario</span>
+            <span id="header-user-plan-pill" class="sports-plan-chip">VIP</span>
+          </div>
+
+          <button id="refresh-btn" class="sports-btn-icon" title="Actualizar datos de las ligas ahora">🔄</button>
+          <button id="logout-header-btn" class="sports-btn-icon sports-logout-btn" title="Cerrar sesión y volver al Portal Web">🚪</button>
         </div>
-        
-        <div id="user-badge-header" style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.76rem;">
-          <span style="color: #38bdf8;">👤</span>
-          <span id="header-user-name" style="font-weight: 700; color: #fff;">Usuario</span>
-          <span id="header-user-plan-pill" style="font-size: 0.68rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 4px; background: #38bdf8; color: #0b1320;">VIP</span>
-        </div>
-        <button id="logout-header-btn" class="btn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; color: #f87171; border-color: rgba(239, 68, 68, 0.3);" title="Cerrar sesión y volver al Portal Web">🚪 Salir</button>
-        <button id="guide-btn" class="btn" title="Ver Guía de Mercados a Operar">📖 ¿Qué Mercado Operar?</button>
-        <button id="backtest-btn" class="btn" title="Ver Backtesting y Rendimiento Histórico">📈 Backtesting</button>
-        <button id="audit-btn" class="btn" title="Ver Auditoría Pública y Track Record">🛡️ Auditoría</button>
-        <button id="academy-btn" class="btn btn-academy" title="Aprender en la Academia Anti-Ruina">🎓 Academia</button>
-        <button id="bankroll-btn" class="btn btn-bankroll" title="Abrir Registro de Operaciones y Control de Banca">💼 Control de Banca</button>
-        <button id="export-csv-btn" class="btn" style="display: none;" title="Exportar resumen a Excel/CSV">📥 Exportar CSV</button>
-        <button id="telegram-btn" class="btn btn-telegram" title="Ver simulador de alertas de Telegram">🤖 Bot Telegram</button>
-        <button id="pricing-btn" class="btn btn-premium">💎 Ver Planes</button>
-        <button id="refresh-btn" class="btn" title="Actualizar datos de las ligas ahora">🔄</button>
-        <button id="league-btn" class="btn">Gestionar Ligas</button>
-        <button id="daily-report-btn" class="btn" style="background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%); color: #fff; font-weight: 700; border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 0 15px rgba(14, 165, 233, 0.25);" title="Ver Informe y Balance de Jornada por Día, Semana y Mes">📊 Informe de Jornada</button>
-        <button id="transparency-btn" class="btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #fff; font-weight: 800; border: 1px solid rgba(74, 222, 128, 0.5); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);" title="Ver Métricas Oficiales de Rendimiento y Transparencia">🔍 Transparencia & Resultados</button>
-        <a href="/landing.html" class="btn" style="text-decoration: none; border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; display: inline-flex; align-items: center; gap: 0.3rem;" title="Ver Landing Page informativa">🌐 Portal Web</a>
-        <button id="admin-panel-btn" class="btn" style="display: none; background: linear-gradient(135deg, #475569 0%, #1e293b 100%); color: #facc15; font-weight: 800; border: 1px solid rgba(250, 204, 21, 0.4); box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
       </div>
     </header>
+
+    <!-- Sports Interactive Date Strip (Selector Horizontal de Fechas) -->
+    <div class="sports-date-strip" id="sports-date-strip">
+      <button class="sports-date-chip" data-date-filter="yesterday">
+        <span class="date-sub">Ayer</span>
+        <span class="date-main">📅 -1D</span>
+      </button>
+      <button class="sports-date-chip active" data-date-filter="today">
+        <span class="date-sub">Hoy</span>
+        <span class="date-main">🔥 En Vivo</span>
+      </button>
+      <button class="sports-date-chip" data-date-filter="tomorrow">
+        <span class="date-sub">Mañana</span>
+        <span class="date-main">📅 +1D</span>
+      </button>
+      <button class="sports-date-chip" data-date-filter="upcoming">
+        <span class="date-sub">Próximos</span>
+        <span class="date-main">📅 Jornada</span>
+      </button>
+      <button class="sports-date-chip" data-date-filter="all">
+        <span class="date-sub">Todas</span>
+        <span class="date-main">🌐 51 Ligas</span>
+      </button>
+    </div>
+
+    <!-- Live Social Proof & Activity Pulse Bar -->
+    <div class="sports-live-pulse-bar">
+      <div class="pulse-status-left">
+        <span class="pulse-live-circle"></span>
+        <strong id="live-online-users-text">2,418 usuarios en línea</strong>
+        <span class="pulse-divider">•</span>
+        <span class="pulse-activity-desc">revisando señales cuantitativas en tiempo real</span>
+      </div>
+      <div class="pulse-status-right">
+        <span class="badge-tag-live">● EN VIVO</span>
+      </div>
+    </div>
+
+    <!-- EnRachas AI Pulse Summary Widget -->
+    <div class="sports-pulse-card">
+      <div class="pulse-card-header">
+        <div class="pulse-card-icon-box">🧠</div>
+        <div>
+          <h4 class="pulse-card-title">ENRACHAS PULSE • Motor Cuantitativo</h4>
+          <p class="pulse-card-sub">51 Ligas Oficiales Monitoreadas 24/7 en Tiempo Real</p>
+        </div>
+      </div>
+      <div class="pulse-card-metrics">
+        <div class="pulse-metric-item">
+          <span class="pulse-metric-label">🔥 ALTA CONFIANZA</span>
+          <strong class="pulse-metric-val val-orange" id="pulse-high-conf-count">24</strong>
+        </div>
+        <div class="pulse-metric-item">
+          <span class="pulse-metric-label">⚡ SEÑALES FUERTES</span>
+          <strong class="pulse-metric-val val-cyan" id="pulse-strong-signals-count">19</strong>
+        </div>
+        <div class="pulse-metric-item">
+          <span class="pulse-metric-label">📈 ACIERTO HIST.</span>
+          <strong class="pulse-metric-val val-green">75.8%</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sports Tools Hub (Barra de Herramientas Deportivas Categorizada) -->
+    <div class="sports-tools-hub" id="header-actions">
+      <div class="tools-scroll-row">
+        <!-- Operativa & Gestión -->
+        <button id="bankroll-btn" class="sports-tool-chip chip-bankroll" title="Abrir Registro de Operaciones y Control de Banca">
+          <span class="tool-icon">💼</span> Control de Banca
+        </button>
+        <button id="backtest-btn" class="sports-tool-chip chip-backtest" title="Ver Backtesting y Rendimiento Histórico">
+          <span class="tool-icon">📈</span> Backtesting
+        </button>
+        <button id="telegram-btn" class="sports-tool-chip chip-telegram" title="Ver simulador de alertas de Telegram">
+          <span class="tool-icon">🤖</span> Bot Telegram
+        </button>
+        <button id="daily-report-btn" class="sports-tool-chip chip-report" title="Ver Informe y Balance de Jornada por Día, Semana y Mes">
+          <span class="tool-icon">📊</span> Informe de Jornada
+        </button>
+
+        <!-- Estrategia & Auditoría -->
+        <button id="guide-btn" class="sports-tool-chip chip-guide" title="Ver Guía de Mercados a Operar">
+          <span class="tool-icon">📖</span> ¿Qué Mercado Operar?
+        </button>
+        <button id="audit-btn" class="sports-tool-chip chip-audit" title="Ver Auditoría Pública y Track Record">
+          <span class="tool-icon">🛡️</span> Auditoría
+        </button>
+        <button id="transparency-btn" class="sports-tool-chip chip-transparency" title="Ver Métricas Oficiales de Rendimiento y Transparencia">
+          <span class="tool-icon">🔍</span> Transparencia & Resultados
+        </button>
+        <button id="academy-btn" class="sports-tool-chip chip-academy" title="Aprender en la Academia Anti-Ruina">
+          <span class="tool-icon">🎓</span> Academia
+        </button>
+
+        <!-- Configuración & Acceso -->
+        <button id="league-btn" class="sports-tool-chip chip-leagues" title="Gestionar Ligas">
+          <span class="tool-icon">⚙️</span> Gestionar Ligas
+        </button>
+        <button id="pricing-btn" class="sports-tool-chip chip-vip" title="Ver Planes">
+          <span class="tool-icon">💎</span> Ver Planes
+        </button>
+        <a href="/landing.html" id="portal-web-btn" class="sports-tool-chip chip-portal" title="Ver Landing Page informativa">
+          <span class="tool-icon">🌐</span> Portal Web
+        </a>
+        <button id="export-csv-btn" class="btn" style="display: none;" title="Exportar resumen a Excel/CSV">📥 Exportar CSV</button>
+        <button id="admin-panel-btn" class="btn" style="display: none;" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
+      </div>
+    </div>
 
     <!-- Permanent Trial Countdown Banner (Dynamically Controlled) -->
     <div id="trial-active-banner" style="display: none; background: linear-gradient(135deg, rgba(250, 204, 21, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%); border: 1px solid rgba(250, 204, 21, 0.4); border-radius: 0.75rem; padding: 0.75rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
@@ -1668,12 +1772,29 @@
       </div>
     </footer>
 
-    <!-- Floating Scroll-To-Top Arrow Button -->
-    <button id="btn-scroll-top" class="btn-scroll-top" title="Subir a la cabecera" aria-label="Subir a la cabecera">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 15l-6-6-6 6"/>
-      </svg>
-    </button>
+    <!-- Sports Native Bottom Navigation Bar (Mobile / Responsive) -->
+    <nav class="sports-bottom-nav">
+      <button class="bottom-nav-btn active" id="bnav-opps">
+        <span class="bnav-icon">🏆</span>
+        <span class="bnav-text">Explorar</span>
+      </button>
+      <button class="bottom-nav-btn" id="bnav-trackers">
+        <span class="bnav-icon">📊</span>
+        <span class="bnav-text">Rastreadores</span>
+      </button>
+      <button class="bottom-nav-btn" id="bnav-bankroll">
+        <span class="bnav-icon">💼</span>
+        <span class="bnav-text">Banca</span>
+      </button>
+      <button class="bottom-nav-btn" id="bnav-telegram">
+        <span class="bnav-icon">🤖</span>
+        <span class="bnav-text">Bot VIP</span>
+      </button>
+      <button class="bottom-nav-btn" id="bnav-plans">
+        <span class="bnav-icon">💎</span>
+        <span class="bnav-text">Planes</span>
+      </button>
+    </nav>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
