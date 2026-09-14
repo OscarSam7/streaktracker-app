@@ -198,21 +198,32 @@
       </div>
     </div>
 
-    <!-- Search & Quick Filters Bar -->
-    <div class="filter-bar">
+    <!-- Search & Quick Filters Bar (Rastreadores y Alertas por Liga) -->
+    <div class="filter-bar sports-tracker-filter-bar">
+      <div class="tracker-filter-bar-header">
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+          <span style="font-size: 1rem; color: #38bdf8;">📊</span>
+          <strong style="font-size: 0.88rem; color: #fff; text-transform: uppercase; letter-spacing: 0.03em;">Filtros de Rastreadores por Liga</strong>
+        </div>
+        <span style="font-size: 0.68rem; font-weight: 800; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 0.15rem 0.5rem; border-radius: 9999px; border: 1px solid rgba(56, 189, 248, 0.25);">51 Ligas Oficiales</span>
+      </div>
+
       <div class="search-box">
         <input type="text" id="search-input" placeholder="🔍 Buscar liga o país..." />
         <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Limpiar búsqueda">✕</button>
         <button id="search-action-btn" class="btn-search-action" title="Buscar y desplazar a la liga">🔍 Buscar</button>
       </div>
-      <div class="filter-pills" id="filter-pills">
-        <button class="filter-pill active" data-filter="all">🔘 Todas las Ligas</button>
-        <button class="filter-pill" data-filter="high_today" style="border-color: rgba(74, 222, 128, 0.6); background: rgba(74, 222, 128, 0.12); color: #4ade80; font-weight: 700;">🟢🔵 Alertas Verdes / Azules de Hoy</button>
-        <button class="filter-pill" data-filter="high_alerts">🟢 Alertas Verdes / Azules (Todas)</button>
-        <button class="filter-pill" data-filter="today" style="border-color: rgba(245, 158, 11, 0.5); font-weight: 700;">🔥 Partidos de Hoy</button>
-        <button class="filter-pill" data-filter="live">🔴 Solo En Vivo</button>
-        <button class="filter-pill" data-filter="upcoming">📅 Con Próximos Partidos</button>
-        <button class="filter-pill" data-filter="operating" style="border-color: rgba(6, 182, 212, 0.6); color: #38bdf8; font-weight: 700;">⚡ Operando</button>
+
+      <div class="filter-pills-scroll-wrapper">
+        <div class="filter-pills" id="filter-pills">
+          <button class="filter-pill active" data-filter="all">🔘 Todas las Ligas</button>
+          <button class="filter-pill pill-alert-today" data-filter="high_today">🟢🔵 Alertas de Hoy</button>
+          <button class="filter-pill pill-alert-high" data-filter="high_alerts">🟢 Alertas Verdes / Azules</button>
+          <button class="filter-pill pill-today" data-filter="today">🔥 Partidos de Hoy</button>
+          <button class="filter-pill pill-live" data-filter="live">🔴 Solo En Vivo</button>
+          <button class="filter-pill pill-upcoming" data-filter="upcoming">📅 Con Próximos</button>
+          <button class="filter-pill pill-operating" data-filter="operating">⚡ Operando</button>
+        </div>
       </div>
     </div>
 
@@ -1706,33 +1717,47 @@
       </dialog>
 
       <!-- CENTRO DE OPORTUNIDADES -->
-      <section id="opportunities-center-section" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 1rem; padding: 1.25rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);">
+      <section id="opportunities-center-section" class="sports-opps-section">
+        <div class="opps-section-header-box">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div class="opps-lightning-icon">
               ⚡
             </div>
             <div>
-              <h2 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <h2 class="opps-section-title">
                 CENTRO DE OPORTUNIDADES
-                <span id="opp-count-badge" style="font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                <span id="opp-count-badge" class="opps-badge-count">
                   0 detectadas
                 </span>
               </h2>
-              <p style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.15rem; margin-bottom: 0;">
+              <p class="opps-section-subtitle">
                 Ranking algorítmico multicriterio (Signal Score, Confianza, Muestra, Calidad de Liga y Horario).
               </p>
             </div>
           </div>
 
-          <!-- Quick Filters: TODAS, PREMIUM, FUERTES, PRÓXIMAS, EN VIVO, OPERANDO -->
-          <div class="filter-pills" id="opp-filter-pills" style="margin: 0;">
-            <button class="filter-pill active" data-opp-filter="all">🔘 TODAS (<span id="opp-fcount-all">0</span>)</button>
-            <button class="filter-pill" data-opp-filter="premium" style="color: #4ade80; border-color: rgba(74, 222, 128, 0.4);">🟢 PREMIUM (<span id="opp-fcount-premium">0</span>)</button>
-            <button class="filter-pill" data-opp-filter="strong" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">🔵 FUERTES (<span id="opp-fcount-strong">0</span>)</button>
-            <button class="filter-pill" data-opp-filter="live" style="color: #f87171; border-color: rgba(248, 113, 113, 0.4);">🔴 EN VIVO (<span id="opp-fcount-live">0</span>)</button>
-            <button class="filter-pill" data-opp-filter="upcoming" style="color: #facc15; border-color: rgba(250, 204, 21, 0.4);">📅 PRÓXIMAS (<span id="opp-fcount-upcoming">0</span>)</button>
-            <button class="filter-pill" data-opp-filter="operating" style="color: #06b6d4; border-color: rgba(6, 182, 212, 0.6); font-weight: 700;">⚡ OPERANDO (<span id="opp-fcount-operating">0</span>)</button>
+          <!-- Quick Filters: TODAS, PREMIUM, FUERTES, PRÓXIMAS, EN VIVO, OPERANDO (Segmented Sports Pill Strip) -->
+          <div class="opp-filter-scroll-wrapper">
+            <div class="filter-pills opp-filter-segmented-bar" id="opp-filter-pills">
+              <button class="filter-pill opp-seg-btn active" data-opp-filter="all">
+                🔘 TODAS (<span id="opp-fcount-all">0</span>)
+              </button>
+              <button class="filter-pill opp-seg-btn pill-opp-prem" data-opp-filter="premium">
+                🟢 PREMIUM (<span id="opp-fcount-premium">0</span>)
+              </button>
+              <button class="filter-pill opp-seg-btn pill-opp-strong" data-opp-filter="strong">
+                🔵 FUERTES (<span id="opp-fcount-strong">0</span>)
+              </button>
+              <button class="filter-pill opp-seg-btn pill-opp-live" data-opp-filter="live">
+                🔴 EN VIVO (<span id="opp-fcount-live">0</span>)
+              </button>
+              <button class="filter-pill opp-seg-btn pill-opp-upc" data-opp-filter="upcoming">
+                📅 PRÓXIMAS (<span id="opp-fcount-upcoming">0</span>)
+              </button>
+              <button class="filter-pill opp-seg-btn pill-opp-oper" data-opp-filter="operating">
+                ⚡ OPERANDO (<span id="opp-fcount-operating">0</span>)
+              </button>
+            </div>
           </div>
         </div>
 
