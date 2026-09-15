@@ -1,4 +1,5 @@
 export type OperationStatus = 'Ganada' | 'Perdida' | 'Pendiente' | 'Cancelada' | 'Reembolsada' | 'Nula';
+export type CapitalMovementType = 'INYECCION' | 'EXTRACCION' | 'GASTO';
 
 export interface CurrencyConfig {
   code: string;
@@ -48,6 +49,20 @@ export interface BankrollOperation {
   locked_at: string | null;
 }
 
+export interface CapitalMovement {
+  id: string;
+  date: string;
+  time: string;
+  type: CapitalMovementType;
+  category: string;
+  description: string;
+  amount: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  notes?: string;
+  created_at: string;
+}
+
 export interface BankrollConfig {
   currencyCode: string;
   initialCapital: number;
@@ -63,6 +78,11 @@ export interface BankrollConfig {
 
 export interface BankrollKPIs {
   initialCapital: number;
+  totalInjections: number;
+  totalWithdrawals: number;
+  totalExpenses: number;
+  netCashflow: number;
+  tradingPnl: number;
   currentCapital: number;
   totalPnl: number;
   totalProfit: number;
@@ -90,6 +110,7 @@ export interface BankrollKPIs {
 
 const STORAGE_KEY_OPERATIONS = 'football_streaks_bankroll_ops_v1';
 const STORAGE_KEY_CONFIG = 'football_streaks_bankroll_cfg_v2_multicurrency';
+const STORAGE_KEY_MOVEMENTS = 'football_streaks_capital_movements_v1';
 
 export const DEFAULT_CONFIG: BankrollConfig = {
   currencyCode: 'USD',
@@ -116,6 +137,48 @@ export const INITIAL_SAMPLE_OPERATIONS: Array<Omit<BankrollOperation, 'capitalBe
   { id: 'OP-009', date: '2026-08-09', time: '20:00', category: 'Fútbol Cuantitativo', description: 'Juventus vs Roma', operationType: 'Pre-partido', market: 'Empate (FT)', status: 'Pendiente', stake: 20, odds: 3.25, notes: 'Operación en curso', is_locked: false, locked_at: null }
 ];
 
+export const INITIAL_SAMPLE_MOVEMENTS: CapitalMovement[] = [
+  {
+    id: 'MOV-001',
+    date: '2026-08-01',
+    time: '09:00',
+    type: 'INYECCION',
+    category: 'Depósito Inicial de Capital',
+    description: 'Aporte de fondos para banca operativa',
+    amount: 500,
+    balanceBefore: 1000,
+    balanceAfter: 1500,
+    notes: 'Inyección inicial de fondos',
+    created_at: '2026-08-01T09:00:00.000Z'
+  },
+  {
+    id: 'MOV-002',
+    date: '2026-08-04',
+    time: '14:30',
+    type: 'GASTO',
+    category: 'Pago Plan VIP / Suscripción',
+    description: 'Suscripción mensual a plataforma StreakTracker',
+    amount: 39,
+    balanceBefore: 1500,
+    balanceAfter: 1461,
+    notes: 'Costo de herramientas de análisis',
+    created_at: '2026-08-04T14:30:00.000Z'
+  },
+  {
+    id: 'MOV-003',
+    date: '2026-08-08',
+    time: '12:00',
+    type: 'EXTRACCION',
+    category: 'Retiro de Ganancias',
+    description: 'Retiro a cuenta bancaria / Billetera',
+    amount: 100,
+    balanceBefore: 1461,
+    balanceAfter: 1361,
+    notes: 'Cosecha de beneficios acumulados',
+    created_at: '2026-08-08T12:00:00.000Z'
+  }
+];
+
 export function getCurrencyConfig(code: string = 'USD'): CurrencyConfig {
   return SUPPORTED_CURRENCIES.find(c => c.code === code) || SUPPORTED_CURRENCIES[0];
 }
@@ -124,14 +187,25 @@ export function formatCurrency(amount: number, currencyCode: string = 'USD', sho
   const cfg = getCurrencyConfig(currencyCode);
   const isNeg = amount < 0;
   const absVal = Math.abs(amount);
-  const formattedNum = absVal.toLocaleString('en-US', {
-    minimumFractionDigits: cfg.decimals,
-    maximumFractionDigits: cfg.decimals
-  });
+
+  let formattedNum: string;
+  if (cfg.decimals === 0) {
+    // Guaraní (PYG) y monedas de 0 decimales: números enteros con punto (.) como separador de miles
+    const rounded = Math.round(absVal);
+    formattedNum = rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  } else {
+    // Monedas con 2 decimales (USD, EUR, BRL, etc.)
+    const parts = absVal.toFixed(cfg.decimals).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    formattedNum = parts.join('.');
+  }
 
   const signStr = showSign ? (amount > 0 ? '+' : isNeg ? '-' : '') : (isNeg ? '-' : '');
   
-  if (cfg.code === 'PYG' || cfg.code === 'BRL' || cfg.code === 'PEN' || cfg.code === 'UYU') {
+  if (cfg.code === 'PYG') {
+    return `${signStr}${formattedNum} ₲`;
+  }
+  if (cfg.code === 'BRL' || cfg.code === 'PEN' || cfg.code === 'UYU') {
     return `${signStr}${cfg.symbol} ${formattedNum}`;
   }
   return `${signStr}${cfg.symbol}${formattedNum}`;
@@ -164,6 +238,22 @@ export function loadRawOperations(): any[] {
 
 export function saveRawOperations(ops: any[]) {
   localStorage.setItem(STORAGE_KEY_OPERATIONS, JSON.stringify(ops));
+}
+
+export function loadCapitalMovements(): CapitalMovement[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY_MOVEMENTS);
+    if (saved !== null) {
+      return JSON.parse(saved);
+    }
+    return INITIAL_SAMPLE_MOVEMENTS;
+  } catch {
+    return INITIAL_SAMPLE_MOVEMENTS;
+  }
+}
+
+export function saveCapitalMovements(movements: CapitalMovement[]) {
+  localStorage.setItem(STORAGE_KEY_MOVEMENTS, JSON.stringify(movements));
 }
 
 export function calculateProcessedOperations(rawOps: any[], config: BankrollConfig): BankrollOperation[] {
@@ -234,7 +324,11 @@ export function calculateProcessedOperations(rawOps: any[], config: BankrollConf
   });
 }
 
-export function computeBankrollKPIs(processedOps: BankrollOperation[], config: BankrollConfig): BankrollKPIs {
+export function computeBankrollKPIs(
+  processedOps: BankrollOperation[],
+  config: BankrollConfig,
+  movements: CapitalMovement[] = []
+): BankrollKPIs {
   const initialCapital = config.initialCapital;
   let totalProfit = 0;
   let totalLoss = 0;
@@ -248,9 +342,26 @@ export function computeBankrollKPIs(processedOps: BankrollOperation[], config: B
   let maxWin = 0;
   let maxLoss = 0;
 
-  let peakCap = initialCapital;
+  // Compute Capital Movements totals
+  let totalInjections = 0;
+  let totalWithdrawals = 0;
+  let totalExpenses = 0;
+
+  movements.forEach(m => {
+    const amt = Math.abs(Number(m.amount) || 0);
+    if (m.type === 'INYECCION') {
+      totalInjections += amt;
+    } else if (m.type === 'EXTRACCION') {
+      totalWithdrawals += amt;
+    } else if (m.type === 'GASTO') {
+      totalExpenses += amt;
+    }
+  });
+
+  const netCashflow = totalInjections - totalWithdrawals - totalExpenses;
+  let peakCap = initialCapital + totalInjections;
   let maxDrawdownPct = 0;
-  let runningCap = initialCapital;
+  let runningCap = initialCapital + netCashflow;
   let committedCapital = 0;
 
   processedOps.forEach(op => {
@@ -288,8 +399,9 @@ export function computeBankrollKPIs(processedOps: BankrollOperation[], config: B
   });
 
   const totalOps = processedOps.length;
-  const currentCapital = initialCapital + totalProfit + totalLoss;
-  const totalPnl = totalProfit + totalLoss;
+  const tradingPnl = totalProfit + totalLoss;
+  const currentCapital = initialCapital + totalInjections - totalWithdrawals - totalExpenses + tradingPnl;
+  const totalPnl = tradingPnl;
   const roi = totalStaked > 0 ? totalPnl / totalStaked : 0;
   const yieldPct = initialCapital > 0 ? totalPnl / initialCapital : 0;
   const winrate = (wonOps + lostOps) > 0 ? wonOps / (wonOps + lostOps) : 0;
@@ -308,6 +420,11 @@ export function computeBankrollKPIs(processedOps: BankrollOperation[], config: B
 
   return {
     initialCapital,
+    totalInjections,
+    totalWithdrawals,
+    totalExpenses,
+    netCashflow,
+    tradingPnl,
     currentCapital,
     totalPnl,
     totalProfit,

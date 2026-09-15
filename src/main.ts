@@ -30,11 +30,15 @@ import {
   loadBankrollConfig, 
   saveBankrollConfig, 
   loadRawOperations, 
-  saveRawOperations, 
+  saveRawOperations,
+  loadCapitalMovements,
+  saveCapitalMovements,
   calculateProcessedOperations, 
   computeBankrollKPIs,
   formatCurrency,
-  type OperationStatus
+  getCurrencyConfig,
+  type OperationStatus,
+  type CapitalMovementType
 } from './logic/bankroll';
 import { I18N, type Language, type Translations } from './config/i18n';
 import { runHistoricalBacktest } from './logic/backtest';
@@ -152,6 +156,7 @@ const state = {
   currentFilter: 'all' as QuickFilter,
   bankrollConfig: loadBankrollConfig(),
   bankrollRawOps: loadRawOperations(),
+  capitalMovements: loadCapitalMovements(),
   activeLiveIndex: {} as Record<number, number>,
   oppFilter: 'all' as 'all' | 'premium' | 'strong' | 'live' | 'upcoming' | 'operating',
   activeTrades: loadActiveTrades() as Record<string, ActiveTrackedTrade>,
@@ -4618,12 +4623,25 @@ function setupBankrollModule() {
   const bankrollModal = document.getElementById('bankroll-modal') as HTMLDialogElement;
   const closeBankrollModal = document.getElementById('close-bankroll-modal') as HTMLButtonElement;
   const bankrollNewOpBtn = document.getElementById('bankroll-new-op-btn') as HTMLButtonElement;
+  const bankrollNewMovementBtn = document.getElementById('bankroll-new-movement-btn') as HTMLButtonElement;
   const addOpRowBtn = document.getElementById('add-op-row-btn') as HTMLButtonElement;
+  const addMovementRowBtn = document.getElementById('add-movement-row-btn') as HTMLButtonElement;
   const clearAllOpsBtn = document.getElementById('clear-all-ops-btn') as HTMLButtonElement;
+  const clearAllMovsBtn = document.getElementById('clear-all-movs-btn') as HTMLButtonElement;
+
   const newOpModal = document.getElementById('new-op-modal') as HTMLDialogElement;
   const closeNewOpModal = document.getElementById('close-new-op-modal') as HTMLButtonElement;
   const cancelNewOpBtn = document.getElementById('cancel-new-op-btn') as HTMLButtonElement;
   const newOpForm = document.getElementById('new-op-form') as HTMLFormElement;
+
+  const newMovementModal = document.getElementById('new-movement-modal') as HTMLDialogElement;
+  const closeNewMovementModal = document.getElementById('close-new-movement-modal') as HTMLButtonElement;
+  const cancelNewMovementBtn = document.getElementById('cancel-new-movement-btn') as HTMLButtonElement;
+  const newMovementForm = document.getElementById('new-movement-form') as HTMLFormElement;
+  const movTypeSelect = document.getElementById('mov-form-type') as HTMLSelectElement;
+  const movCategorySelect = document.getElementById('mov-form-category') as HTMLSelectElement;
+  const lblMovAmount = document.getElementById('lbl-mov-amount') as HTMLElement;
+
   const bankrollDownloadXlsxBtn = document.getElementById('bankroll-download-xlsx-btn') as HTMLButtonElement;
   const bankrollExportCsvBtn = document.getElementById('bankroll-export-csv-btn') as HTMLButtonElement;
   const saveBankrollCfgBtn = document.getElementById('save-bankroll-cfg-btn') as HTMLButtonElement;
@@ -4639,10 +4657,24 @@ function setupBankrollModule() {
       if (confirmReset) {
         state.bankrollRawOps = [];
         saveRawOperations([]);
-        // Sincronizar con backend si está disponible
         DataRepository.syncBankroll(state.userProfile.id, [], state.bankrollConfig).catch(() => {});
         refreshBankrollUI();
         alert('✅ Registro de operaciones reiniciado con éxito a 0 operaciones.');
+      }
+    });
+  }
+
+  // Clear all capital movements handler
+  if (clearAllMovsBtn) {
+    clearAllMovsBtn.addEventListener('click', () => {
+      const confirmReset = confirm(
+        '⚠️ ¿Estás seguro de que deseas BORRAR TODO el historial de movimientos de capital (inyecciones, extracciones y gastos)?\n\nEsta acción no se puede deshacer.'
+      );
+      if (confirmReset) {
+        state.capitalMovements = [];
+        saveCapitalMovements([]);
+        refreshBankrollUI();
+        alert('✅ Historial de movimientos de capital reiniciado.');
       }
     });
   }
@@ -4672,7 +4704,7 @@ function setupBankrollModule() {
       const targetContent = document.getElementById(targetTabId || '') as HTMLDivElement;
       if (targetContent) targetContent.classList.add('active');
 
-      if (targetTabId === 'tab-dashboard' || targetTabId === 'tab-operations') {
+      if (targetTabId === 'tab-dashboard' || targetTabId === 'tab-operations' || targetTabId === 'tab-movements') {
         refreshBankrollUI();
       }
     });
@@ -4696,6 +4728,121 @@ function setupBankrollModule() {
   if (addOpRowBtn) addOpRowBtn.addEventListener('click', openNewOp);
   if (closeNewOpModal) closeNewOpModal.addEventListener('click', () => newOpModal.close());
   if (cancelNewOpBtn) cancelNewOpBtn.addEventListener('click', () => newOpModal.close());
+
+  // New Capital Movement Modal triggers
+  const openNewMovement = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const nowTime = new Date().toTimeString().slice(0, 5);
+    (document.getElementById('mov-form-date') as HTMLInputElement).value = today;
+    (document.getElementById('mov-form-time') as HTMLInputElement).value = nowTime;
+    (document.getElementById('mov-form-amount') as HTMLInputElement).value = '';
+    (document.getElementById('mov-form-desc') as HTMLInputElement).value = '';
+    (document.getElementById('mov-form-notes') as HTMLInputElement).value = '';
+    updateMovementCategoryOptions();
+    if (newMovementModal) newMovementModal.showModal();
+  };
+
+  function updateMovementCategoryOptions() {
+    if (!movTypeSelect || !movCategorySelect) return;
+    const type = movTypeSelect.value as CapitalMovementType;
+    if (type === 'INYECCION') {
+      if (lblMovAmount) {
+        lblMovAmount.innerText = 'Monto a Inyectar / Depositar (+)';
+        lblMovAmount.style.color = '#4ade80';
+      }
+      movCategorySelect.innerHTML = `
+        <option value="Depósito de Capital" selected>Depósito de Capital</option>
+        <option value="Aporte Extraordinario">Aporte Extraordinario</option>
+        <option value="Recarga de Billetera">Recarga de Billetera</option>
+        <option value="Otro Depósito">Otro Depósito</option>
+      `;
+    } else if (type === 'EXTRACCION') {
+      if (lblMovAmount) {
+        lblMovAmount.innerText = 'Monto a Extraer / Retirar (-)';
+        lblMovAmount.style.color = '#f87171';
+      }
+      movCategorySelect.innerHTML = `
+        <option value="Retiro de Ganancias" selected>Retiro de Ganancias</option>
+        <option value="Cosecha de Beneficios">Cosecha de Beneficios</option>
+        <option value="Retiro a Cuenta Bancaria">Retiro a Cuenta Bancaria</option>
+        <option value="Retiro a Billetera">Retiro a Billetera</option>
+        <option value="Otro Retiro">Otro Retiro</option>
+      `;
+    } else if (type === 'GASTO') {
+      if (lblMovAmount) {
+        lblMovAmount.innerText = 'Monto del Gasto / Costo (-)';
+        lblMovAmount.style.color = '#fb923c';
+      }
+      movCategorySelect.innerHTML = `
+        <option value="Pago Plan VIP / Suscripción" selected>Pago Plan VIP / Suscripción</option>
+        <option value="Comisiones Bancarias / Pasarela">Comisiones Bancarias / Pasarela</option>
+        <option value="Herramientas / Software">Herramientas / Software</option>
+        <option value="Servicios / Conectividad">Servicios / Conectividad</option>
+        <option value="Otro Gasto Operativo">Otro Gasto Operativo</option>
+      `;
+    }
+  }
+
+  if (movTypeSelect) {
+    movTypeSelect.addEventListener('change', updateMovementCategoryOptions);
+  }
+
+  if (bankrollNewMovementBtn) bankrollNewMovementBtn.addEventListener('click', openNewMovement);
+  if (addMovementRowBtn) addMovementRowBtn.addEventListener('click', openNewMovement);
+  if (closeNewMovementModal) closeNewMovementModal.addEventListener('click', () => newMovementModal.close());
+  if (cancelNewMovementBtn) cancelNewMovementBtn.addEventListener('click', () => newMovementModal.close());
+
+  // Submit New Capital Movement Form
+  if (newMovementForm) {
+    newMovementForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const type = (document.getElementById('mov-form-type') as HTMLSelectElement).value as CapitalMovementType;
+      const category = (document.getElementById('mov-form-category') as HTMLSelectElement).value;
+      const date = (document.getElementById('mov-form-date') as HTMLInputElement).value;
+      const time = (document.getElementById('mov-form-time') as HTMLInputElement).value;
+      const amount = Math.abs(parseFloat((document.getElementById('mov-form-amount') as HTMLInputElement).value) || 0);
+      const description = (document.getElementById('mov-form-desc') as HTMLInputElement).value;
+      const notes = (document.getElementById('mov-form-notes') as HTMLInputElement).value;
+
+      if (amount <= 0) {
+        alert('Por favor, ingresa un monto válido superior a 0.');
+        return;
+      }
+
+      // Calculate current balance before this movement
+      const processedOps = calculateProcessedOperations(state.bankrollRawOps, state.bankrollConfig);
+      const currentKPIs = computeBankrollKPIs(processedOps, state.bankrollConfig, state.capitalMovements);
+      const balanceBefore = currentKPIs.currentCapital;
+      const balanceAfter = type === 'INYECCION' ? balanceBefore + amount : balanceBefore - amount;
+
+      const nextId = `MOV-${String(state.capitalMovements.length + 1).padStart(3, '0')}`;
+
+      state.capitalMovements.push({
+        id: nextId,
+        date,
+        time,
+        type,
+        category,
+        description,
+        amount,
+        balanceBefore,
+        balanceAfter,
+        notes,
+        created_at: new Date().toISOString()
+      });
+
+      saveCapitalMovements(state.capitalMovements);
+      newMovementModal.close();
+      newMovementForm.reset();
+      refreshBankrollUI();
+
+      triggerPushNotification(
+        `💵 Movimiento Registrado`,
+        `${type === 'INYECCION' ? 'Inyección de fondos' : type === 'EXTRACCION' ? 'Extracción de ganancias' : 'Gasto operativo'} registrado exitosamente.`,
+        'toast-push-alert'
+      );
+    });
+  }
 
   // Submit New Operation Form
   if (newOpForm) {
@@ -4784,12 +4931,12 @@ function setupBankrollModule() {
     });
   }
 
-  // Export CSV of Operations
+  // Export CSV of Operations and Movements
   if (bankrollExportCsvBtn) {
     bankrollExportCsvBtn.addEventListener('click', () => {
       const processedOps = calculateProcessedOperations(state.bankrollRawOps, state.bankrollConfig);
       const rows = [
-        ['ID', 'Fecha', 'Hora', 'Categoría', 'Descripción', 'Tipo Operación', 'Mercado / Segmento', 'Estado', 'Capital Antes ($)', 'Stake ($)', '% Capital', 'Cuota', 'Ganancia / Pérdida ($)', 'Capital Después ($)', 'ROI %', 'Disciplina / Regla', 'Observaciones']
+        ['ID', 'Fecha', 'Hora', 'Categoría', 'Descripción', 'Tipo Operación', 'Mercado / Segmento', 'Estado', 'Capital Antes', 'Stake', '% Capital', 'Cuota', 'Ganancia / Pérdida', 'Capital Después', 'ROI %', 'Disciplina / Regla', 'Observaciones']
       ];
 
       processedOps.forEach(op => {
@@ -4814,13 +4961,32 @@ function setupBankrollModule() {
         ]);
       });
 
-      // sep=; informs Excel to automatically separate columns cleanly
+      // Append capital movements section
+      if (state.capitalMovements.length > 0) {
+        rows.push([]);
+        rows.push(['--- HISTORIAL DE MOVIMIENTOS DE CAPITAL & GASTOS ---']);
+        rows.push(['ID', 'Fecha', 'Hora', 'Tipo', 'Categoría', 'Concepto', 'Monto', 'Saldo Después', 'Observaciones']);
+        state.capitalMovements.forEach(m => {
+          rows.push([
+            m.id,
+            m.date,
+            m.time,
+            m.type,
+            `"${(m.category || '').replace(/"/g, '""')}"`,
+            `"${(m.description || '').replace(/"/g, '""')}"`,
+            (m.type === 'INYECCION' ? '+' : '-') + m.amount.toFixed(2),
+            m.balanceAfter ? m.balanceAfter.toFixed(2) : '',
+            `"${(m.notes || '').replace(/"/g, '""')}"`
+          ]);
+        });
+      }
+
       const csvData = 'sep=;\r\n' + rows.map(e => e.join(';')).join('\r\n');
       const blob = new Blob(['\uFEFF' + csvData], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `REGISTRO_OPERACIONES_BANCA_${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `REGISTRO_OPERACIONES_Y_CAPITAL_${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -4834,35 +5000,57 @@ function setupBankrollModule() {
 
 function refreshBankrollUI() {
   const processedOps = calculateProcessedOperations(state.bankrollRawOps, state.bankrollConfig);
-  const kpis = computeBankrollKPIs(processedOps, state.bankrollConfig);
+  const kpis = computeBankrollKPIs(processedOps, state.bankrollConfig, state.capitalMovements);
 
   // Update KPI Cards
-  const kpiInit = document.getElementById('kpi-initial-cap');
   const kpiCur = document.getElementById('kpi-current-cap');
   const kpiYield = document.getElementById('kpi-yield');
   const kpiPnl = document.getElementById('kpi-total-pnl');
   const kpiPnlBreak = document.getElementById('kpi-pnl-breakdown');
+  const kpiInj = document.getElementById('kpi-injections');
+  const kpiWith = document.getElementById('kpi-withdrawals');
+  const kpiExp = document.getElementById('kpi-expenses');
   const kpiRoi = document.getElementById('kpi-roi');
   const kpiWin = document.getElementById('kpi-winrate');
   const kpiOpsCount = document.getElementById('kpi-ops-count');
-  const kpiExp = document.getElementById('kpi-exposure');
+  const kpiAvail = document.getElementById('kpi-available-cap');
   const kpiExpSub = document.getElementById('kpi-exposure-sub');
   const kpiDd = document.getElementById('kpi-drawdown');
-  const kpiPf = document.getElementById('kpi-profit-factor');
-  const kpiEv = document.getElementById('kpi-ev');
   const opsCounter = document.getElementById('ops-total-counter');
+  const movsCounter = document.getElementById('movs-total-counter');
 
   const currCode = state.bankrollConfig.currencyCode || 'USD';
 
-  if (kpiInit) kpiInit.innerText = formatCurrency(kpis.initialCapital, currCode);
+  // Reconciliation Box updates
+  const recInit = document.getElementById('rec-init-cap');
+  const recInj = document.getElementById('rec-total-inj');
+  const recWith = document.getElementById('rec-total-with');
+  const recExp = document.getElementById('rec-total-exp');
+  const recPnl = document.getElementById('rec-trading-pnl');
+  const recFinal = document.getElementById('rec-final-balance');
+
+  if (recInit) recInit.innerText = formatCurrency(kpis.initialCapital, currCode);
+  if (recInj) recInj.innerText = `+${formatCurrency(kpis.totalInjections, currCode)}`;
+  if (recWith) recWith.innerText = `-${formatCurrency(kpis.totalWithdrawals, currCode)}`;
+  if (recExp) recExp.innerText = `-${formatCurrency(kpis.totalExpenses, currCode)}`;
+  if (recPnl) {
+    recPnl.innerText = formatCurrency(kpis.tradingPnl, currCode, true);
+    recPnl.style.color = kpis.tradingPnl >= 0 ? '#4ade80' : '#f87171';
+  }
+  if (recFinal) recFinal.innerText = formatCurrency(kpis.currentCapital, currCode);
+
   if (kpiCur) kpiCur.innerText = formatCurrency(kpis.currentCapital, currCode);
-  if (kpiYield) kpiYield.innerText = `${kpis.yieldPct >= 0 ? '+' : ''}${(kpis.yieldPct * 100).toFixed(2)}% Yield Total`;
+  if (kpiYield) kpiYield.innerText = `${kpis.yieldPct >= 0 ? '+' : ''}${(kpis.yieldPct * 100).toFixed(2)}% Yield Trading`;
   
   if (kpiPnl) {
     kpiPnl.innerText = formatCurrency(kpis.totalPnl, currCode, true);
     kpiPnl.className = `kpi-value ${kpis.totalPnl >= 0 ? 'positive' : 'negative'}`;
   }
   if (kpiPnlBreak) kpiPnlBreak.innerText = `Gan: ${formatCurrency(kpis.totalProfit, currCode)} | Pérd: -${formatCurrency(Math.abs(kpis.totalLoss), currCode)}`;
+
+  if (kpiInj) kpiInj.innerText = `+${formatCurrency(kpis.totalInjections, currCode)}`;
+  if (kpiWith) kpiWith.innerText = `-${formatCurrency(kpis.totalWithdrawals, currCode)}`;
+  if (kpiExp) kpiExp.innerText = `-${formatCurrency(kpis.totalExpenses, currCode)}`;
 
   if (kpiRoi) {
     kpiRoi.innerText = `${kpis.roi >= 0 ? '+' : ''}${(kpis.roi * 100).toFixed(2)}%`;
@@ -4872,27 +5060,21 @@ function refreshBankrollUI() {
   if (kpiWin) kpiWin.innerText = `${(kpis.winrate * 100).toFixed(2)}%`;
   if (kpiOpsCount) kpiOpsCount.innerText = `${kpis.wonOps} Ganadas / ${kpis.lostOps} Perdidas / ${kpis.pendingOps} Pend.`;
 
-  if (kpiExp) kpiExp.innerText = `${(kpis.exposurePct * 100).toFixed(2)}%`;
+  if (kpiAvail) kpiAvail.innerText = formatCurrency(kpis.availableCapital, currCode);
   if (kpiExpSub) kpiExpSub.innerText = `Comprometido: ${formatCurrency(kpis.committedCapital, currCode)}`;
 
   if (kpiDd) kpiDd.innerText = `${(kpis.maxDrawdownPct * 100).toFixed(2)}%`;
-  if (kpiPf) kpiPf.innerText = kpis.profitFactor.toFixed(2);
-
-  if (kpiEv) {
-    kpiEv.innerText = formatCurrency(kpis.ev, currCode, true);
-    kpiEv.className = `kpi-value ${kpis.ev >= 0 ? 'positive' : 'negative'}`;
-  }
-
   if (opsCounter) opsCounter.innerText = processedOps.length.toString();
+  if (movsCounter) movsCounter.innerText = state.capitalMovements.length.toString();
 
-  // Populate Table Body
+  // Populate Operations Table Body
   const tbody = document.getElementById('bankroll-table-body');
   if (tbody) {
     tbody.innerHTML = '';
     if (processedOps.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="12" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+          <td colspan="15" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
             <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📋</div>
             <p style="margin: 0; font-weight: 600; color: #fff;">Sin operaciones registradas</p>
             <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">Haz clic en <strong>"➕ Añadir Registro"</strong> o pulsa <strong>"💼 Operar"</strong> desde el Centro de Oportunidades.</p>
@@ -4927,7 +5109,7 @@ function refreshBankrollUI() {
           <div style="display: flex; align-items: center; justify-content: center;">
             <span class="badge-locked" title="Registro auditado y bloqueado (${op.locked_at ? new Date(op.locked_at).toLocaleString() : 'Inmutable'})" style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.68rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.15rem 0.45rem; border-radius: 0.35rem; cursor: default; white-space: nowrap;">
               <span>🔒</span>
-              <span>Registro auditado y bloqueado</span>
+              <span>Bloqueado</span>
             </span>
           </div>
         ` : `
@@ -5007,10 +5189,87 @@ function refreshBankrollUI() {
     }
   }
 
+  // Populate Capital Movements Table Body
+  const movsTbody = document.getElementById('bankroll-movements-tbody');
+  if (movsTbody) {
+    movsTbody.innerHTML = '';
+    if (state.capitalMovements.length === 0) {
+      movsTbody.innerHTML = `
+        <tr>
+          <td colspan="10" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💳</div>
+            <p style="margin: 0; font-weight: 600; color: #fff;">Sin movimientos de capital registrados</p>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">Pulsa en <strong>"➕ Registrar Movimiento"</strong> para asentar inyecciones, extracciones o gastos operativos.</p>
+          </td>
+        </tr>
+      `;
+    } else {
+      let runningBal = kpis.initialCapital;
+      state.capitalMovements.forEach((mov, idx) => {
+        const tr = document.createElement('tr');
+        const amt = Math.abs(mov.amount);
+
+        let typeBadge = '';
+        let amtFormatted = '';
+        if (mov.type === 'INYECCION') {
+          runningBal += amt;
+          typeBadge = `<span style="font-size: 0.72rem; font-weight: 800; color: #4ade80; background: rgba(74, 222, 128, 0.15); border: 1px solid rgba(74, 222, 128, 0.4); padding: 0.15rem 0.45rem; border-radius: 4px;">📥 Inyección (+)</span>`;
+          amtFormatted = `<strong style="color: #4ade80;">+${formatCurrency(amt, currCode)}</strong>`;
+        } else if (mov.type === 'EXTRACCION') {
+          runningBal -= amt;
+          typeBadge = `<span style="font-size: 0.72rem; font-weight: 800; color: #f87171; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.15rem 0.45rem; border-radius: 4px;">📤 Extracción (-)</span>`;
+          amtFormatted = `<strong style="color: #f87171;">-${formatCurrency(amt, currCode)}</strong>`;
+        } else if (mov.type === 'GASTO') {
+          runningBal -= amt;
+          typeBadge = `<span style="font-size: 0.72rem; font-weight: 800; color: #fb923c; background: rgba(251, 146, 60, 0.15); border: 1px solid rgba(251, 146, 60, 0.4); padding: 0.15rem 0.45rem; border-radius: 4px;">🧾 Gasto (-)</span>`;
+          amtFormatted = `<strong style="color: #fb923c;">-${formatCurrency(amt, currCode)}</strong>`;
+        }
+
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: #38bdf8;">${mov.id}</td>
+          <td>${mov.date}</td>
+          <td style="color: var(--text-muted);">${mov.time}</td>
+          <td>${typeBadge}</td>
+          <td><strong>${mov.category}</strong></td>
+          <td>${mov.description}</td>
+          <td>${amtFormatted}</td>
+          <td style="font-weight: 700; color: #fff;">${formatCurrency(runningBal, currCode)}</td>
+          <td style="font-size: 0.75rem; color: var(--text-muted);">${mov.notes || '-'}</td>
+          <td style="text-align: center;">
+            <button class="btn mov-delete-btn" data-idx="${idx}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); cursor: pointer;" title="Eliminar este movimiento">✕</button>
+          </td>
+        `;
+
+        movsTbody.appendChild(tr);
+      });
+
+      // Delete listener for movements
+      movsTbody.querySelectorAll('.mov-delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget as HTMLButtonElement;
+          const movIdx = parseInt(target.dataset.idx || '0', 10);
+          const mov = state.capitalMovements[movIdx];
+          if (!mov) return;
+          if (confirm(`¿Seguro que deseas eliminar el movimiento ${mov.id} (${mov.description})?`)) {
+            state.capitalMovements.splice(movIdx, 1);
+            saveCapitalMovements(state.capitalMovements);
+            refreshBankrollUI();
+          }
+        });
+      });
+    }
+  }
+
   // Pre-fill Calculator capital with available capital
   const calcCapInput = document.getElementById('calc-cap-input') as HTMLInputElement;
   if (calcCapInput) {
-    calcCapInput.value = kpis.availableCapital.toFixed(2);
+    if (currCode === 'PYG' || getCurrencyConfig(currCode).decimals === 0) {
+      calcCapInput.value = Math.round(kpis.availableCapital).toString();
+      calcCapInput.step = '10000';
+    } else {
+      calcCapInput.value = kpis.availableCapital.toFixed(2);
+      calcCapInput.step = '10';
+    }
     triggerStakeCalc();
   }
 }
