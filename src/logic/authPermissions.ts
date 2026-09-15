@@ -151,7 +151,7 @@ export function loadUserProfile(): UserProfile {
   const defaultProfile: UserProfile = {
     id: 'usr_default_01',
     email: 'trader@streaktracker.io',
-    name: 'Usuario StreakTracker',
+    name: 'Usuario EnRachas',
     role: 'FREE',
     subscription: {
       plan: 'FREE',

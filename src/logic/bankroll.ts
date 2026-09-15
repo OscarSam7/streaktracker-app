@@ -157,7 +157,7 @@ export const INITIAL_SAMPLE_MOVEMENTS: CapitalMovement[] = [
     time: '14:30',
     type: 'GASTO',
     category: 'Pago Plan VIP / Suscripción',
-    description: 'Suscripción mensual a plataforma StreakTracker',
+    description: 'Suscripción mensual a plataforma EnRachas',
     amount: 39,
     balanceBefore: 1500,
     balanceAfter: 1461,

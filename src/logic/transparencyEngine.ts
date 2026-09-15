@@ -182,7 +182,7 @@ export function getTransparencySuite(): TransparencySuite {
     trackTitle: 'RESULTADOS REALES VERIFICADOS (LEDGER INMUTABLE)',
     trackBadge: '🛡️ RESULTADOS REALES VERIFICADOS (IS_LOCKED = TRUE)',
     trackColor: '#4ade80',
-    trackDescription: 'Operaciones auditadas y bloqueadas inmutablemente (is_locked = true) en el registro oficial de StreakTracker.',
+    trackDescription: 'Operaciones auditadas y bloqueadas inmutablemente (is_locked = true) en el registro oficial de EnRachas.',
     sampleSize: realSample,
     sampleAdequate: isRealSampleAdequate,
     minSampleRequired: 5,

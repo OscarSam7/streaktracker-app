@@ -174,7 +174,7 @@ if (!initialUsers['usr_default_01']) {
   initialUsers['usr_default_01'] = {
     id: 'usr_default_01',
     email: 'trader@streaktracker.io',
-    name: 'Usuario StreakTracker',
+    name: 'Usuario EnRachas',
     role: 'VIP',
     subscription: {
       plan: 'VIP',
@@ -217,7 +217,7 @@ function forwardToApiSports(pathStr, retries = 2) {
       method: 'GET',
       headers: {
         'x-apisports-key': APISPORTS_KEY,
-        'User-Agent': 'StreakTracker-Proxy/2.0'
+        'User-Agent': 'EnRachas-Proxy/2.0'
       },
       timeout: 8000
     };
@@ -797,7 +797,7 @@ const server = http.createServer(async (req, res) => {
 
 if (require.main === module) {
   server.listen(PORT, '0.0.0.0', () => {
-    console.log(`[StreakTracker Hardened Backend] Running on port ${PORT} [ENV: ${PAYMENT_ENVIRONMENT}, ORIGIN: ${ALLOWED_ORIGIN}]`);
+    console.log(`[EnRachas Hardened Backend] Running on port ${PORT} [ENV: ${PAYMENT_ENVIRONMENT}, ORIGIN: ${ALLOWED_ORIGIN}]`);
   });
 }
 

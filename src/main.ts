@@ -3395,10 +3395,10 @@ function generateTelegramAlert() {
   const chanTitleEl = document.getElementById('telegram-channel-name');
   if (chanTitleEl) {
     chanTitleEl.innerText = selectedTgChannel === 'VIP' 
-      ? '🟢 StreakTracker VIP Institutional' 
+      ? '🟢 EnRachas VIP Institutional' 
       : selectedTgChannel === 'PRO' 
-      ? '🔵 StreakTracker PRO Signals' 
-      : '⚪ StreakTracker Public Alerts';
+      ? '🔵 EnRachas PRO Signals' 
+      : '⚪ EnRachas Public Alerts';
   }
 
   const timeEl = document.getElementById('telegram-time');
@@ -3414,7 +3414,7 @@ function generateTelegramAlert() {
 function buildTelegramPlainTextAlert(): string {
   if (lastGeneratedPayload) return lastGeneratedPayload.messageText;
   const { leagueInfo, bestMarketKey, bestStreakVal } = findHottestStreak();
-  return `Señal StreakTracker — ${leagueInfo.name} — Mercado ${bestMarketKey} (Racha: ${bestStreakVal})`;
+  return `Señal EnRachas — ${leagueInfo.name} — Mercado ${bestMarketKey} (Racha: ${bestStreakVal})`;
 }
 
 // ---------------------------------------------------------
@@ -3762,7 +3762,7 @@ function toggleOpportunityPush(opp: any): void {
     savePushNotificationPreferences(prefs);
     updateOpportunityPushButtonsUI(oppKey, false);
     triggerPushNotification(
-      '🔕 StreakTracker: Alerta Desactivada',
+      '🔕 EnRachas: Alerta Desactivada',
       `Has desactivado las notificaciones push para ${opp.fixtureName} (${opp.leagueName}).`,
       'toast-push-alert'
     );
@@ -3795,7 +3795,7 @@ function toggleOpportunityPush(opp: any): void {
     }
 
     triggerPushNotification(
-      '🔔 StreakTracker: Alerta Push Activada',
+      '🔔 EnRachas: Alerta Push Activada',
       `Monitoreando ${opp.fixtureName} (${opp.leagueName}). Te notificaremos 10 min antes, goles y al finalizar.`,
       'toast-10min'
     );
@@ -3997,7 +3997,7 @@ function setupGlobalNotificationSettingsModule() {
   if (testPushBtn) {
     testPushBtn.addEventListener('click', () => {
       triggerPushNotification(
-        '⚡ Alerta de Prueba (StreakTracker)',
+        '⚡ Alerta de Prueba (EnRachas)',
         'Notificación de alta prioridad: señal VIP detectada en vivo.',
         'toast-push-alert'
       );
@@ -4128,7 +4128,7 @@ function setupPushNotificationModule() {
 
         // Emitir notificación push de confirmación inmediata
         triggerPushNotification(
-          '🔔 StreakTracker: Alerta Push Activada',
+          '🔔 EnRachas: Alerta Push Activada',
           `Monitoreando ${currentTarget.fixtureName} (${currentTarget.leagueName}). Te notificaremos 10 min antes, goles y al finalizar.`,
           'toast-10min'
         );
