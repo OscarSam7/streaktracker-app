@@ -3132,6 +3132,7 @@ function setupSearchAndFilters() {
 
 function setupSportsDateStrip() {
   const dateChips = document.querySelectorAll('.sports-date-chip');
+  if (!dateChips || dateChips.length === 0) return;
   dateChips.forEach(chip => {
     chip.addEventListener('click', (e) => {
       dateChips.forEach(c => c.classList.remove('active'));
