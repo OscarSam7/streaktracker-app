@@ -450,3 +450,182 @@ export function computeBankrollKPIs(
     excessRiskOps
   };
 }
+
+// ---------------------------------------------------------
+// MARTINGALA ACOTADA CON STOP-LOSS ESTRICTO (3-4 PASOS)
+// ---------------------------------------------------------
+
+export interface BoundedMartingaleParams {
+  bankroll_actual: number;
+  racha_perdidas_consecutivas: number;
+  max_pasos?: number; // por defecto = 4
+  max_stake_permitido_pct?: number; // por defecto = 5.0 (%)
+}
+
+export interface BoundedMartingaleResult {
+  stake_recomendado: number;
+  porcentaje_del_bankroll: number;
+  paso_actual: number;
+  alerta_stop_loss: boolean;
+  stake_base: number;
+  max_stake_permitido: number;
+  riesgo_acumulado_ciclo: number;
+  riesgo_acumulado_ciclo_pct: number;
+  multiplicador: number;
+  max_pasos_configurados: number;
+  mensaje_estado: string;
+}
+
+export interface MartingaleSimulationStep {
+  operacion: number;
+  racha_perdidas_consecutivas: number;
+  paso_actual: number;
+  stake_recomendado: number;
+  porcentaje_del_bankroll: number;
+  alerta_stop_loss: boolean;
+  pnl_simulado: number;
+  capital_restante: number;
+  riesgo_acumulado_ciclo: number;
+  estado: string;
+}
+
+/**
+ * Dimensiona el tamaño de la posición utilizando Martingala Acotada con Stop-Loss Estricto.
+ * Garantiza matemáticamente que el intento final nunca supere el max_stake_permitido_pct
+ * y dispara un evento de Stop-Loss obligatorio cortando la secuencia al alcanzar max_pasos.
+ */
+export function calcularMartingalaAcotada(params: BoundedMartingaleParams): BoundedMartingaleResult {
+  // 1. Validaciones defensivas contra valores nulos, negativos o cero
+  const bankroll = Math.max(0, Number(params.bankroll_actual) || 0);
+  const maxPasos = Math.max(1, Math.floor(Number(params.max_pasos) || 4));
+  const maxPct = Math.max(0.01, Number(params.max_stake_permitido_pct) || 5.0);
+  const rachaPerdidas = Math.max(0, Math.floor(Number(params.racha_perdidas_consecutivas) || 0));
+
+  if (bankroll <= 0) {
+    return {
+      stake_recomendado: 0,
+      porcentaje_del_bankroll: 0,
+      paso_actual: 1,
+      alerta_stop_loss: false,
+      stake_base: 0,
+      max_stake_permitido: 0,
+      riesgo_acumulado_ciclo: 0,
+      riesgo_acumulado_ciclo_pct: 0,
+      multiplicador: 1,
+      max_pasos_configurados: maxPasos,
+      mensaje_estado: 'Bankroll insuficiente para operar.'
+    };
+  }
+
+  // 2. Cálculo dinámico de Stake Base Anti-Ruina
+  // Fórmula: stake_base = (bankroll_actual * (max_stake_permitido_pct / 100)) / (2^(max_pasos - 1))
+  const maxStakePermitido = bankroll * (maxPct / 100);
+  const divisorBase = Math.pow(2, maxPasos - 1);
+  const stakeBase = maxStakePermitido / (divisorBase > 0 ? divisorBase : 1);
+
+  let stakeCalculado = stakeBase;
+  let pasoActual = 1;
+  let alertaStopLoss = false;
+  let multiplicador = 1;
+  let mensaje = 'Operación inicial del ciclo (Paso 1).';
+
+  // 3. Lógica del algoritmo
+  if (rachaPerdidas === 0) {
+    pasoActual = 1;
+    multiplicador = 1;
+    stakeCalculado = stakeBase;
+    alertaStopLoss = false;
+    mensaje = `Paso 1/${maxPasos}: Stake base inicial (${((stakeBase / bankroll) * 100).toFixed(3)}% del bankroll).`;
+  } else if (rachaPerdidas < maxPasos) {
+    pasoActual = rachaPerdidas + 1;
+    multiplicador = Math.pow(2, rachaPerdidas);
+    stakeCalculado = stakeBase * multiplicador;
+    alertaStopLoss = false;
+    mensaje = `Paso ${pasoActual}/${maxPasos}: Progresión acotada (x${multiplicador}). Límite de seguridad activo.`;
+  } else {
+    // racha_perdidas_consecutivas >= max_pasos: DISPARO DE STOP-LOSS / RESET
+    alertaStopLoss = true;
+    pasoActual = 1; // Se asume la pérdida y se reinicia el contador
+    multiplicador = 1;
+    stakeCalculado = stakeBase;
+    mensaje = `🛑 STOP-LOSS ACTIVADO: Límite de ${maxPasos} pasos fallidos alcanzado. Se corta la secuencia, se asume la pérdida controlada y se reinicia al stake base sin duplicar.`;
+  }
+
+  // 4. Clamping de seguridad absoluto (defensa estricta ante errores de punto flotante)
+  if (stakeCalculado > maxStakePermitido) {
+    stakeCalculado = maxStakePermitido;
+  }
+
+  // 5. Cálculo de riesgo acumulado del ciclo actual
+  const pasoEfectivo = alertaStopLoss ? maxPasos : pasoActual;
+  const riesgoAcumulado = stakeBase * (Math.pow(2, pasoEfectivo) - 1);
+  const riesgoAcumuladoPct = bankroll > 0 ? (riesgoAcumulado / bankroll) * 100 : 0;
+  const porcentajeBankroll = bankroll > 0 ? Number(((stakeCalculado / bankroll) * 100).toFixed(4)) : 0;
+  const stakeRecomendado = Number(stakeCalculado.toFixed(2));
+
+  return {
+    stake_recomendado: stakeRecomendado,
+    porcentaje_del_bankroll: porcentajeBankroll,
+    paso_actual: pasoActual,
+    alerta_stop_loss: alertaStopLoss,
+    stake_base: Number(stakeBase.toFixed(2)),
+    max_stake_permitido: Number(maxStakePermitido.toFixed(2)),
+    riesgo_acumulado_ciclo: Number(riesgoAcumulado.toFixed(2)),
+    riesgo_acumulado_ciclo_pct: Number(riesgoAcumuladoPct.toFixed(2)),
+    multiplicador: multiplicador,
+    max_pasos_configurados: maxPasos,
+    mensaje_estado: mensaje
+  };
+}
+
+/**
+ * Simula una secuencia de N operaciones consecutivas con pérdidas para verificar
+ * de forma auditable que al alcanzar max_pasos se corte la duplicación y se dispare el Stop-Loss.
+ */
+export function simulateMartingaleSequence(
+  bankrollInicial: number = 1000,
+  maxPasos: number = 4,
+  maxPct: number = 5.0,
+  numOps: number = 5
+): MartingaleSimulationStep[] {
+  const steps: MartingaleSimulationStep[] = [];
+  let currentBankroll = bankrollInicial;
+  let rachaPerdidas = 0;
+
+  for (let i = 1; i <= numOps; i++) {
+    const res = calcularMartingalaAcotada({
+      bankroll_actual: currentBankroll,
+      racha_perdidas_consecutivas: rachaPerdidas,
+      max_pasos: maxPasos,
+      max_stake_permitido_pct: maxPct
+    });
+
+    const stake = res.stake_recomendado;
+    const pnl = -stake;
+    currentBankroll += pnl;
+
+    steps.push({
+      operacion: i,
+      racha_perdidas_consecutivas: rachaPerdidas,
+      paso_actual: res.paso_actual,
+      stake_recomendado: res.stake_recomendado,
+      porcentaje_del_bankroll: res.porcentaje_del_bankroll,
+      alerta_stop_loss: res.alerta_stop_loss,
+      pnl_simulado: pnl,
+      capital_restante: Number(currentBankroll.toFixed(2)),
+      riesgo_acumulado_ciclo: res.riesgo_acumulado_ciclo,
+      estado: res.alerta_stop_loss
+        ? `🛑 STOP-LOSS ACTIVADO (Corte de Secuencia & Reset)`
+        : `Paso ${res.paso_actual}/${maxPasos} (Pérdida -$${stake.toFixed(2)})`
+    });
+
+    if (res.alerta_stop_loss) {
+      rachaPerdidas = 1; // Reinició ciclo y falló el nuevo intento
+    } else {
+      rachaPerdidas++;
+    }
+  }
+
+  return steps;
+}
+

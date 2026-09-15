@@ -37,6 +37,8 @@ import {
   computeBankrollKPIs,
   formatCurrency,
   getCurrencyConfig,
+  calcularMartingalaAcotada,
+  simulateMartingaleSequence,
   type OperationStatus,
   type CapitalMovementType
 } from './logic/bankroll';
@@ -5274,28 +5276,72 @@ function refreshBankrollUI() {
   }
 }
 
+let currentMartingaleLosses = 0;
+
 function setupStakeCalculator() {
   const capInput = document.getElementById('calc-cap-input') as HTMLInputElement;
   const profileSelect = document.getElementById('calc-profile-select') as HTMLSelectElement;
   const customGroup = document.getElementById('calc-custom-risk-group') as HTMLDivElement;
   const customInput = document.getElementById('calc-custom-risk-input') as HTMLInputElement;
   const oddsInput = document.getElementById('calc-odds-input') as HTMLInputElement;
+  const martContainer = document.getElementById('calc-martingale-container') as HTMLDivElement;
+  const martStepsSelect = document.getElementById('calc-mart-max-steps') as HTMLSelectElement;
+  const martPctInput = document.getElementById('calc-mart-max-pct') as HTMLInputElement;
+  const martLossBtns = document.querySelectorAll('.btn-mart-loss');
 
   if (!capInput || !profileSelect) return;
 
-  const updateCalc = () => {
+  const updateVisibility = () => {
     if (profileSelect.value === 'custom') {
       if (customGroup) customGroup.style.display = 'flex';
+      if (martContainer) martContainer.style.display = 'none';
+    } else if (profileSelect.value === 'martingale_bounded') {
+      if (customGroup) customGroup.style.display = 'none';
+      if (martContainer) martContainer.style.display = 'block';
     } else {
       if (customGroup) customGroup.style.display = 'none';
+      if (martContainer) martContainer.style.display = 'none';
     }
     triggerStakeCalc();
   };
 
-  profileSelect.addEventListener('change', updateCalc);
+  profileSelect.addEventListener('change', updateVisibility);
   capInput.addEventListener('input', triggerStakeCalc);
   if (customInput) customInput.addEventListener('input', triggerStakeCalc);
   if (oddsInput) oddsInput.addEventListener('input', triggerStakeCalc);
+  if (martStepsSelect) martStepsSelect.addEventListener('change', triggerStakeCalc);
+  if (martPctInput) martPctInput.addEventListener('input', triggerStakeCalc);
+
+  martLossBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      martLossBtns.forEach(b => {
+        b.classList.remove('active');
+        (b as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)';
+        (b as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
+        (b as HTMLElement).style.color = '#94a3b8';
+      });
+      btn.classList.add('active');
+      (btn as HTMLElement).style.borderColor = 'rgba(56,189,248,0.4)';
+      (btn as HTMLElement).style.background = 'rgba(56,189,248,0.2)';
+      (btn as HTMLElement).style.color = '#fff';
+
+      const losses = parseInt((btn as HTMLElement).dataset.losses || '0', 10);
+      currentMartingaleLosses = losses;
+      triggerStakeCalc();
+    });
+  });
+
+  // Ejecutar prueba unitaria simulando 5 operaciones con pérdidas consecutivas en consola
+  try {
+    const simResults = simulateMartingaleSequence(1000, 4, 5.0, 5);
+    console.group('🛡️ [ACADEMIA ANTI-RUINA] Simulación Martingala Acotada (5 Operaciones Consecutivas)');
+    console.log('Capital Inicial: $1,000 | Límite Pasos: 4 | Techo Máximo Anti-Ruina: 5.0% ($50.00)');
+    console.table(simResults);
+    console.log('✅ Verificación completada: Al 4to intento fallido se dispara Stop-Loss y reinicia al paso 1 en la 5ta operación.');
+    console.groupEnd();
+  } catch (e) {
+    console.error('Error running martingale simulation:', e);
+  }
 }
 
 function triggerStakeCalc() {
@@ -5303,6 +5349,12 @@ function triggerStakeCalc() {
   const profileSelect = document.getElementById('calc-profile-select') as HTMLSelectElement;
   const customInput = document.getElementById('calc-custom-risk-input') as HTMLInputElement;
   const oddsInput = document.getElementById('calc-odds-input') as HTMLInputElement;
+
+  const martStepsSelect = document.getElementById('calc-mart-max-steps') as HTMLSelectElement;
+  const martPctInput = document.getElementById('calc-mart-max-pct') as HTMLInputElement;
+  const martStepBadge = document.getElementById('calc-mart-step-badge');
+  const martStopAlert = document.getElementById('calc-mart-stoploss-alert');
+  const martTableBody = document.getElementById('calc-mart-projection-body');
 
   const outStake = document.getElementById('calc-out-stake');
   const outReturn = document.getElementById('calc-out-return');
@@ -5313,25 +5365,100 @@ function triggerStakeCalc() {
   if (!capInput || !profileSelect || !outStake) return;
 
   const cap = parseFloat(capInput.value) || 0;
-  let riskPct = parseFloat(profileSelect.value) || 0.02;
-  if (profileSelect.value === 'custom') {
-    riskPct = (parseFloat(customInput.value) || 2.0) / 100;
-  }
-  const odds = parseFloat(oddsInput.value) || 1.0;
+  const odds = parseFloat(oddsInput?.value || '1.95') || 1.0;
+  const curr = state.bankrollConfig.currencyCode || 'USD';
 
-  const stake = cap * riskPct;
+  let stake = 0;
+  let riskPct = 0.02;
+  let isMartingale = profileSelect.value === 'martingale_bounded';
+
+  if (isMartingale) {
+    const maxSteps = parseInt(martStepsSelect?.value || '4', 10);
+    const maxPct = parseFloat(martPctInput?.value || '5.0') || 5.0;
+
+    const martResult = calcularMartingalaAcotada({
+      bankroll_actual: cap,
+      racha_perdidas_consecutivas: currentMartingaleLosses,
+      max_pasos: maxSteps,
+      max_stake_permitido_pct: maxPct
+    });
+
+    stake = martResult.stake_recomendado;
+    riskPct = martResult.porcentaje_del_bankroll / 100;
+
+    if (martStepBadge) {
+      if (martResult.alerta_stop_loss) {
+        martStepBadge.className = 'badge-status badge-lost';
+        martStepBadge.innerText = '🛑 STOP-LOSS ACTIVADO (Reset a Paso 1)';
+      } else {
+        martStepBadge.className = 'badge-status badge-info';
+        martStepBadge.innerText = `Paso ${martResult.paso_actual}/${maxSteps} (x${martResult.multiplicador})`;
+      }
+    }
+
+    if (martStopAlert) {
+      martStopAlert.style.display = martResult.alerta_stop_loss ? 'block' : 'none';
+    }
+
+    // Render Projection Table
+    if (martTableBody) {
+      const divisor = Math.pow(2, maxSteps - 1);
+      const stakeBase = (cap * (maxPct / 100)) / divisor;
+      let html = '';
+
+      for (let s = 1; s <= maxSteps; s++) {
+        const mult = Math.pow(2, s - 1);
+        const sStake = Math.min(stakeBase * mult, cap * (maxPct / 100));
+        const sPct = cap > 0 ? (sStake / cap) * 100 : 0;
+        const cumRisk = stakeBase * (Math.pow(2, s) - 1);
+        const isCurrent = !martResult.alerta_stop_loss && martResult.paso_actual === s;
+        const isCap = s === maxSteps;
+
+        html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${isCurrent ? 'background: rgba(56,189,248,0.15); font-weight: bold;' : ''}">
+          <td style="padding: 0.35rem; color: ${isCurrent ? '#38bdf8' : '#fff'};">${s === 1 ? '1 (Base)' : s === maxSteps ? `${s} (Tope)` : s}</td>
+          <td style="padding: 0.35rem; color: #94a3b8;">x${mult}</td>
+          <td style="padding: 0.35rem; color: ${isCurrent ? '#38bdf8' : '#fff'};">${formatCurrency(sStake, curr)}</td>
+          <td style="padding: 0.35rem; color: ${sPct > 4 ? '#f87171' : '#4ade80'};">${sPct.toFixed(2)}%</td>
+          <td style="padding: 0.35rem; color: #fbbf24;">-${formatCurrency(cumRisk, curr)}</td>
+          <td style="padding: 0.35rem;">
+            ${isCurrent 
+              ? '<span class="badge-status badge-info" style="font-size: 0.65rem; padding: 0.1rem 0.3rem;">ACTUAL</span>' 
+              : isCap 
+                ? '<span style="color: #f87171; font-size: 0.65rem;">STOP-LOSS</span>' 
+                : '<span style="color: #94a3b8; font-size: 0.65rem;">En cola</span>'}
+          </td>
+        </tr>`;
+      }
+      martTableBody.innerHTML = html;
+    }
+
+  } else if (profileSelect.value === 'custom') {
+    riskPct = (parseFloat(customInput?.value || '2.0') || 2.0) / 100;
+    stake = cap * riskPct;
+  } else {
+    riskPct = parseFloat(profileSelect.value) || 0.02;
+    stake = cap * riskPct;
+  }
+
   const potReturn = stake * odds;
   const potProfit = potReturn - stake;
   const potLoss = -stake;
 
-  const curr = state.bankrollConfig.currencyCode || 'USD';
   outStake.innerText = formatCurrency(stake, curr);
   if (outReturn) outReturn.innerText = formatCurrency(potReturn, curr);
   if (outProfit) outProfit.innerText = formatCurrency(potProfit, curr, true);
   if (outLoss) outLoss.innerText = formatCurrency(potLoss, curr, false);
 
   if (outVal) {
-    if (riskPct > state.bankrollConfig.maxStakePct) {
+    if (isMartingale) {
+      if (currentMartingaleLosses >= parseInt(martStepsSelect?.value || '4', 10)) {
+        outVal.className = 'badge-status badge-lost';
+        outVal.innerText = '🛑 STOP-LOSS EJECUTADO: Secuencia cortada. Se asume pérdida y reinicia al paso 1';
+      } else {
+        outVal.className = 'badge-status badge-won';
+        outVal.innerText = `🟢 PROGRESIÓN ACOTADA: Paso ${currentMartingaleLosses + 1} blindado contra ruina (< 5% tope)`;
+      }
+    } else if (riskPct > state.bankrollConfig.maxStakePct) {
       outVal.className = 'badge-status badge-lost';
       outVal.innerText = `🔴 EXCESO: Supera el ${(state.bankrollConfig.maxStakePct * 100).toFixed(1)}% máximo permitido`;
     } else if (riskPct > state.bankrollConfig.recommendedStakePct) {

@@ -14,23 +14,27 @@ const LESSONS_DB: Record<Language, AcademyLesson[]> = {
   es: [
     {
       id: 'lesson-1',
-      title: '1. Por qué la Martingala Destruye Cualquier Banca',
-      subtitle: 'La falacia matemática que arruina al 98% de los operadores.',
-      duration: '4 min lectura',
-      icon: '💣',
+      title: '1. Martingala Clásica vs. Martingala Acotada con Stop-Loss',
+      subtitle: 'Por qué la duplicación infinita arruina y cómo el enfoque acotado (3-4 pasos) protege el capital.',
+      duration: '5 min lectura',
+      icon: '🛡️',
       content: `
-        La estrategia de duplicar tras perder (Martingala) asume capital infinito. En los mercados reales, las rachas adversas existen y crecen de forma exponencial:
+        La <strong>Martingala Tradicional</strong> (duplicar sin límite tras cada fallo) asume capital infinito y conduce a la ruina matemática por crecimiento exponencial:
         <br><br>
-        • <strong>Intento 1:</strong> $20<br>
-        • <strong>Intento 2:</strong> $40<br>
-        • <strong>Intento 3:</strong> $80<br>
-        • <strong>Intento 4:</strong> $160<br>
-        • <strong>Intento 5:</strong> $320<br>
-        • <strong>Intento 6:</strong> $640 (¡Más del 60% de una banca de $1,000 en 1 solo juego!)
+        • <strong>Intento 1:</strong> $20 | <strong>Intento 2:</strong> $40 | <strong>Intento 3:</strong> $80 | <strong>Intento 4:</strong> $160 | <strong>Intento 5:</strong> $320 | <strong>Intento 6:</strong> $640 (¡Más del 60% de una banca de $1,000 en 1 solo juego!).
         <br><br>
-        <strong>Nuestra Regla:</strong> Nunca doblar tras pérdida. El dimensionamiento matemático siempre se basa en un porcentaje plano del capital disponible actual.
+        <strong>El Enfoque Cuantitativo: Martingala Acotada (3 a 4 Pasos con Stop-Loss Estricto):</strong><br>
+        Para aprovechar el potencial de recuperación de beneficios con riesgo matemáticamente acotado, el <strong>Stake Base</strong> se dimensiona hacia atrás desde el techo máximo anti-ruina (5%):
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.4rem; padding: 0.6rem; margin: 0.75rem 0; font-family: monospace; font-size: 0.82rem; color: #38bdf8; text-align: center; font-weight: 700;">
+          Stake Base = (Bankroll × MaxStakePct) / 2^(MaxPasos - 1)
+        </div>
+        • <strong>Paso 1:</strong> $6.25 (0.625% de $1,000)<br>
+        • <strong>Paso 2:</strong> $12.50 (1.250%)<br>
+        • <strong>Paso 3:</strong> $25.00 (2.500%)<br>
+        • <strong>Paso 4 (Tope):</strong> $50.00 (5.00% exacto = Límite Anti-Ruina)<br>
+        • <strong>🛑 Evento de Stop-Loss:</strong> Si el 4º intento no acierta, <em>se corta la secuencia de forma estricta</em>, se asume la pérdida acotada (&lt;9.4% total del bankroll) y se reinicia el ciclo al Stake Base sin duplicar jamás.
       `,
-      keyRule: '🛡️ Regla Anti-Ruina #1: El stake máximo jamás debe superar el 5% de tu capital disponible.'
+      keyRule: '🛡️ Regla Anti-Ruina #1: Jamás operes Martingala infinita. Si aplicas progresión, acótala estrictamente a 3-4 pasos con Stop-Loss obligatorio y stake tope del 5%.'
     },
     {
       id: 'lesson-2',
@@ -99,23 +103,27 @@ const LESSONS_DB: Record<Language, AcademyLesson[]> = {
   en: [
     {
       id: 'lesson-1',
-      title: '1. Why Martingale Destroys Any Bankroll',
-      subtitle: 'The mathematical fallacy that bankrupts 98% of retail traders.',
-      duration: '4 min read',
-      icon: '💣',
+      title: '1. Classic Martingale vs. Bounded Martingale with Hard Stop-Loss',
+      subtitle: 'Why infinite doubling fails and how the bounded method (3-4 steps) shields your capital.',
+      duration: '5 min read',
+      icon: '🛡️',
       content: `
-        The strategy of doubling up after a loss (Martingale) assumes infinite bankroll. In real markets, drawdown streaks exist and grow exponentially:
+        <strong>Traditional Martingale</strong> (unlimited doubling after every loss) assumes infinite bankroll and leads to mathematical ruin due to exponential scaling:
         <br><br>
-        • <strong>Attempt 1:</strong> $20<br>
-        • <strong>Attempt 2:</strong> $40<br>
-        • <strong>Attempt 3:</strong> $80<br>
-        • <strong>Attempt 4:</strong> $160<br>
-        • <strong>Attempt 5:</strong> $320<br>
-        • <strong>Attempt 6:</strong> $640 (Over 60% of a $1,000 bankroll on a single game!)
+        • <strong>Attempt 1:</strong> $20 | <strong>Attempt 2:</strong> $40 | <strong>Attempt 3:</strong> $80 | <strong>Attempt 4:</strong> $160 | <strong>Attempt 5:</strong> $320 | <strong>Attempt 6:</strong> $640 (Over 60% of a $1,000 bankroll on a single game!).
         <br><br>
-        <strong>Our Rule:</strong> Never double after a loss. Quantitative sizing is always based on a flat percentage of currently available capital.
+        <strong>Quantitative Framework: Bounded Martingale (3-4 Steps with Hard Stop-Loss):</strong><br>
+        To harness recovery potential while capping catastrophic drawdown, the <strong>Base Stake</strong> is calculated backwards from the anti-ruin ceiling (5% max):
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.4rem; padding: 0.6rem; margin: 0.75rem 0; font-family: monospace; font-size: 0.82rem; color: #38bdf8; text-align: center; font-weight: 700;">
+          Base Stake = (Bankroll × MaxStakePct) / 2^(MaxSteps - 1)
+        </div>
+        • <strong>Step 1:</strong> $6.25 (0.625% of $1,000)<br>
+        • <strong>Step 2:</strong> $12.50 (1.250%)<br>
+        • <strong>Step 3:</strong> $25.00 (2.500%)<br>
+        • <strong>Step 4 (Ceiling):</strong> $50.00 (5.00% exact = Anti-Ruin Cap)<br>
+        • <strong>🛑 Stop-Loss Event:</strong> If Step 4 fails, <em>the sequence immediately cuts</em>, accepts the bounded loss (&lt;9.4% total bankroll), and resets to the Base Stake without ever doubling further.
       `,
-      keyRule: '🛡️ Anti-Ruin Rule #1: Maximum stake must never exceed 5% of your available bankroll.'
+      keyRule: '🛡️ Anti-Ruin Rule #1: Never run infinite Martingale. If using progression, strictly bound it to 3-4 steps with mandatory Stop-Loss and 5% stake ceiling.'
     },
     {
       id: 'lesson-2',
@@ -184,23 +192,27 @@ const LESSONS_DB: Record<Language, AcademyLesson[]> = {
   pt: [
     {
       id: 'lesson-1',
-      title: '1. Por que o Martingale Destrói Qualquer Banca',
-      subtitle: 'A falácia matemática que arruína 98% dos apostadores.',
-      duration: '4 min leitura',
-      icon: '💣',
+      title: '1. Martingale Clássico vs. Martingale Limitado com Stop-Loss',
+      subtitle: 'Por que a duplicação infinita quebra e como o método limitado (3-4 passos) protege o capital.',
+      duration: '5 min leitura',
+      icon: '🛡️',
       content: `
-        A estratégia de dobrar após perder (Martingale) pressupõe capital infinito. Nos mercados reais, sequências ruins existem e crescem exponencialmente:
+        O <strong>Martingale Tradicional</strong> (dobrar sem limite após cada erro) pressupõe capital infinito e conduz à ruína matemática pelo crescimento exponencial:
         <br><br>
-        • <strong>Tentativa 1:</strong> $20<br>
-        • <strong>Tentativa 2:</strong> $40<br>
-        • <strong>Tentativa 3:</strong> $80<br>
-        • <strong>Tentativa 4:</strong> $160<br>
-        • <strong>Tentativa 5:</strong> $320<br>
-        • <strong>Tentativa 6:</strong> $640 (Mais de 60% de uma banca de $1,000 em 1 único jogo!)
+        • <strong>Tentativa 1:</strong> $20 | <strong>Tentativa 2:</strong> $40 | <strong>Tentativa 3:</strong> $80 | <strong>Tentativa 4:</strong> $160 | <strong>Tentativa 5:</strong> $320 | <strong>Tentativa 6:</strong> $640 (Mais de 60% de uma banca de $1,000 em 1 único jogo!).
         <br><br>
-        <strong>Nossa Regra:</strong> Nunca dobre após a perda. O dimensionamento matemático baseia-se sempre numa percentagem fixa do capital disponível atual.
+        <strong>Abordagem Quantitativa: Martingale Limitado (3 a 4 Passos com Stop-Loss Estrito):</strong><br>
+        Para capturar benefícios de recuperação com risco matematicamente controlado, o <strong>Stake Base</strong> é dimensionado a partir do teto de segurança (5% máx):
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.4rem; padding: 0.6rem; margin: 0.75rem 0; font-family: monospace; font-size: 0.82rem; color: #38bdf8; text-align: center; font-weight: 700;">
+          Stake Base = (Bankroll × MaxStakePct) / 2^(MaxPassos - 1)
+        </div>
+        • <strong>Passo 1:</strong> $6.25 (0.625% de $1,000)<br>
+        • <strong>Passo 2:</strong> $12.50 (1.250%)<br>
+        • <strong>Passo 3:</strong> $25.00 (2.500%)<br>
+        • <strong>Passo 4 (Teto):</strong> $50.00 (5.00% exato = Limite Anti-Ruína)<br>
+        • <strong>🛑 Evento de Stop-Loss:</strong> Se o 4º passo falhar, <em>a sequência é cortada imediatamente</em>, assume-se a perda limitada (&lt;9.4% total) e reinicia-se o ciclo ao Stake Base sem dobrar mais.
       `,
-      keyRule: '🛡️ Regra Anti-Ruína #1: O stake máximo nunca deve ultrapassar 5% do seu capital disponível.'
+      keyRule: '🛡️ Regra Anti-Ruína #1: Nunca opere Martingale infinito. Se usar progressão, limite estritamente a 3-4 passos com Stop-Loss obrigatório e teto de 5%.'
     },
     {
       id: 'lesson-2',
@@ -237,7 +249,7 @@ const LESSONS_DB: Record<Language, AcademyLesson[]> = {
     },
     {
       id: 'lesson-4',
-      title: '4. Valor Esperado Positivo (+EV) e Reversão à Média',
+      title: '4. Valor Esperado Positivo (+EV) e Reversión à Média',
       subtitle: 'Focar em probabilidades estatísticas e não em adivinhação.',
       duration: '6 min leitura',
       icon: '📈',
@@ -269,23 +281,27 @@ const LESSONS_DB: Record<Language, AcademyLesson[]> = {
   gn: [
     {
       id: 'lesson-1',
-      title: '1. Mba\'érepa pe Martingala Ohundi Oimeraẽva Banca',
-      subtitle: 'Pe falacia matemática ohundíva 98% operadores-pe.',
-      duration: '4 min moñe\'ẽ',
-      icon: '💣',
+      title: '1. Martingala Clásica vs. Martingala Acotada Stop-Loss Reheve',
+      subtitle: 'Mba\'érepa pe duplicación infinita ohundi ha mba\'éichapa pe enfoque acotado (3-4 pasos) oñangareko capital rehe.',
+      duration: '5 min moñe\'ẽ',
+      icon: '🛡️',
       content: `
-        Pe estrategia emomokõivo operde rire (Martingala) oimo'ã pirapire ndopaiha. Mercados añeteguápe, racha vai oiko ha oñembotuicha pya'eterei:
+        Pe <strong>Martingala Tradicional</strong> (emomokõivo límite\'ỹre reperde jave) oimo'ã pirapire ndopaiha ha ogueraha ruina matemática-pe exponencialmente:
         <br><br>
-        • <strong>Ñeha'ã 1:</strong> $20<br>
-        • <strong>Ñeha'ã 2:</strong> $40<br>
-        • <strong>Ñeha'ã 3:</strong> $80<br>
-        • <strong>Ñeha'ã 4:</strong> $160<br>
-        • <strong>Ñeha'ã 5:</strong> $320<br>
-        • <strong>Ñeha'ã 6:</strong> $640 (¡60% rasa peteĩ banca $1,000-gui peteĩ partido añóme!)
+        • <strong>Ñeha'ã 1:</strong> $20 | <strong>Ñeha'ã 2:</strong> $40 | <strong>Ñeha'ã 3:</strong> $80 | <strong>Ñeha'ã 4:</strong> $160 | <strong>Ñeha'ã 5:</strong> $320 | <strong>Ñeha'ã 6:</strong> $640 (¡60% rasa peteĩ banca $1,000-gui peteĩ partido añóme!).
         <br><br>
-        <strong>Ñande Regla:</strong> Araka'eve ani emomokõi reperde rire. Pe dimensión matemática oñemopyenda porcentaje plano nde banca ko'ág̃agua rehe.
+        <strong>Enfoque Cuantitativo: Martingala Acotada (3 térã 4 Pasos Stop-Loss Estricto reheve):</strong><br>
+        Jaipuru haguã beneficio recuperacion-gui ruina riesgo\'ỹre, pe <strong>Stake Base</strong> oñemombyky pe techo anti-ruina (5% max)-gui:
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.4rem; padding: 0.6rem; margin: 0.75rem 0; font-family: monospace; font-size: 0.82rem; color: #38bdf8; text-align: center; font-weight: 700;">
+          Stake Base = (Bankroll × MaxStakePct) / 2^(MaxPasos - 1)
+        </div>
+        • <strong>Paso 1:</strong> $6.25 (0.625% $1,000-gui)<br>
+        • <strong>Paso 2:</strong> $12.50 (1.250%)<br>
+        • <strong>Paso 3:</strong> $25.00 (2.500%)<br>
+        • <strong>Paso 4 (Techo):</strong> $50.00 (5.00% exacto = Límite Anti-Ruina)<br>
+        • <strong>🛑 Stop-Loss Disparo:</strong> 4º intento ofalla ramo, <em>oñekytĩ secuencia pya'ete</em>, oje'asumi pérdida acotada (&lt;9.4% total) ha oñepyrũ jey Stake Base-pe emomokõi jey\'ỹre.
       `,
-      keyRule: '🛡️ Regla Anti-Ruina #1: Pe stake tuichavéva araka\'eve ndohasai va\'erã 5% nde banca oĩvagui.'
+      keyRule: '🛡️ Regla Anti-Ruina #1: Araka\'eve ani eipuru Martingala infinita. Epurúramo progresión, emohenda 3-4 pasos-pe Stop-Loss obligatorio ha stake 5% tope reheve.'
     },
     {
       id: 'lesson-2',
@@ -327,7 +343,7 @@ const LESSONS_DB: Record<Language, AcademyLesson[]> = {
       duration: '6 min moñe\'ẽ',
       icon: '📈',
       content: `
-        Peteĩ racha estadística hi'ajuetéva (techapyrã: 18 partidos empate'ỹre peteĩ liga históricamente 28% empatávape) omoheñói <strong>asimetría favorable</strong>:
+        Peteĩ racha estadística hi'ajuetéva (techapyrã: 18 partidos empate\'ỹre peteĩ liga históricamente 28% empatávape) omoheñói <strong>asimetría favorable</strong>:
         <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.4rem; padding: 0.6rem; margin: 0.75rem 0; font-family: monospace; font-size: 0.82rem; color: #38bdf8; text-align: center; font-weight: 700;">
           EV = (Probabilidad Añetegua × Ganancia) - (Probabilidad Pérdida × Pérdida)
         </div>

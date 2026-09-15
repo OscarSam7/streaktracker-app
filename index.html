@@ -1427,12 +1427,76 @@
                   <option value="0.01">Ultra Conservador (1.00%)</option>
                   <option value="0.03">Moderado (3.00%)</option>
                   <option value="0.04">Moderado Alto (4.00%)</option>
+                  <option value="martingale_bounded">🛡️ Martingala Acotada (Stop-Loss 3-4 Pasos)</option>
                   <option value="custom">Personalizado (%)</option>
                 </select>
               </div>
               <div class="form-group" id="calc-custom-risk-group" style="display: none;">
                 <label>% Personalizado</label>
                 <input type="number" id="calc-custom-risk-input" value="2.0" step="0.1" min="0.1" max="10" />
+              </div>
+              
+              <!-- Controles Martingala Acotada con Stop-Loss Estricto -->
+              <div id="calc-martingale-container" style="display: none; grid-column: 1 / -1; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 0.6rem; padding: 1rem; margin: 0.5rem 0 1rem 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                  <span style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 0.4rem;">
+                    🛡️ Configuración de Progresión Cuantitativa Acotada
+                  </span>
+                  <span id="calc-mart-step-badge" class="badge-status badge-info" style="font-size: 0.75rem;">Paso 1/4 (Stake Base)</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 0.72rem; color: #94a3b8;">Límite de Pasos (Stop-Loss)</label>
+                    <select id="calc-mart-max-steps" style="padding: 0.4rem 0.6rem; font-size: 0.8rem; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem; color: #fff; width: 100%;">
+                      <option value="4" selected>4 Pasos (Tope x8 | Stop en 4to)</option>
+                      <option value="3">3 Pasos (Tope x4 | Stop en 3ro)</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 0.72rem; color: #94a3b8;">Tope Máx. Anti-Ruina (%)</label>
+                    <input type="number" id="calc-mart-max-pct" value="5.0" step="0.5" min="1.0" max="10.0" style="padding: 0.4rem 0.6rem; font-size: 0.8rem; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem; color: #fff; width: 100%;" />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 0.72rem; color: #94a3b8;">Racha de Pérdidas Actual</label>
+                    <div style="display: flex; gap: 0.25rem;">
+                      <button type="button" class="btn-sm btn-mart-loss active" data-losses="0" style="flex: 1; padding: 0.35rem 0; font-size: 0.75rem; border-radius: 0.3rem; border: 1px solid rgba(56,189,248,0.4); background: rgba(56,189,248,0.2); color: #fff; cursor: pointer;">0</button>
+                      <button type="button" class="btn-sm btn-mart-loss" data-losses="1" style="flex: 1; padding: 0.35rem 0; font-size: 0.75rem; border-radius: 0.3rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #94a3b8; cursor: pointer;">1</button>
+                      <button type="button" class="btn-sm btn-mart-loss" data-losses="2" style="flex: 1; padding: 0.35rem 0; font-size: 0.75rem; border-radius: 0.3rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #94a3b8; cursor: pointer;">2</button>
+                      <button type="button" class="btn-sm btn-mart-loss" data-losses="3" style="flex: 1; padding: 0.35rem 0; font-size: 0.75rem; border-radius: 0.3rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #94a3b8; cursor: pointer;">3</button>
+                      <button type="button" class="btn-sm btn-mart-loss" data-losses="4" style="flex: 1; padding: 0.35rem 0; font-size: 0.75rem; border-radius: 0.3rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #94a3b8; cursor: pointer;">4+</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stop Loss Warning Alert Banner -->
+                <div id="calc-mart-stoploss-alert" style="display: none; margin-top: 0.75rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 0.4rem; padding: 0.6rem 0.8rem; font-size: 0.75rem; color: #fca5a5;">
+                  🛑 <strong>ALERTA STOP-LOSS DISPARADO:</strong> Se alcanzó el límite máximo de duplicaciones. Se corta la secuencia, se asume la pérdida controlada del ciclo y se reinicia al Stake Base para proteger el 90%+ restante de tu capital.
+                </div>
+
+                <!-- Sequence Projection Table -->
+                <div style="margin-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.65rem;">
+                  <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 0.4rem;">
+                    📊 Proyección de la Secuencia Acotada
+                  </span>
+                  <div style="overflow-x: auto;">
+                    <table id="calc-mart-projection-table" style="width: 100%; font-size: 0.72rem; border-collapse: collapse; text-align: center;">
+                      <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8;">
+                          <th style="padding: 0.3rem;">Paso</th>
+                          <th style="padding: 0.3rem;">Multiplicador</th>
+                          <th style="padding: 0.3rem;">Stake</th>
+                          <th style="padding: 0.3rem;">% Banca</th>
+                          <th style="padding: 0.3rem;">Riesgo Acumulado</th>
+                          <th style="padding: 0.3rem;">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody id="calc-mart-projection-body">
+                        <!-- Populated dynamically by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
               <div class="form-group">
                 <label>Cuota / Multiplicador</label>
