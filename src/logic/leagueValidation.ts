@@ -37,8 +37,9 @@ export interface LeagueValidationTelemetry {
   quality: LeagueQualityScorecard;
 }
 
-// Catálogo interno de telemetría y evaluación cuantitativa para las 51 ligas autorizadas
+// Catálogo interno de telemetría y evaluación cuantitativa para las +51 ligas autorizadas
 export const LEAGUE_VALIDATION_METRICS: Record<number, Partial<LeagueValidationTelemetry>> = {
+  128: { matchesAvailable: 378, historicalSeasons: 5, signalsGeneratedCount: 35, dataCompletenessPct: 99.2, sampleSize: 'GRANDE' }, // Argentina Liga Profesional
   39:  { matchesAvailable: 380, historicalSeasons: 5, signalsGeneratedCount: 42, dataCompletenessPct: 99.8, sampleSize: 'GRANDE' }, // Inglaterra Premier
   140: { matchesAvailable: 380, historicalSeasons: 5, signalsGeneratedCount: 38, dataCompletenessPct: 99.5, sampleSize: 'GRANDE' }, // España La Liga
   141: { matchesAvailable: 462, historicalSeasons: 4, signalsGeneratedCount: 31, dataCompletenessPct: 98.9, sampleSize: 'GRANDE' }, // España 2

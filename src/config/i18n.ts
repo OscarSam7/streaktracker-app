@@ -622,9 +622,9 @@ export const I18N: Record<Language, Translations> = {
       "title": "Ligas Activas",
       "selectAll": "Seleccionar Todas",
       "requireElite": "(🔒 Requiere Plan VIP)",
-      "limitBasicAlert": "🔒 En el Plan FREE solo puedes monitorear hasta 5 ligas. ¡Actualiza a PRO para 15 ligas o a VIP para todas las 51 ligas oficiales!",
-      "limitProAlert": "🔒 En el Plan PRO tienes un límite de 15 ligas activas simultáneas. ¡Actualiza a VIP para monitorear todas las 51 ligas oficiales!",
-      "requireEliteAlert": "🔒 La opción \"Seleccionar Todas\" está disponible exclusivamente en el Plan VIP (51 ligas oficiales)."
+      "limitBasicAlert": "🔒 En el Plan FREE solo puedes monitorear hasta 5 ligas. ¡Actualiza a PRO para 15 ligas o a VIP para todas las +51 ligas oficiales!",
+      "limitProAlert": "🔒 En el Plan PRO tienes un límite de 15 ligas activas simultáneas. ¡Actualiza a VIP para monitorear todas las +51 ligas oficiales!",
+      "requireEliteAlert": "🔒 La opción \"Seleccionar Todas\" está disponible exclusivamente en el Plan VIP (+51 ligas oficiales)."
     },
     "telegramModal": {
       "title": "Simulador de Bot de Telegram VIP",
@@ -903,7 +903,7 @@ export const I18N: Record<Language, Translations> = {
       "trackBacktest": "📈 BACKTEST (Histórico 3 Temp)",
       "bannerRealDesc": "Señales auditadas y liquidadas directamente en el Ledger Inmutable oficial de StreakTracker.",
       "bannerPaperDesc": "Señales capturadas en tiempo real y registradas a cuota de apertura en entorno de simulación riguroso.",
-      "bannerBacktestDesc": "Simulación algorítmica cuantitativa sobre 51 ligas y +3 temporadas históricas (2022-2026).",
+      "bannerBacktestDesc": "Simulación algorítmica cuantitativa sobre +51 ligas y +3 temporadas históricas (2022-2026).",
       "lastUpdated": "ÚLTIMA ACTUALIZACIÓN",
       "kpiTotal": "NÚMERO TOTAL SEÑALES",
       "kpiResolved": "SEÑALES RESUELTAS",
@@ -1147,9 +1147,9 @@ export const I18N: Record<Language, Translations> = {
       "title": "Active Monitored Leagues",
       "selectAll": "Select All Leagues",
       "requireElite": "(🔒 Requires VIP Plan)",
-      "limitBasicAlert": "🔒 On the FREE Plan you can monitor up to 5 leagues. Upgrade to PRO for 15 leagues or VIP for all 51 official leagues!",
-      "limitProAlert": "🔒 On the PRO Plan you have a limit of 15 active leagues. Upgrade to VIP to monitor all 51 official leagues!",
-      "requireEliteAlert": "🔒 \"Select All\" is exclusively available for VIP subscribers (51 official worldwide leagues)."
+      "limitBasicAlert": "🔒 On the FREE Plan you can monitor up to 5 leagues. Upgrade to PRO for 15 leagues or VIP for all +51 official leagues!",
+      "limitProAlert": "🔒 On the PRO Plan you have a limit of 15 active leagues. Upgrade to VIP to monitor all +51 official leagues!",
+      "requireEliteAlert": "🔒 \"Select All\" is exclusively available for VIP subscribers (+51 official worldwide leagues)."
     },
     "telegramModal": {
       "title": "Telegram VIP Signal Bot Simulator",
@@ -1426,7 +1426,7 @@ export const I18N: Record<Language, Translations> = {
       "trackBacktest": "📈 BACKTEST (3-Season Historical)",
       "bannerRealDesc": "Audited and settled signals directly verified on StreakTracker's official Immutable Ledger.",
       "bannerPaperDesc": "Real-time signals captured at open odds in a strict zero-risk forward testing sandbox.",
-      "bannerBacktestDesc": "Quantitative multi-season simulation across 51 worldwide leagues and +3 complete seasons.",
+      "bannerBacktestDesc": "Quantitative multi-season simulation across +51 worldwide leagues and +3 complete seasons.",
       "lastUpdated": "LAST UPDATED",
       "kpiTotal": "TOTAL SIGNALS",
       "kpiResolved": "RESOLVED SIGNALS",
@@ -1670,9 +1670,9 @@ export const I18N: Record<Language, Translations> = {
       "title": "Ligas Ativas",
       "selectAll": "Selecionar Todas",
       "requireElite": "(🔒 Requer Plano VIP)",
-      "limitBasicAlert": "🔒 No Plano FREE você pode monitorar até 5 ligas. Atualize para PRO para 15 ligas ou VIP para todas as 51 ligas oficiais!",
-      "limitProAlert": "🔒 No Plano PRO você tem o limite de 15 ligas ativas simultâneas. Atualize para VIP para monitorar todas as 51 ligas oficiais!",
-      "requireEliteAlert": "🔒 A opção \"Selecionar Todas\" está disponível exclusivamente no Plano VIP (51 ligas oficiais)."
+      "limitBasicAlert": "🔒 No Plano FREE você pode monitorar até 5 ligas. Atualize para PRO para 15 ligas ou VIP para todas as +51 ligas oficiais!",
+      "limitProAlert": "🔒 No Plano PRO você tem o limite de 15 ligas ativas simultâneas. Atualize para VIP para monitorar todas as +51 ligas oficiais!",
+      "requireEliteAlert": "🔒 A opção \"Selecionar Todas\" está disponível exclusivamente no Plano VIP (+51 ligas oficiais)."
     },
     "telegramModal": {
       "title": "Simulador de Bot do Telegram VIP",
@@ -1951,7 +1951,7 @@ export const I18N: Record<Language, Translations> = {
       "trackBacktest": "📈 BACKTEST (Histórico 3 Temp)",
       "bannerRealDesc": "Sinais auditados e liquidados diretamente no Ledger Imutável oficial do StreakTracker.",
       "bannerPaperDesc": "Sinais capturados em tempo real e registrados na odd de abertura em ambiente estrito de simulação.",
-      "bannerBacktestDesc": "Simulação algorítmica quantitativa em 51 ligas e +3 temporadas históricas (2022-2026).",
+      "bannerBacktestDesc": "Simulação algorítmica quantitativa em +51 ligas e +3 temporadas históricas (2022-2026).",
       "lastUpdated": "ÚLTIMA ATUALIZAÇÃO",
       "kpiTotal": "NÚMERO TOTAL DE SINAIS",
       "kpiResolved": "SINAIS RESOLVIDOS",
@@ -2195,9 +2195,9 @@ export const I18N: Record<Language, Translations> = {
       "title": "Ligakuéra Oĩva Activo",
       "selectAll": "Eiporavo Opaite",
       "requireElite": "(🔒 Oikotevẽ VIP)",
-      "limitBasicAlert": "🔒 FREE Plan-pe ikatu emoĩ 5 ligas añoite. Embotuicha PRO-pe 15 ligas térã VIP-pe opa 51 ligas oficiales!",
-      "limitProAlert": "🔒 PRO Plan-pe oreko 15 ligas límite. Embotuicha VIP-pe emoĩ hag̃ua opaite 51 ligas oficiales!",
-      "requireEliteAlert": "🔒 \"Eiporavo Opaite\" oĩ exclusivamente Plan VIP-pe (51 ligas oficiales)."
+      "limitBasicAlert": "🔒 FREE Plan-pe ikatu emoĩ 5 ligas añoite. Embotuicha PRO-pe 15 ligas térã VIP-pe opa +51 ligas oficiales!",
+      "limitProAlert": "🔒 PRO Plan-pe oreko 15 ligas límite. Embotuicha VIP-pe emoĩ hag̃ua opaite +51 ligas oficiales!",
+      "requireEliteAlert": "🔒 \"Eiporavo Opaite\" oĩ exclusivamente Plan VIP-pe (+51 ligas oficiales)."
     },
     "telegramModal": {
       "title": "Telegram VIP Bot Simulador",
@@ -2474,7 +2474,7 @@ export const I18N: Record<Language, Translations> = {
       "trackBacktest": "📈 BACKTEST (Histórico 3 Temp)",
       "bannerRealDesc": "Señales auditadas ha liquidadas directamente Ledger Inmutable oficial StreakTracker-pe.",
       "bannerPaperDesc": "Señales ojehecháva en tiempo real cuota de apertura simulación entorno-pe.",
-      "bannerBacktestDesc": "Simulación algorítmica cuantitativa 51 ligas ha +3 temporadas históricas-pe (2022-2026).",
+      "bannerBacktestDesc": "Simulación algorítmica cuantitativa +51 ligas ha +3 temporadas históricas-pe (2022-2026).",
       "lastUpdated": "ÚLTIMA ACTUALIZACIÓN",
       "kpiTotal": "OPAITE SEÑALES",
       "kpiResolved": "SEÑALES RESUELTAS",

@@ -2355,7 +2355,8 @@ button[id^="close-"]:hover,
 .pulse-card-metrics {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.25rem;
   flex-wrap: wrap;
 }
 
@@ -2363,6 +2364,8 @@ button[id^="close-"]:hover,
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .pulse-metric-label {
@@ -2370,12 +2373,14 @@ button[id^="close-"]:hover,
   font-weight: 800;
   color: #94a3b8;
   letter-spacing: 0.03em;
+  text-align: center;
 }
 
 .pulse-metric-val {
   font-size: 1.05rem;
   font-weight: 900;
   margin-top: 0.1rem;
+  text-align: center;
 }
 
 .val-orange { color: #fb923c; text-shadow: 0 0 10px rgba(251, 146, 60, 0.6); }
@@ -2660,6 +2665,10 @@ button[id^="close-"]:hover,
 }
 
 .opps-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   font-size: 0.72rem;
   font-weight: 800;
   padding: 0.15rem 0.55rem;

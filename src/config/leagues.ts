@@ -7,6 +7,7 @@ export interface LeagueInfo {
 }
 
 export const LEAGUES: Record<string, LeagueInfo> = {
+    ARGENTINA: { id: 128, name: "Liga Profesional", country: "Argentina", code: "ar", flag: "🇦🇷" },
     LIBERTADORES: { id: 13, name: "Copa Libertadores", country: "Sudamérica", code: "conmebol", flag: "🏆" },
     AUSTRALIA: { id: 188, name: "A-League", country: "Australia", code: "au", flag: "🇦🇺" },
     AUSTRALIA_W: { id: 190, name: "A-League Women", country: "Australia", code: "au", flag: "🇦🇺" },

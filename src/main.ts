@@ -2937,7 +2937,7 @@ function updateStaticLanguageTexts() {
   // Opportunities Center Static Elements
   const oppSectionTitle = document.querySelector<HTMLElement>('#opportunities-center-section h2');
   if (oppSectionTitle) {
-    const badgeHtml = `<span id="opp-count-badge" style="font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">${document.getElementById('opp-count-badge')?.innerText || '0 ' + lang.opportunitiesCenter.detectedBadge}</span>`;
+    const badgeHtml = `<span id="opp-count-badge" class="opps-badge-count" style="display: inline-flex; align-items: center; justify-content: center; text-align: center; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">${document.getElementById('opp-count-badge')?.innerText || '0 ' + lang.opportunitiesCenter.detectedBadge}</span>`;
     oppSectionTitle.innerHTML = `${lang.opportunitiesCenter.title} ${badgeHtml}`;
   }
 
