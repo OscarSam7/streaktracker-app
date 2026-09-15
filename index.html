@@ -52,10 +52,10 @@
           <div class="plan-selector-box">
             <label for="plan-select" id="plan-label" class="plan-selector-label" style="display: none;">Plan:</label>
             <select id="plan-select" class="plan-select" style="font-weight: 800;">
-              <option value="FREE">⚪ FREE (Básico)</option>
-              <option value="TRIAL">🧪 TRIAL (Prueba 3 Días)</option>
-              <option value="PRO">🔵 PRO (Cuantitativo)</option>
-              <option value="VIP" selected>🟢 VIP (Todo Incluido)</option>
+              <option value="FREE">⚪ Plan INICIO ($0/mes)</option>
+              <!-- <option value="TRIAL">🧪 TRIAL (Prueba 3 Días)</option> -->
+              <!-- <option value="PRO">🔵 PRO (Cuantitativo)</option> -->
+              <option value="VIP" selected>👑 Plan VIP ($2 / 7 días)</option>
             </select>
           </div>
           
@@ -310,29 +310,47 @@
           <button id="close-pricing-modal" class="btn">✕ Cerrar</button>
         </div>
 
-        <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));">
-          <!-- Plan FREE -->
+        <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 860px; margin: 0 auto;">
+          <!-- Tarjeta 1: Plan INICIO -->
           <div class="pricing-card">
             <div class="pricing-card-header">
-              <h3 class="plan-name" style="color: #94a3b8;">⚪ FREE</h3>
+              <h3 class="plan-name" style="color: #cbd5e1;">⚪ Plan INICIO</h3>
               <div class="plan-price">$0 <span>/ mes</span></div>
               <p class="plan-desc">Acceso introductorio para explorar la plataforma.</p>
             </div>
             <ul class="plan-features">
-              <li><span class="check">✓</span> <strong>Hasta 5 ligas activas</strong></li>
+              <li><span class="check">✓</span> <strong>3 Ligas activas simultáneas</strong></li>
               <li><span class="check">✓</span> <strong>Estadísticas y rachas básicas</strong></li>
               <li><span class="check">✓</span> <strong>2 oportunidades diarias observables</strong></li>
-              <li><span class="check">✓</span> Calculadora de stake básica</li>
-              <li><span class="cross">✕</span> <span class="muted">Alertas PREMIUM y FUERTES bloqueadas</span></li>
-              <li><span class="cross">✕</span> <span class="muted">Sin Backtesting Histórico avanzado</span></li>
-              <li><span class="cross">✕</span> <span class="muted">Sin alertas de Telegram VIP</span></li>
-              <li><span class="cross">✕</span> <span class="muted">Sin informes diarios de jornada</span></li>
+              <li><span class="check">✓</span> Calculadora de stake proporcional</li>
+              <li><span class="cross">✕</span> <span class="muted">Sin Bot de Telegram VIP</span></li>
             </ul>
-            <button class="btn btn-tier-action" data-tier="FREE">Activar Plan FREE</button>
+            <button class="btn btn-tier-action" data-tier="FREE" style="width: 100%; background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.2);">Empezar Gratis</button>
           </div>
 
-          <!-- Plan PRO -->
-          <div class="pricing-card pricing-card-pro">
+          <!-- Tarjeta 2: Plan VIP (Destacado) -->
+          <div class="pricing-card pricing-card-elite" style="border-color: rgba(56, 189, 248, 0.5); box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);">
+            <div class="badge-tag badge-elite" style="background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); color: #fff; font-weight: 800;">MÁS ELEGIDO</div>
+            <div class="pricing-card-header">
+              <h3 class="plan-name" style="color: #38bdf8;">👑 Plan VIP</h3>
+              <div class="plan-price">$2 <span style="font-size: 0.85rem; color: #94a3b8; font-weight: normal;">por 7 días, luego $39/mes</span></div>
+              <p class="plan-desc">La suite cuantitativa completa para maximizar tu ventaja matemática.</p>
+            </div>
+            <ul class="plan-features">
+              <li><span class="check">✓</span> <strong>51+ Ligas mundiales completas desbloqueadas</strong></li>
+              <li><span class="check">✓</span> <strong>🤖 Integración con Bot de Telegram VIP en vivo</strong></li>
+              <li><span class="check">✓</span> <strong>📈 Backtesting cuantitativo (+3 Temporadas)</strong></li>
+              <li><span class="check">✓</span> <strong>100% Señales PREMIUM desbloqueadas (🟢 Verde)</strong></li>
+              <li><span class="check">✓</span> <strong>Control de banca y registro inmutable ilimitado</strong></li>
+            </ul>
+            <button class="btn btn-tier-action btn-tier-elite" style="background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); color: #fff; font-weight: 800; width: 100%; box-shadow: 0 4px 20px rgba(37,99,235,0.4);" data-tier="VIP">Probar 7 días por $2</button>
+          </div>
+
+          <!--
+          =======================================================
+          PLANES PRO Y TRIAL (Desactivados temporalmente en Frontend):
+          =======================================================
+          <div class="pricing-card pricing-card-pro" style="display: none;">
             <div class="badge-tag">POPULAR</div>
             <div class="pricing-card-header">
               <h3 class="plan-name" style="color: #38bdf8;">🔵 PRO</h3>
@@ -340,38 +358,15 @@
               <p class="plan-desc">Para operadores cuantitativos que buscan mayor volumen de señales.</p>
             </div>
             <ul class="plan-features">
-              <li><span class="check">✓</span> <strong>Hasta 15 ligas activas simultáneas</strong></li>
-              <li><span class="check">✓</span> <strong>Alertas FUERTES desbloqueadas (🔵 Azul)</strong></li>
-              <li><span class="check">✓</span> <strong>Estadísticas avanzadas y telemetría</strong></li>
-              <li><span class="check">✓</span> <strong>Filtros adicionales y Centro de Oportunidades</strong></li>
-              <li><span class="check">✓</span> <strong>Módulo de Backtesting Ampliado (+3 Temp)</strong></li>
-              <li><span class="check">✓</span> <strong>Control de banca hasta 50 operaciones</strong></li>
-              <li><span class="check">✓</span> <strong>📥 Descarga de Planilla Excel Oficial (.xlsx)</strong></li>
-              <li><span class="cross">✕</span> <span class="muted">Sin Bot de Telegram VIP</span></li>
+              <li><span class="check">✓</span> Hasta 15 ligas activas simultáneas</li>
+              <li><span class="check">✓</span> Alertas FUERTES desbloqueadas (🔵 Azul)</li>
+              <li><span class="check">✓</span> Módulo de Backtesting Ampliado (+3 Temp)</li>
+              <li><span class="check">✓</span> Control de banca hasta 50 operaciones</li>
             </ul>
             <button class="btn btn-tier-action btn-tier-pro" data-tier="PRO">Activar Plan PRO</button>
           </div>
-
-          <!-- Plan VIP -->
-          <div class="pricing-card pricing-card-elite" style="border-color: rgba(74, 222, 128, 0.4); box-shadow: 0 0 35px rgba(34, 197, 94, 0.25);">
-            <div class="badge-tag badge-elite" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">TODO INCLUIDO</div>
-            <div class="pricing-card-header">
-              <h3 class="plan-name" style="color: #4ade80;">🟢 VIP</h3>
-              <div class="plan-price">$39.00 <span>/ mes</span></div>
-              <p class="plan-desc">La suite definitiva para traders profesionales y sindicatos.</p>
-            </div>
-            <ul class="plan-features">
-              <li><span class="check">✓</span> <strong>Todas las 50+ ligas mundiales desbloqueadas</strong></li>
-              <li><span class="check">✓</span> <strong>100% Señales PREMIUM desbloqueadas (🟢 Verde)</strong></li>
-              <li><span class="check">✓</span> <strong>Alertas prioritarias instantáneas</strong></li>
-              <li><span class="check">✓</span> <strong>Información estadística e institucional completa</strong></li>
-              <li><span class="check">✓</span> <strong>🤖 Integración con Bot de Telegram VIP en tiempo real</strong></li>
-              <li><span class="check">✓</span> <strong>Historial completo y auditoría inmutable</strong></li>
-              <li><span class="check">✓</span> <strong>Herramientas avanzadas de banca ILIMITADAS</strong></li>
-              <li><span class="check">✓</span> <strong>📊 Balance e Informes de Jornada profesionales</strong></li>
-            </ul>
-            <button class="btn btn-tier-action btn-tier-elite" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" data-tier="VIP">Activar Plan VIP</button>
-          </div>
+          =======================================================
+          -->
         </div>
       </dialog>
 

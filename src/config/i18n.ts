@@ -655,21 +655,18 @@ export const I18N: Record<Language, Translations> = {
       "badgePopular": "POPULAR",
       "badgeAllIncluded": "TODO INCLUIDO",
       "free": {
-        "name": "⚪ FREE",
-        "price": "$0.00",
+        "name": "⚪ Plan INICIO",
+        "price": "$0",
         "period": "/ mes",
         "desc": "Acceso introductorio para explorar la plataforma.",
         "features": [
-          "✓ Hasta 5 ligas activas",
+          "✓ 3 Ligas activas simultáneas",
           "✓ Estadísticas y rachas básicas",
           "✓ 2 oportunidades diarias observables",
-          "✓ Calculadora de stake básica",
-          "✕ Alertas PREMIUM y FUERTES bloqueadas",
-          "✕ Sin Backtesting Histórico avanzado",
-          "✕ Sin alertas de Telegram VIP",
-          "✕ Sin informes diarios de jornada"
+          "✓ Calculadora de stake proporcional",
+          "✕ Sin Bot de Telegram VIP"
         ],
-        "btn": "Activar Plan FREE"
+        "btn": "Empezar Gratis"
       },
       "pro": {
         "name": "🔵 PRO",
@@ -679,31 +676,24 @@ export const I18N: Record<Language, Translations> = {
         "features": [
           "✓ Hasta 15 ligas activas simultáneas",
           "✓ Alertas FUERTES desbloqueadas (🔵 Azul)",
-          "✓ Estadísticas avanzadas y telemetría",
-          "✓ Filtros adicionales y Centro de Oportunidades",
           "✓ Módulo de Backtesting Ampliado (+3 Temp)",
-          "✓ Control de banca hasta 50 operaciones",
-          "✓ 📥 Descarga de Planilla Excel Oficial (.xlsx)",
-          "✕ Sin Bot de Telegram VIP"
+          "✓ Control de banca hasta 50 operaciones"
         ],
         "btn": "Activar Plan PRO"
       },
       "vip": {
-        "name": "🟢 VIP",
-        "price": "$39.00",
-        "period": "/ mes",
-        "desc": "La suite definitiva para traders profesionales y sindicatos.",
+        "name": "👑 Plan VIP",
+        "price": "$2",
+        "period": "por 7 días, luego $39/mes",
+        "desc": "La suite cuantitativa completa para maximizar tu ventaja matemática.",
         "features": [
-          "✓ Todas las 50+ ligas mundiales desbloqueadas",
+          "✓ 51+ Ligas mundiales completas desbloqueadas",
+          "✓ 🤖 Integración con Bot de Telegram VIP en vivo",
+          "✓ 📈 Backtesting cuantitativo (+3 Temporadas)",
           "✓ 100% Señales PREMIUM desbloqueadas (🟢 Verde)",
-          "✓ Alertas prioritarias instantáneas",
-          "✓ Información estadística e institucional completa",
-          "✓ 🤖 Integración con Bot de Telegram VIP en tiempo real",
-          "✓ Historial completo y auditoría inmutable",
-          "✓ Herramientas avanzadas de banca ILIMITADAS",
-          "✓ 📊 Balance e Informes de Jornada profesionales"
+          "✓ Control de banca y registro inmutable ilimitado"
         ],
-        "btn": "Activar Plan VIP"
+        "btn": "Probar 7 días por $2"
       }
     },
     "guideModal": {
@@ -1190,21 +1180,18 @@ export const I18N: Record<Language, Translations> = {
       "badgePopular": "POPULAR",
       "badgeAllIncluded": "ALL INCLUSIVE",
       "free": {
-        "name": "⚪ FREE",
-        "price": "$0.00",
+        "name": "⚪ INICIO Plan",
+        "price": "$0",
         "period": "/ mo",
         "desc": "Introductory tier to explore platform capabilities.",
         "features": [
-          "✓ Up to 5 active leagues",
+          "✓ 3 Simultaneous active leagues",
           "✓ Basic streak metrics & statistics",
           "✓ 2 observable opportunities per day",
-          "✓ Basic position sizing calculator",
-          "✕ PREMIUM and STRONG alerts locked",
-          "✕ No Historical Backtesting suite",
-          "✕ No VIP Telegram signal alerts",
-          "✕ No daily matchday audit reports"
+          "✓ Position sizing calculator",
+          "✕ No VIP Telegram signal alerts"
         ],
-        "btn": "Activate FREE Plan"
+        "btn": "Start Free"
       },
       "pro": {
         "name": "🔵 PRO",
@@ -1214,31 +1201,24 @@ export const I18N: Record<Language, Translations> = {
         "features": [
           "✓ Up to 15 simultaneous active leagues",
           "✓ STRONG alerts unlocked (🔵 Blue)",
-          "✓ Advanced telemetry & statistics",
-          "✓ Extended filters & Opportunity Radar",
           "✓ Extended Backtesting Suite (+3 Seasons)",
-          "✓ Bankroll tracking up to 50 operations",
-          "✓ 📥 Official Excel Workbook export (.xlsx)",
-          "✕ No VIP Telegram Bot integration"
+          "✓ Bankroll tracking up to 50 operations"
         ],
         "btn": "Activate PRO Plan"
       },
       "vip": {
-        "name": "🟢 VIP",
-        "price": "$39.00",
-        "period": "/ mo",
-        "desc": "The ultimate suite for professional traders and betting syndicates.",
+        "name": "👑 VIP Plan",
+        "price": "$2",
+        "period": "for 7 days, then $39/mo",
+        "desc": "The complete quantitative suite to maximize your mathematical edge.",
         "features": [
-          "✓ All 50+ worldwide leagues unlocked",
-          "✓ 100% PREMIUM signals unlocked (🟢 Green)",
-          "✓ Instant priority push alerts",
-          "✓ Complete statistical & institutional intelligence",
+          "✓ 51+ Worldwide leagues fully unlocked",
           "✓ 🤖 Real-time VIP Telegram Bot integration",
-          "✓ Full history & immutable signal ledger",
-          "✓ UNLIMITED advanced bankroll management",
-          "✓ 📊 Professional Matchday Reports & Balance"
+          "✓ 📈 Quantitative Backtesting (+3 Seasons)",
+          "✓ 100% PREMIUM signals unlocked (🟢 Green)",
+          "✓ Unlimited bankroll tracking & immutable ledger"
         ],
-        "btn": "Activate VIP Plan"
+        "btn": "Try 7 days for $2"
       }
     },
     "guideModal": {
@@ -1723,21 +1703,18 @@ export const I18N: Record<Language, Translations> = {
       "badgePopular": "POPULAR",
       "badgeAllIncluded": "TUDO INCLUÍDO",
       "free": {
-        "name": "⚪ FREE",
-        "price": "$0.00",
+        "name": "⚪ Plano INÍCIO",
+        "price": "$0",
         "period": "/ mês",
         "desc": "Acesso introdutório para explorar a plataforma.",
         "features": [
-          "✓ Até 5 ligas ativas",
+          "✓ 3 Ligas ativas simultâneas",
           "✓ Estatísticas e sequências básicas",
           "✓ 2 oportunidades diárias observáveis",
-          "✓ Calculadora de stake básica",
-          "✕ Alertas PREMIUM e FORTES bloqueados",
-          "✕ Sem Backtesting Histórico avançado",
-          "✕ Sem alertas do Telegram VIP",
-          "✕ Sem relatórios diários de rodada"
+          "✓ Calculadora de stake proporcional",
+          "✕ Sem Bot do Telegram VIP"
         ],
-        "btn": "Ativar Plano FREE"
+        "btn": "Começar Grátis"
       },
       "pro": {
         "name": "🔵 PRO",
@@ -1747,31 +1724,24 @@ export const I18N: Record<Language, Translations> = {
         "features": [
           "✓ Até 15 ligas ativas simultâneas",
           "✓ Alertas FORTES desbloqueados (🔵 Azul)",
-          "✓ Estatísticas avançadas e telemetria",
-          "✓ Filtros adicionais e Centro de Oportunidades",
           "✓ Módulo de Backtesting Ampliado (+3 Temp)",
-          "✓ Gestão de banca até 50 operações",
-          "✓ 📥 Download de Planilha Excel Oficial (.xlsx)",
-          "✕ Sem Bot do Telegram VIP"
+          "✓ Gestão de banca até 50 operações"
         ],
         "btn": "Ativar Plano PRO"
       },
       "vip": {
-        "name": "🟢 VIP",
-        "price": "$39.00",
-        "period": "/ mês",
-        "desc": "A suíte definitiva para traders profissionais e sindicatos.",
+        "name": "👑 Plano VIP",
+        "price": "$2",
+        "period": "por 7 dias, depois $39/mês",
+        "desc": "A suíte quantitativa completa para maximizar sua vantagem matemática.",
         "features": [
-          "✓ Todas as 50+ ligas mundiais desbloqueadas",
+          "✓ 51+ Ligas mundiais completas desbloqueadas",
+          "✓ 🤖 Integração com Bot do Telegram VIP ao vivo",
+          "✓ 📈 Backtesting quantitativo (+3 Temporadas)",
           "✓ 100% Sinais PREMIUM desbloqueados (🟢 Verde)",
-          "✓ Alertas prioritários instantâneos",
-          "✓ Informações estatísticas e institucionais completas",
-          "✓ 🤖 Integração com Bot do Telegram VIP em tempo real",
-          "✓ Histórico completo e auditoria imutável",
-          "✓ Ferramentas avançadas de banca ILIMITADAS",
-          "✓ 📊 Balanço e Relatórios de Rodada profissionais"
+          "✓ Gestão de banca e registro imutável ilimitado"
         ],
-        "btn": "Ativar Plano VIP"
+        "btn": "Testar 7 dias por $2"
       }
     },
     "guideModal": {
@@ -2258,21 +2228,18 @@ export const I18N: Record<Language, Translations> = {
       "badgePopular": "HERAKUÃVÉVA",
       "badgeAllIncluded": "OPARUPIETE",
       "free": {
-        "name": "⚪ FREE",
-        "price": "$0.00",
+        "name": "⚪ Plan INICIO",
+        "price": "$0",
         "period": "/ jasy",
         "desc": "Eñepyrũ hag̃ua rehecha mba'éichapa omba'apo plataforma.",
         "features": [
-          "✓ 5 ligas activas peve",
+          "✓ 3 ligas activas peve",
           "✓ Estadísticas ha rachas básicas",
           "✓ 2 oportunidades ára ha ára",
-          "✓ Stake calculadora básica",
-          "✕ Alertas PREMIUM ha IMBARETE oñemboty",
-          "✕ Ndaipóri Backtesting Histórico",
-          "✕ Ndaipóri Telegram VIP bot",
-          "✕ Ndaipóri informe ára ha ára"
+          "✓ Stake calculadora proporcional",
+          "✕ Ndaipóri Telegram VIP Bot"
         ],
-        "btn": "Emboaje Plan FREE"
+        "btn": "Eñepyrũ Gratis"
       },
       "pro": {
         "name": "🔵 PRO",
@@ -2282,31 +2249,24 @@ export const I18N: Record<Language, Translations> = {
         "features": [
           "✓ 15 ligas activas peve",
           "✓ Alertas IMBARETE ojepe'a (🔵 Hovy)",
-          "✓ Estadísticas ha telemetría tuicháva",
-          "✓ Filtros pyahu ha Oportunidades Renda",
           "✓ Backtesting Módulo (+3 Temporadas)",
-          "✓ Banca ñangareko 50 operaciones peve",
-          "✓ 📥 Emboguejy Planilla Excel Oficial (.xlsx)",
-          "✕ Ndaipóri Telegram VIP Bot"
+          "✓ Banca ñangareko 50 operaciones peve"
         ],
         "btn": "Emboaje Plan PRO"
       },
       "vip": {
-        "name": "🟢 VIP",
-        "price": "$39.00",
-        "period": "/ jasy",
+        "name": "👑 Plan VIP",
+        "price": "$2",
+        "period": "7 ára rehe, upéi $39/jasy",
         "desc": "Suíte tuichavéva traders profesionales ha sindicatos-pe g̃uarã.",
         "features": [
-          "✓ Opaite 50+ ligas del mundo ojepe'a",
+          "✓ 51+ ligas del mundo ojepe'a",
+          "✓ 🤖 Telegram VIP Bot en vivo",
+          "✓ 📈 Backtesting kuantitativo (+3 Temporadas)",
           "✓ 100% Señales PREMIUM ojepe'a (🟢 Hovyũ)",
-          "✓ Alertas prioritarias instantáneas",
-          "✓ Marandu institucional ha estadístico completo",
-          "✓ 🤖 Telegram VIP Bot en tiempo real",
-          "✓ Historial completo ha auditoría inmutable",
-          "✓ Herramientas de banca OPA'ỸVA",
-          "✓ 📊 Balance ha Jornada Marandu profesional"
+          "✓ Herramientas de banca ha registro OPA'ỸVA"
         ],
-        "btn": "Emboaje Plan VIP"
+        "btn": "Eha'ã 7 ára $2 rehe"
       }
     },
     "guideModal": {

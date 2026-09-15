@@ -77,9 +77,9 @@ export function saveAdminSystemConfig(cfg: Partial<SystemConfigAdmin>): SystemCo
 export const PLAN_PERMISSIONS: Record<PlatformPlan | 'TRIAL', PlanFeatureMatrix> = {
   FREE: {
     plan: 'FREE',
-    displayName: 'Plan FREE (Básico)',
+    displayName: 'Plan INICIO',
     priceTag: '$0.00 / mes',
-    maxActiveLeagues: 5,
+    maxActiveLeagues: 3,
     maxDailyOpportunities: 2,
     unlockedTiers: ['OBSERVABLE', 'SECUNDARIA'],
     unlockedAlertColors: ['orange', 'yellow'],
@@ -128,9 +128,9 @@ export const PLAN_PERMISSIONS: Record<PlatformPlan | 'TRIAL', PlanFeatureMatrix>
   },
   VIP: {
     plan: 'VIP',
-    displayName: 'Plan VIP Todo Incluido',
-    priceTag: '$39.00 / mes',
-    maxActiveLeagues: 99, // Todas las 50+ ligas oficiales
+    displayName: 'Plan VIP',
+    priceTag: '$2 por 7 días, luego $39/mes',
+    maxActiveLeagues: 99, // Todas las 51+ ligas oficiales
     maxDailyOpportunities: 999, // Ilimitado
     unlockedTiers: ['PREMIUM', 'FUERTE', 'OBSERVABLE', 'SECUNDARIA'],
     unlockedAlertColors: ['orange', 'yellow', 'blue', 'green'],

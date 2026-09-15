@@ -2887,10 +2887,10 @@ function updateStaticLanguageTexts() {
     const optPro = planSelectEl.querySelector('option[value="PRO"]');
     const optVip = planSelectEl.querySelector('option[value="VIP"]');
 
-    if (optFree) optFree.textContent = state.currentLang === 'en' ? '⚪ FREE (Basic)' : (state.currentLang === 'pt' ? '⚪ FREE (Básico)' : (state.currentLang === 'gn' ? '⚪ FREE (Básico)' : '⚪ FREE (Básico)'));
-    if (optTrial) optTrial.textContent = state.currentLang === 'en' ? '🧪 TRIAL (3-Day Trial)' : (state.currentLang === 'pt' ? '🧪 TRIAL (Teste 3 Dias)' : (state.currentLang === 'gn' ? '🧪 TRIAL (3 Ára Ñeha\'ã)' : '🧪 TRIAL (Prueba 3 Días)'));
-    if (optPro) optPro.textContent = state.currentLang === 'en' ? '🔵 PRO (Quantitative)' : (state.currentLang === 'pt' ? '🔵 PRO (Quantitativo)' : (state.currentLang === 'gn' ? '🔵 PRO (Kuantitativo)' : '🔵 PRO (Cuantitativo)'));
-    if (optVip) optVip.textContent = state.currentLang === 'en' ? '🟢 VIP (All Inclusive)' : (state.currentLang === 'pt' ? '🟢 VIP (Tudo Incluído)' : (state.currentLang === 'gn' ? '🟢 VIP (Oparupiete)' : '🟢 VIP (Todo Incluido)'));
+    if (optFree) optFree.textContent = state.currentLang === 'en' ? '⚪ INICIO Plan ($0/mo)' : (state.currentLang === 'pt' ? '⚪ Plano INÍCIO ($0/mês)' : (state.currentLang === 'gn' ? '⚪ Plan INICIO ($0/jasy)' : '⚪ Plan INICIO ($0/mes)'));
+    if (optTrial) optTrial.textContent = state.currentLang === 'en' ? '🧪 TRIAL (3-Day Trial)' : '🧪 TRIAL (Prueba 3 Días)';
+    if (optPro) optPro.textContent = state.currentLang === 'en' ? '🔵 PRO (Quantitative)' : '🔵 PRO (Cuantitativo)';
+    if (optVip) optVip.textContent = state.currentLang === 'en' ? '👑 VIP Plan ($2 / 7 days)' : (state.currentLang === 'pt' ? '👑 Plano VIP ($2 / 7 dias)' : (state.currentLang === 'gn' ? '👑 Plan VIP ($2 / 7 ára)' : '👑 Plan VIP ($2 / 7 días)'));
   }
 
   // Trial Active Banner
