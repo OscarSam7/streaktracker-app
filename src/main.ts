@@ -2631,13 +2631,13 @@ function updateAuditModalTexts() {
   }
 
   const btnAll = document.getElementById('audit-filter-all');
-  if (btnAll) btnAll.innerHTML = `🔘 ${lang.auditModal.filterAll} (<span id="audit-count-all">${document.getElementById('audit-count-all')?.innerText || '0'}</span>)`;
+  if (btnAll) btnAll.innerHTML = `${lang.auditModal.filterAll} (<span id="audit-count-all">${document.getElementById('audit-count-all')?.innerText || '0'}</span>)`;
 
   const btnWon = document.getElementById('audit-filter-won');
-  if (btnWon) btnWon.innerHTML = `✅ ${lang.auditModal.filterWon} (<span id="audit-count-won">${document.getElementById('audit-count-won')?.innerText || '0'}</span>)`;
+  if (btnWon) btnWon.innerHTML = `${lang.auditModal.filterWon} (<span id="audit-count-won">${document.getElementById('audit-count-won')?.innerText || '0'}</span>)`;
 
   const btnLost = document.getElementById('audit-filter-lost');
-  if (btnLost) btnLost.innerHTML = `❌ ${lang.auditModal.filterLost} (<span id="audit-count-lost">${document.getElementById('audit-count-lost')?.innerText || '0'}</span>)`;
+  if (btnLost) btnLost.innerHTML = `${lang.auditModal.filterLost} (<span id="audit-count-lost">${document.getElementById('audit-count-lost')?.innerText || '0'}</span>)`;
 
   const footnote = modal.querySelector('div[style*="justify-content: space-between"] > span[style*="color: #94a3b8"]');
   if (footnote) footnote.textContent = lang.auditModal.footnote;
