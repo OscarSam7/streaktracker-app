@@ -910,17 +910,17 @@
 
     <div style="margin-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.85rem; text-align: center;">
       <span style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.5rem;">Cuentas de prueba rápida:</span>
-      <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-        <button type="button" class="btn-demo-quick" data-demo-email="demo@enrachas.com" data-demo-name="Operador Free" data-demo-plan="FREE" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; border-radius: 4px; cursor: pointer;">🟢 Demo Free</button>
-        <button type="button" class="btn-demo-quick" data-demo-email="vip@enrachas.com" data-demo-name="Trader VIP" data-demo-plan="VIP" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; border-radius: 4px; cursor: pointer;">⚡ Demo VIP</button>
-        <button type="button" class="btn-demo-quick" data-demo-email="admin@enrachas.com" data-demo-name="Administrador Central" data-demo-plan="ADMIN" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.3); color: #facc15; border-radius: 4px; cursor: pointer;">🛡️ Admin Demo</button>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem; width: 100%;">
+        <button type="button" class="btn-demo-quick" data-demo-email="vip@enrachas.com" data-demo-name="Trader VIP" data-demo-plan="VIP" style="font-size: 0.76rem; font-weight: 700; padding: 0.45rem 0.6rem; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.45); color: #38bdf8; border-radius: 6px; cursor: pointer;">⚡ Demo VIP</button>
+        <button type="button" class="btn-demo-quick" data-demo-email="admin@enrachas.com" data-demo-name="Administrador Central" data-demo-plan="ADMIN" style="font-size: 0.76rem; font-weight: 700; padding: 0.45rem 0.6rem; background: rgba(250,204,21,0.18); border: 1px solid rgba(250,204,21,0.45); color: #facc15; border-radius: 6px; cursor: pointer;">🛡️ Admin Demo</button>
+        <button type="button" class="btn-demo-quick" data-demo-email="demo@enrachas.com" data-demo-name="Operador Free" data-demo-plan="FREE" style="font-size: 0.76rem; font-weight: 700; padding: 0.45rem 0.6rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">🟢 Demo Free</button>
       </div>
     </div>
   </dialog>
 
   <!-- Script de Interacción y Autenticación del Portal -->
-  <script type="module">
-    import { loadUserProfile, saveUserProfile } from '/src/logic/authPermissions.ts';
+  <script>
+    const STORAGE_KEY_USER = 'streaktracker_user_profile_v2';
 
     const authModal = document.getElementById('auth-modal');
     const closeAuthModal = document.getElementById('close-auth-modal');
@@ -939,37 +939,37 @@
     const hiddenPlanInput = document.getElementById('auth-user-plan');
 
     let currentMode = 'register';
-    let selectedPlan = 'FREE';
+    let selectedPlan = 'VIP'; // Default to VIP for maximum experience
 
     function setPlanChoice(plan) {
       selectedPlan = plan;
       if (hiddenPlanInput) hiddenPlanInput.value = plan;
 
       if (plan === 'FREE') {
-        cardFree?.classList.add('active');
         if (cardFree) {
+          cardFree.classList.add('active');
           cardFree.style.borderColor = '#38bdf8';
           cardFree.style.background = 'rgba(56, 189, 248, 0.08)';
           const dot = cardFree.querySelector('.plan-radio-dot');
           if (dot) { dot.style.borderColor = '#38bdf8'; dot.style.background = '#38bdf8'; }
         }
-        cardVip?.classList.remove('active');
         if (cardVip) {
+          cardVip.classList.remove('active');
           cardVip.style.borderColor = 'rgba(255, 255, 255, 0.15)';
           cardVip.style.background = 'rgba(15, 23, 42, 0.6)';
           const dot = cardVip.querySelector('.plan-radio-dot');
           if (dot) { dot.style.borderColor = 'rgba(255,255,255,0.3)'; dot.style.background = 'transparent'; }
         }
       } else {
-        cardVip?.classList.add('active');
         if (cardVip) {
+          cardVip.classList.add('active');
           cardVip.style.borderColor = '#38bdf8';
           cardVip.style.background = 'rgba(56, 189, 248, 0.15)';
           const dot = cardVip.querySelector('.plan-radio-dot');
           if (dot) { dot.style.borderColor = '#38bdf8'; dot.style.background = '#38bdf8'; }
         }
-        cardFree?.classList.remove('active');
         if (cardFree) {
+          cardFree.classList.remove('active');
           cardFree.style.borderColor = 'rgba(255, 255, 255, 0.15)';
           cardFree.style.background = 'rgba(15, 23, 42, 0.6)';
           const dot = cardFree.querySelector('.plan-radio-dot');
@@ -1006,24 +1006,53 @@
       }
     }
 
-    function openModal(mode = 'register', presetPlan = 'FREE') {
+    function openModal(mode = 'register', presetPlan = 'VIP') {
       setAuthMode(mode, presetPlan);
       authModal?.showModal();
     }
 
+    function authenticateAndEnter(email, name, role) {
+      const plan = role === 'ADMIN' ? 'VIP' : (role === 'TRIAL' ? 'PRO' : role);
+      const userObj = {
+        id: 'usr_' + Date.now(),
+        name: name || 'Operador EnRachas',
+        email: email.toLowerCase().trim(),
+        role: role,
+        subscription: {
+          plan: plan,
+          status: role === 'TRIAL' ? 'TRIAL' : 'ACTIVE',
+          startedAt: new Date().toISOString(),
+          expiresAt: role === 'FREE' ? null : new Date(Date.now() + 30 * 86400000).toISOString(),
+          autoRenew: role !== 'FREE',
+          accessLevel: role,
+          paymentGatewayReady: true
+        }
+      };
+
+      try {
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(userObj));
+      } catch (e) {
+        console.error('Error saving user profile:', e);
+      }
+
+      window.location.href = '/index.html';
+    }
+
     document.getElementById('nav-login-btn')?.addEventListener('click', () => openModal('login'));
-    document.getElementById('hero-cta-btn')?.addEventListener('click', () => openModal('register', 'FREE'));
+    document.getElementById('hero-cta-btn')?.addEventListener('click', () => openModal('register', 'VIP'));
     document.getElementById('cta-bottom-btn')?.addEventListener('click', () => openModal('register', 'VIP'));
-    document.getElementById('open-audit-portal-btn')?.addEventListener('click', () => { window.location.href = '/?tab=audit'; });
+    document.getElementById('open-audit-portal-btn')?.addEventListener('click', () => { window.location.href = '/index.html?tab=audit'; });
 
     document.querySelectorAll('.btn-plan-select').forEach(btn => {
       btn.addEventListener('click', () => {
-        const plan = btn.getAttribute('data-plan') || 'FREE';
+        const plan = btn.getAttribute('data-plan') || 'VIP';
         openModal('register', plan);
       });
     });
 
     closeAuthModal?.addEventListener('click', () => authModal?.close());
+    authModal?.addEventListener('click', (e) => { if (e.target === authModal) authModal.close(); });
+
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
     tabLogin?.addEventListener('click', () => setAuthMode('login'));
 
@@ -1037,40 +1066,20 @@
 
       if (!email) return;
 
-      const profile = loadUserProfile();
-      profile.email = email;
-      profile.name = currentMode === 'register' ? name : (profile.name || name);
-      
-      if (currentMode === 'register') {
-        profile.plan = selectedPlan;
-      }
-      profile.status = 'ACTIVO';
-      profile.last_login = new Date().toISOString();
-
-      saveUserProfile(profile);
-      setLocalAuthToken(`usr_tok_${Date.now()}`);
-
-      window.location.href = '/';
+      const role = currentMode === 'register' ? selectedPlan : 'VIP';
+      authenticateAndEnter(email, name, role);
     });
 
-    // Quick demo buttons
+    // Quick demo buttons click
     document.querySelectorAll('.btn-demo-quick').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const email = btn.getAttribute('data-demo-email') || 'demo@enrachas.com';
-        const name = btn.getAttribute('data-demo-name') || 'Usuario Demo';
-        const plan = btn.getAttribute('data-demo-plan') || 'FREE';
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const email = btn.getAttribute('data-demo-email') || 'vip@enrachas.com';
+        const name = btn.getAttribute('data-demo-name') || 'Trader VIP';
+        const plan = btn.getAttribute('data-demo-plan') || 'VIP';
 
-        const profile = loadUserProfile();
-        profile.email = email;
-        profile.name = name;
-        profile.plan = plan;
-        profile.status = 'ACTIVO';
-        profile.last_login = new Date().toISOString();
-
-        saveUserProfile(profile);
-        setLocalAuthToken(`demo_token_${plan.toLowerCase()}`);
-
-        window.location.href = '/';
+        authenticateAndEnter(email, name, plan);
       });
     });
   </script>
