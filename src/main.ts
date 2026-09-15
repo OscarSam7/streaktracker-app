@@ -3131,6 +3131,53 @@ function updateStaticLanguageTexts() {
 function setupSearchAndFilters() {
   const searchActionBtn = document.getElementById('search-action-btn');
 
+  function executeSearchAndNavigate(q?: string) {
+    const rawQuery = (q !== undefined ? q : (searchInput ? searchInput.value : '')).trim();
+    if (!rawQuery) {
+      state.searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+      renderDashboard();
+      return;
+    }
+
+    const query = rawQuery.toLowerCase();
+
+    // Find the first matching league from all active leagues
+    const matchedLid = state.activeLeagues.find(lid => {
+      const leagueInfo = Object.values(LEAGUES).find(l => l.id === lid);
+      if (!leagueInfo) return false;
+      return leagueInfo.name.toLowerCase().includes(query) || leagueInfo.country.toLowerCase().includes(query);
+    });
+
+    // Clear the typed text automatically so the user can continue without having to delete manually
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.blur();
+    }
+    if (clearSearchBtn) {
+      clearSearchBtn.style.display = 'none';
+    }
+    state.searchQuery = '';
+
+    // Render the dashboard with full/active filter view
+    renderDashboard();
+
+    if (matchedLid) {
+      const targetCard = document.getElementById(`card-league-${matchedLid}`);
+      if (targetCard) {
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.querySelectorAll('.league-card-highlighted').forEach(el => el.classList.remove('league-card-highlighted'));
+        targetCard.classList.add('league-card-highlighted');
+        setTimeout(() => {
+          targetCard.classList.remove('league-card-highlighted');
+        }, 2800);
+      }
+    } else {
+      scrollToFirstMatchingLeague();
+    }
+  }
+
   function scrollToFirstMatchingLeague() {
     const dashboardEl = document.getElementById('dashboard');
     if (!dashboardEl) return;
@@ -3159,19 +3206,14 @@ function setupSearchAndFilters() {
 
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        renderDashboard();
-        scrollToFirstMatchingLeague();
+        executeSearchAndNavigate();
       }
     });
   }
 
   if (searchActionBtn) {
     searchActionBtn.addEventListener('click', () => {
-      if (searchInput) {
-        state.searchQuery = searchInput.value;
-      }
-      renderDashboard();
-      scrollToFirstMatchingLeague();
+      executeSearchAndNavigate();
     });
   }
 
