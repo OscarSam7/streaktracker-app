@@ -216,6 +216,7 @@ async function run() {
   setupSportsDateStrip();
   setupSportsBottomNav();
   setupPushNotificationModule();
+  setupGlobalNotificationSettingsModule();
   setupLeagueHistoryModal();
   updateTrialBannerUI();
   updateUserHeaderUI();
@@ -3600,6 +3601,7 @@ function setupCheckoutModal() {
 }
 
 const STORAGE_KEY_PUSH_NOTIF = 'streaktracker_push_notifications_v1';
+const STORAGE_KEY_GLOBAL_NOTIF_SETTINGS = 'streaktracker_global_notif_settings_v1';
 
 interface PushConfigEntry {
   oppKey: string;
@@ -3618,6 +3620,61 @@ interface PushConfigEntry {
   notifiedLive: boolean;
   notifiedFt?: boolean;
   createdAt: number;
+}
+
+interface GlobalNotificationSettings {
+  soundEnabled: boolean;
+  vipOppsEnabled: boolean;
+  matureStreaksEnabled: boolean;
+  min10Enabled: boolean;
+  liveStartEnabled: boolean;
+  goalsEnabled: boolean;
+  ftEnabled: boolean;
+  markets: {
+    draw: boolean;
+    over35: boolean;
+    bttsOver25: boolean;
+    htDraw: boolean;
+    btts1H: boolean;
+  };
+}
+
+const defaultGlobalNotifSettings: GlobalNotificationSettings = {
+  soundEnabled: true,
+  vipOppsEnabled: true,
+  matureStreaksEnabled: true,
+  min10Enabled: true,
+  liveStartEnabled: true,
+  goalsEnabled: true,
+  ftEnabled: true,
+  markets: {
+    draw: true,
+    over35: true,
+    bttsOver25: true,
+    htDraw: true,
+    btts1H: true
+  }
+};
+
+function loadGlobalNotificationSettings(): GlobalNotificationSettings {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_GLOBAL_NOTIF_SETTINGS);
+    if (!raw) return { ...defaultGlobalNotifSettings };
+    const parsed = JSON.parse(raw);
+    return {
+      ...defaultGlobalNotifSettings,
+      ...parsed,
+      markets: { ...defaultGlobalNotifSettings.markets, ...(parsed.markets || {}) }
+    };
+  } catch (e) {
+    return { ...defaultGlobalNotifSettings };
+  }
+}
+
+function saveGlobalNotificationSettings(settings: GlobalNotificationSettings) {
+  try {
+    localStorage.setItem(STORAGE_KEY_GLOBAL_NOTIF_SETTINGS, JSON.stringify(settings));
+  } catch (e) {}
 }
 
 function getOpportunityPushKey(opp: any): string {
@@ -3646,6 +3703,26 @@ function isOpportunityPushActive(oppKey: string): boolean {
   return !!prefs[oppKey];
 }
 
+function updateNotificationBadgeCount() {
+  const badgeEl = document.getElementById('notif-badge-count');
+  const chipEl = document.getElementById('notif-active-count-chip');
+  const prefs = loadPushNotificationPreferences();
+  const count = Object.keys(prefs).length;
+
+  if (badgeEl) {
+    if (count > 0) {
+      badgeEl.innerText = count.toString();
+      badgeEl.style.display = 'flex';
+    } else {
+      badgeEl.style.display = 'none';
+    }
+  }
+
+  if (chipEl) {
+    chipEl.innerText = `${count} ${count === 1 ? 'activo' : 'activos'}`;
+  }
+}
+
 function updateOpportunityPushButtonsUI(oppKey: string, isActive: boolean) {
   const btns = document.querySelectorAll<HTMLButtonElement>(`button.btn-push-alert[data-opp-key="${oppKey}"]`);
   btns.forEach(btn => {
@@ -3659,6 +3736,7 @@ function updateOpportunityPushButtonsUI(oppKey: string, isActive: boolean) {
       btn.title = 'Activar Alerta Push para este partido';
     }
   });
+  updateNotificationBadgeCount();
 }
 
 function toggleOpportunityPush(opp: any): void {
@@ -3710,6 +3788,269 @@ function toggleOpportunityPush(opp: any): void {
       'toast-10min'
     );
   }
+}
+
+function playNotificationAudio(toneType: string = 'default') {
+  try {
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (toneType === 'toast-goal' || toneType === 'goal') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
+      osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); // G5
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.12); // A5
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.4);
+    }
+  } catch (e) {}
+}
+
+function renderMonitoredMatchesInModal() {
+  const container = document.getElementById('notif-monitored-list');
+  if (!container) return;
+
+  const prefs = loadPushNotificationPreferences();
+  const entries = Object.values(prefs);
+
+  if (entries.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 1.25rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem; border: 1px dashed rgba(255,255,255,0.1); color: #94a3b8; font-size: 0.76rem;">
+        <span>🔔 No tienes partidos monitoreados individualmente.</span>
+        <div style="font-size: 0.68rem; color: #64748b; margin-top: 0.25rem;">Haz clic en la campana de cualquier oportunidad en el Centro de Oportunidades para activar alertas en tiempo real.</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = entries.map(item => {
+    return `
+      <div class="notif-monitored-card" id="notif-item-${item.oppKey}">
+        <div>
+          <div style="font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.35rem;">
+            <span>⚽ ${item.fixtureName}</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.2rem; font-size: 0.68rem;">
+            <span style="color: #38bdf8; font-weight: 700;">${item.leagueName}</span>
+            <span style="color: #4ade80;">🎯 ${item.marketLabel}</span>
+          </div>
+        </div>
+        <button class="btn btn-remove-monitored-item" data-opp-key="${item.oppKey}" style="font-size: 0.65rem; padding: 0.2rem 0.5rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);" title="Desactivar alerta para este partido">
+          ✕ Quitar
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  // Attach delete handlers
+  container.querySelectorAll('.btn-remove-monitored-item').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const targetOppKey = (e.currentTarget as HTMLElement).getAttribute('data-opp-key');
+      if (targetOppKey && prefs[targetOppKey]) {
+        delete prefs[targetOppKey];
+        savePushNotificationPreferences(prefs);
+        updateOpportunityPushButtonsUI(targetOppKey, false);
+        renderMonitoredMatchesInModal();
+        updateNotificationBadgeCount();
+      }
+    });
+  });
+}
+
+function updateNotificationPermissionBadge() {
+  const badge = document.getElementById('notif-perm-status-badge');
+  if (!badge) return;
+
+  if (!('Notification' in window)) {
+    badge.innerText = 'No soportado';
+    badge.style.background = 'rgba(239, 68, 68, 0.15)';
+    badge.style.color = '#f87171';
+  } else if (Notification.permission === 'granted') {
+    badge.innerText = '✅ Permitido';
+    badge.style.background = 'rgba(34, 197, 94, 0.15)';
+    badge.style.color = '#4ade80';
+  } else if (Notification.permission === 'denied') {
+    badge.innerText = '🚫 Bloqueado';
+    badge.style.background = 'rgba(239, 68, 68, 0.15)';
+    badge.style.color = '#f87171';
+  } else {
+    badge.innerText = '⚠️ Pendiente';
+    badge.style.background = 'rgba(250, 204, 21, 0.15)';
+    badge.style.color = '#facc15';
+  }
+}
+
+function setupGlobalNotificationSettingsModule() {
+  const headerBtn = document.getElementById('notif-settings-btn');
+  const modal = document.getElementById('notif-settings-modal') as HTMLDialogElement;
+  const closeBtn = document.getElementById('close-notif-settings-modal');
+  const cancelBtn = document.getElementById('btn-cancel-notif-settings');
+  const saveBtn = document.getElementById('btn-save-notif-settings');
+  const testPushBtn = document.getElementById('btn-test-push-notif');
+  const testSoundBtn = document.getElementById('btn-test-sound');
+  const requestPermBtn = document.getElementById('btn-request-notif-perm');
+  const openTelegramBtn = document.getElementById('btn-open-telegram-from-notif');
+  const clearAllMonitoredBtn = document.getElementById('btn-clear-all-monitored');
+
+  // Input Toggles
+  const soundToggle = document.getElementById('notif-cfg-sound') as HTMLInputElement;
+  const vipOppsToggle = document.getElementById('notif-cfg-vip-opps') as HTMLInputElement;
+  const matureStreaksToggle = document.getElementById('notif-cfg-mature-streaks') as HTMLInputElement;
+  const min10Toggle = document.getElementById('notif-cfg-10min') as HTMLInputElement;
+  const liveStartToggle = document.getElementById('notif-cfg-live-start') as HTMLInputElement;
+  const goalsToggle = document.getElementById('notif-cfg-goals') as HTMLInputElement;
+  const ftToggle = document.getElementById('notif-cfg-ft') as HTMLInputElement;
+
+  // Market Toggles
+  const mktDraw = document.getElementById('notif-mkt-draw') as HTMLInputElement;
+  const mktOver35 = document.getElementById('notif-mkt-over35') as HTMLInputElement;
+  const mktBttsOver25 = document.getElementById('notif-mkt-bttsOver25') as HTMLInputElement;
+  const mktHtDraw = document.getElementById('notif-mkt-htDraw') as HTMLInputElement;
+  const mktBtts1H = document.getElementById('notif-mkt-btts1H') as HTMLInputElement;
+
+  // Sync Form Values with Saved Settings
+  const syncFormFromSettings = () => {
+    const s = loadGlobalNotificationSettings();
+    if (soundToggle) soundToggle.checked = s.soundEnabled;
+    if (vipOppsToggle) vipOppsToggle.checked = s.vipOppsEnabled;
+    if (matureStreaksToggle) matureStreaksToggle.checked = s.matureStreaksEnabled;
+    if (min10Toggle) min10Toggle.checked = s.min10Enabled;
+    if (liveStartToggle) liveStartToggle.checked = s.liveStartEnabled;
+    if (goalsToggle) goalsToggle.checked = s.goalsEnabled;
+    if (ftToggle) ftToggle.checked = s.ftEnabled;
+
+    if (mktDraw) mktDraw.checked = s.markets.draw;
+    if (mktOver35) mktOver35.checked = s.markets.over35;
+    if (mktBttsOver25) mktBttsOver25.checked = s.markets.bttsOver25;
+    if (mktHtDraw) mktHtDraw.checked = s.markets.htDraw;
+    if (mktBtts1H) mktBtts1H.checked = s.markets.btts1H;
+
+    updateNotificationPermissionBadge();
+    renderMonitoredMatchesInModal();
+    updateNotificationBadgeCount();
+  };
+
+  if (headerBtn) {
+    headerBtn.addEventListener('click', () => {
+      syncFormFromSettings();
+      if (modal) modal.showModal();
+    });
+  }
+
+  if (closeBtn && modal) closeBtn.addEventListener('click', () => modal.close());
+  if (cancelBtn && modal) cancelBtn.addEventListener('click', () => modal.close());
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.close();
+    });
+  }
+
+  if (requestPermBtn) {
+    requestPermBtn.addEventListener('click', async () => {
+      if ('Notification' in window) {
+        try {
+          const perm = await Notification.requestPermission();
+          updateNotificationPermissionBadge();
+          if (perm === 'granted') {
+            triggerPushNotification(
+              '✅ Notificaciones Activadas',
+              'Has otorgado permisos correctamente para recibir alertas en tiempo real en tu pantalla.',
+              'toast-10min'
+            );
+          }
+        } catch (e) {}
+      }
+    });
+  }
+
+  if (testSoundBtn) {
+    testSoundBtn.addEventListener('click', () => {
+      playNotificationAudio('toast-goal');
+    });
+  }
+
+  if (testPushBtn) {
+    testPushBtn.addEventListener('click', () => {
+      triggerPushNotification(
+        '⚡ Alerta de Prueba (StreakTracker)',
+        'Notificación de alta prioridad: señal VIP detectada en vivo.',
+        'toast-push-alert'
+      );
+    });
+  }
+
+  if (openTelegramBtn && modal) {
+    openTelegramBtn.addEventListener('click', () => {
+      modal.close();
+      const tgModal = document.getElementById('telegram-modal') as HTMLDialogElement;
+      if (tgModal) tgModal.showModal();
+    });
+  }
+
+  if (clearAllMonitoredBtn) {
+    clearAllMonitoredBtn.addEventListener('click', () => {
+      const prefs = loadPushNotificationPreferences();
+      const oppKeys = Object.keys(prefs);
+      if (oppKeys.length === 0) return;
+
+      oppKeys.forEach(k => updateOpportunityPushButtonsUI(k, false));
+      savePushNotificationPreferences({});
+      renderMonitoredMatchesInModal();
+      updateNotificationBadgeCount();
+
+      triggerPushNotification(
+        '🧹 Monitoreo Limpiado',
+        'Se han desactivado todas las alertas de partidos monitoreados.',
+        'toast-push-alert'
+      );
+    });
+  }
+
+  if (saveBtn && modal) {
+    saveBtn.addEventListener('click', () => {
+      const newSettings: GlobalNotificationSettings = {
+        soundEnabled: soundToggle ? soundToggle.checked : true,
+        vipOppsEnabled: vipOppsToggle ? vipOppsToggle.checked : true,
+        matureStreaksEnabled: matureStreaksToggle ? matureStreaksToggle.checked : true,
+        min10Enabled: min10Toggle ? min10Toggle.checked : true,
+        liveStartEnabled: liveStartToggle ? liveStartToggle.checked : true,
+        goalsEnabled: goalsToggle ? goalsToggle.checked : true,
+        ftEnabled: ftToggle ? ftToggle.checked : true,
+        markets: {
+          draw: mktDraw ? mktDraw.checked : true,
+          over35: mktOver35 ? mktOver35.checked : true,
+          bttsOver25: mktBttsOver25 ? mktBttsOver25.checked : true,
+          htDraw: mktHtDraw ? mktHtDraw.checked : true,
+          btts1H: mktBtts1H ? mktBtts1H.checked : true
+        }
+      };
+
+      saveGlobalNotificationSettings(newSettings);
+      modal.close();
+
+      triggerPushNotification(
+        '💾 Preferencias Guardadas',
+        'Tu configuración y clasificación de notificaciones se ha actualizado correctamente.',
+        'toast-10min'
+      );
+    });
+  }
+
+  // Initial badge update
+  updateNotificationBadgeCount();
 }
 
 function setupPushNotificationModule() {
@@ -3821,15 +4162,24 @@ function openPushNotificationModal(opp: any) {
 
 function checkScheduledPushAlerts() {
   const prefs = loadPushNotificationPreferences();
+  const globalSettings = loadGlobalNotificationSettings();
   const now = Date.now();
   const TEN_MINUTES_MS = 10 * 60 * 1000;
   let changed = false;
 
   Object.values(prefs).forEach(item => {
+    // Check if market is disabled globally
+    if (item.marketKey) {
+      const mktKey = item.marketKey as keyof typeof globalSettings.markets;
+      if (globalSettings.markets[mktKey] === false) {
+        return;
+      }
+    }
+
     const timeUntilMatch = item.matchTimestamp - now;
 
     // 1. Alerta de 10 minutos antes (entre 11 min y 0 min antes)
-    if (item.notify10Min && !item.notified10Min && timeUntilMatch > 0 && timeUntilMatch <= TEN_MINUTES_MS) {
+    if (globalSettings.min10Enabled && item.notify10Min && !item.notified10Min && timeUntilMatch > 0 && timeUntilMatch <= TEN_MINUTES_MS) {
       triggerPushNotification(
         `⏰ ¡Atención! Partido en 10 minutos (${item.leagueName})`,
         `El encuentro ${item.fixtureName} comienza pronto. Oportunidad madura: ${item.marketLabel}.`,
@@ -3840,7 +4190,7 @@ function checkScheduledPushAlerts() {
     }
 
     // 2. Alerta al inicio del partido
-    if (item.notifyLive && !item.notifiedLive && timeUntilMatch <= 0 && timeUntilMatch >= -300000) {
+    if (globalSettings.liveStartEnabled && item.notifyLive && !item.notifiedLive && timeUntilMatch <= 0 && timeUntilMatch >= -300000) {
       triggerPushNotification(
         `🔴 ¡PARTIDO EN VIVO! (${item.leagueName})`,
         `Ha comenzado ${item.fixtureName}. Racha objetivo: ${item.marketLabel}.`,
@@ -3856,7 +4206,7 @@ function checkScheduledPushAlerts() {
       const currentScore = `${liveMatch.goalsHome}-${liveMatch.goalsAway}`;
       
       // Detección de GOL
-      if (item.notifyGoal && item.lastKnownScore && item.lastKnownScore !== currentScore) {
+      if (globalSettings.goalsEnabled && item.notifyGoal && item.lastKnownScore && item.lastKnownScore !== currentScore) {
         const totalGoals = liveMatch.goalsHome + liveMatch.goalsAway;
         if (totalGoals > 0) {
           triggerPushNotification(
@@ -3873,7 +4223,7 @@ function checkScheduledPushAlerts() {
       }
 
       // Detección de FINAL DE PARTIDO (FT)
-      if (item.notifyFt && !item.notifiedFt && (liveMatch.status === 'FT' || liveMatch.status === 'AET' || liveMatch.status === 'PEN')) {
+      if (globalSettings.ftEnabled && item.notifyFt && !item.notifiedFt && (liveMatch.status === 'FT' || liveMatch.status === 'AET' || liveMatch.status === 'PEN')) {
         triggerPushNotification(
           `🏁 FINAL DEL PARTIDO en ${item.leagueName}`,
           `Resultado final: ${liveMatch.homeTeam} ${liveMatch.goalsHome} - ${liveMatch.goalsAway} ${liveMatch.awayTeam}. Mercado evaluado: ${item.marketLabel}`,
@@ -3891,6 +4241,8 @@ function checkScheduledPushAlerts() {
 }
 
 function triggerPushNotification(title: string, body: string, toastType: string = 'toast-push-alert') {
+  const globalSettings = loadGlobalNotificationSettings();
+
   // 1. Notificación Nativa Push del Sistema Operativo
   if ('Notification' in window && Notification.permission === 'granted') {
     try {
@@ -3905,20 +4257,10 @@ function triggerPushNotification(title: string, body: string, toastType: string 
   // 2. Banner Flotante Interactivo (Toast In-App Push) en pantalla
   showInAppToast(title, body, toastType);
 
-  // 3. Alerta Sonora
-  try {
-    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    // Melodía de notificación
-    osc.frequency.setValueAtTime(toastType === 'toast-goal' ? 880 : 587.33, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.4);
-  } catch (e) {}
+  // 3. Alerta Sonora (si está habilitada en la configuración global)
+  if (globalSettings.soundEnabled) {
+    playNotificationAudio(toastType);
+  }
 }
 
 function showInAppToast(title: string, body: string, toastClass: string = 'toast-push-alert') {

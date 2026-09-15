@@ -66,6 +66,10 @@
           </div>
 
           <button id="refresh-btn" class="sports-btn-icon" title="Actualizar datos de las ligas ahora">🔄</button>
+          <button id="notif-settings-btn" class="sports-btn-icon sports-notif-btn" title="Centro de Notificaciones y Clasificación de Alertas">
+            <span class="notif-bell-icon">🔔</span>
+            <span id="notif-badge-count" class="notif-badge-pill" style="display: none;">0</span>
+          </button>
           <button id="logout-header-btn" class="sports-btn-icon sports-logout-btn" title="Cerrar sesión y volver al Portal Web">🚪</button>
         </div>
       </div>
@@ -542,6 +546,203 @@
         </div>
 
         <div id="push-status-msg" style="display: none; text-align: center; margin-top: 0.85rem; font-size: 0.78rem; font-weight: 700;"></div>
+      </dialog>
+
+      <!-- Modal CENTRO DE NOTIFICACIONES Y CLASIFICACIÓN DE ALERTAS -->
+      <dialog id="notif-settings-modal" class="custom-dialog notif-center-dialog" style="width: 95vw; max-width: 680px; max-height: 90vh; padding: 1.6rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.35); color: var(--text-main); background: #0b1320; box-shadow: 0 0 60px rgba(0,0,0,0.9); overflow-y: auto;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.85rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #0369a1); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); border: 1px solid rgba(56, 189, 248, 0.5);">
+              🔔
+            </div>
+            <div>
+              <h2 id="notif-center-title" style="font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                Centro de Notificaciones y Clasificación
+                <span class="sports-plan-chip" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); font-size: 0.65rem;">En Vivo</span>
+              </h2>
+              <p id="notif-center-subtitle" style="font-size: 0.74rem; color: #94a3b8; margin-top: 0.15rem; margin-bottom: 0;">
+                Configura los canales, sonidos, filtros de mercado y tipos de alertas que deseas recibir.
+              </p>
+            </div>
+          </div>
+          <button id="close-notif-settings-modal" class="btn" style="min-width: 32px; padding: 0.3rem 0.6rem; font-size: 0.9rem;">✕</button>
+        </div>
+
+        <!-- Quick Status & Channel Controls Card -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.65rem; margin-bottom: 1.25rem;">
+          <!-- Push Web Status -->
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">🌐 Push del Navegador</span>
+              <span id="notif-perm-status-badge" style="font-size: 0.65rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px; background: rgba(34, 197, 94, 0.15); color: #4ade80;">Permitido</span>
+            </div>
+            <div style="display: flex; gap: 0.4rem;">
+              <button id="btn-request-notif-perm" class="btn" style="flex: 1; font-size: 0.68rem; padding: 0.25rem 0.4rem; justify-content: center;">🔔 Permiso</button>
+              <button id="btn-test-push-notif" class="btn" style="flex: 1; font-size: 0.68rem; padding: 0.25rem 0.4rem; justify-content: center; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">⚡ Probar</button>
+            </div>
+          </div>
+
+          <!-- Sound Toggle & Test -->
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">🔊 Sonido de Alerta</span>
+              <label class="notif-switch" style="margin: 0;">
+                <input type="checkbox" id="notif-cfg-sound" checked />
+                <span class="notif-slider"></span>
+              </label>
+            </div>
+            <button id="btn-test-sound" class="btn" style="width: 100%; font-size: 0.68rem; padding: 0.25rem 0.4rem; justify-content: center; background: rgba(250, 204, 21, 0.12); color: #facc15; border-color: rgba(250, 204, 21, 0.3);">
+              🎵 Probar Melodía Sonora
+            </button>
+          </div>
+
+          <!-- Telegram VIP Integration -->
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">✈️ Bot de Telegram</span>
+              <span class="sports-plan-chip" style="font-size: 0.62rem; background: rgba(36, 158, 235, 0.2); color: #38bdf8;">Canal VIP</span>
+            </div>
+            <button id="btn-open-telegram-from-notif" class="btn" style="width: 100%; font-size: 0.68rem; padding: 0.25rem 0.4rem; justify-content: center; background: rgba(36, 158, 235, 0.18); color: #38bdf8; border-color: rgba(36, 158, 235, 0.35);">
+              🚀 Configurar Bot Telegram
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 1: Clasificación de Eventos Notificables -->
+        <div style="margin-bottom: 1.25rem;">
+          <h3 style="font-size: 0.85rem; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>🎛️</span> Clasificación por Tipo de Evento
+          </h3>
+          <div style="display: grid; gap: 0.5rem;">
+            <!-- VIP Opportunities -->
+            <label class="notif-category-row">
+              <input type="checkbox" id="notif-cfg-vip-opps" checked />
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <strong style="font-size: 0.82rem; color: #fff;">⭐ Oportunidades VIP / Alta Confianza (Score > 80)</strong>
+                  <span style="font-size: 0.62rem; padding: 0.05rem 0.3rem; border-radius: 3px; background: rgba(74, 222, 128, 0.15); color: #4ade80;">Top Signal</span>
+                </div>
+                <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 0.1rem;">
+                  Notificar inmediatamente cuando el algoritmo detecte señales de máxima probabilidad de éxito.
+                </span>
+              </div>
+            </label>
+
+            <!-- Extreme Streaks -->
+            <label class="notif-category-row">
+              <input type="checkbox" id="notif-cfg-mature-streaks" checked />
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <strong style="font-size: 0.82rem; color: #fff;">🔥 Rachas Maduras Críticas (Nivel 4+ / 5+)</strong>
+                  <span style="font-size: 0.62rem; padding: 0.05rem 0.3rem; border-radius: 3px; background: rgba(249, 115, 22, 0.2); color: #fdba74;">Madurez Alta</span>
+                </div>
+                <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 0.1rem;">
+                  Alertar cuando una racha histórica alcance el punto de quiebre estadístico óptimo.
+                </span>
+              </div>
+            </label>
+
+            <!-- 10 Min Before -->
+            <label class="notif-category-row">
+              <input type="checkbox" id="notif-cfg-10min" checked />
+              <div style="flex: 1;">
+                <strong style="font-size: 0.82rem; color: #fff;">⏰ Aviso Anticipado (10 Minutos Antes)</strong>
+                <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 0.1rem;">
+                  Alerta con tiempo suficiente para verificar cuotas y preparar la orden de trade/apuesta.
+                </span>
+              </div>
+            </label>
+
+            <!-- Live Match Start -->
+            <label class="notif-category-row">
+              <input type="checkbox" id="notif-cfg-live-start" checked />
+              <div style="flex: 1;">
+                <strong style="font-size: 0.82rem; color: #fff;">🔴 Inicio de Partido En Vivo (00')</strong>
+                <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 0.1rem;">
+                  Notificación instantánea cuando el encuentro comience a disputarse.
+                </span>
+              </div>
+            </label>
+
+            <!-- Real-time Goals -->
+            <label class="notif-category-row">
+              <input type="checkbox" id="notif-cfg-goals" checked />
+              <div style="flex: 1;">
+                <strong style="font-size: 0.82rem; color: #4ade80;">⚽ Goles en Tiempo Real</strong>
+                <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 0.1rem;">
+                  Aviso instantáneo cada vez que suba un gol al marcador con minuto y goleador.
+                </span>
+              </div>
+            </label>
+
+            <!-- Match Finish / Streak Resolution -->
+            <label class="notif-category-row">
+              <input type="checkbox" id="notif-cfg-ft" checked />
+              <div style="flex: 1;">
+                <strong style="font-size: 0.82rem; color: #c084fc;">🏁 Final de Partido y Liquidación de Racha (FT)</strong>
+                <span style="font-size: 0.7rem; color: #94a3b8; display: block; margin-top: 0.1rem;">
+                  Resultado final del partido y confirmación automática de acierto (Green ✅) o reinicio de ciclo.
+                </span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Section 2: Filtro de Mercados Notificables -->
+        <div style="margin-bottom: 1.25rem;">
+          <h3 style="font-size: 0.85rem; font-weight: 800; color: #facc15; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>🎯</span> Mercados con Notificación Activa
+          </h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.45rem;">
+            <label class="notif-market-chip">
+              <input type="checkbox" id="notif-mkt-draw" checked />
+              <span>🟡 Empate FT</span>
+            </label>
+            <label class="notif-market-chip">
+              <input type="checkbox" id="notif-mkt-over35" checked />
+              <span>🟠 Más de 3.5 Goles</span>
+            </label>
+            <label class="notif-market-chip">
+              <input type="checkbox" id="notif-mkt-bttsOver25" checked />
+              <span>🟣 Ambos Marcan & +2.5</span>
+            </label>
+            <label class="notif-market-chip">
+              <input type="checkbox" id="notif-mkt-htDraw" checked />
+              <span>🔵 Empate 1er Tiempo</span>
+            </label>
+            <label class="notif-market-chip">
+              <input type="checkbox" id="notif-mkt-btts1H" checked />
+              <span>🟢 Ambos Marcan 1er T</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Section 3: Banners y Partidos Monitoreados Individualmente -->
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <h3 style="font-size: 0.85rem; font-weight: 800; color: #4ade80; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+              <span>📋</span> Banners Monitoreados Activamente
+              <span id="notif-active-count-chip" class="sports-plan-chip" style="font-size: 0.62rem; background: rgba(34, 197, 94, 0.2); color: #4ade80;">0 activos</span>
+            </h3>
+            <button id="btn-clear-all-monitored" class="btn" style="font-size: 0.65rem; padding: 0.2rem 0.5rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+              🗑️ Desactivar Todos
+            </button>
+          </div>
+          <div id="notif-monitored-list" style="display: grid; gap: 0.45rem; max-height: 180px; overflow-y: auto; padding-right: 0.25rem;">
+            <!-- Contenido dinámico generado por TypeScript -->
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div style="display: flex; gap: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+          <button id="btn-cancel-notif-settings" class="btn" style="flex: 1; justify-content: center;">
+            Cerrar
+          </button>
+          <button id="btn-save-notif-settings" class="btn btn-premium" style="flex: 2; justify-content: center; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; font-weight: 800; border: 1px solid #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);">
+            💾 Guardar Preferencias
+          </button>
+        </div>
       </dialog>
 
 

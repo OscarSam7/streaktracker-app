@@ -2780,4 +2780,167 @@ button[id^="close-"]:hover,
   transform: scale(1.05) !important;
 }
 
+/* Notification Center Header Button & Badge */
+.sports-notif-btn {
+  position: relative !important;
+  color: #facc15 !important;
+  border-color: rgba(250, 204, 21, 0.35) !important;
+}
+
+.sports-notif-btn:hover {
+  background: rgba(250, 204, 21, 0.2) !important;
+  border-color: #facc15 !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.4) !important;
+}
+
+.notif-badge-pill {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 900;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+  border: 1.5px solid #0f172a;
+  animation: pulse-badge 2s infinite ease-in-out;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+/* Modern Notification Switch (iOS / Cyber Style) */
+.notif-switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+}
+
+.notif-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.notif-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.notif-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.notif-switch input:checked + .notif-slider {
+  background-color: #0284c7;
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.notif-switch input:checked + .notif-slider:before {
+  transform: translateX(18px);
+  background-color: #fff;
+}
+
+/* Category Row in Notification Classification */
+.notif-category-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.65rem;
+  transition: all 0.2s ease;
+}
+
+.notif-category-row:hover {
+  background: rgba(30, 41, 59, 0.75);
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateX(2px);
+}
+
+.notif-category-row input[type="checkbox"] {
+  cursor: pointer;
+  transform: scale(1.25);
+  margin-top: 0.2rem;
+  accent-color: #0284c7;
+}
+
+/* Market Chips in Notification Center */
+.notif-market-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.notif-market-chip:hover {
+  border-color: #facc15;
+  background: rgba(250, 204, 21, 0.12);
+  color: #fff;
+}
+
+.notif-market-chip input[type="checkbox"] {
+  accent-color: #facc15;
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+/* Monitored match item inside the notification center */
+.notif-monitored-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.notif-monitored-card:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+
 
