@@ -208,13 +208,13 @@
 
         <!-- Channel Selector Tabs: FREE, PRO, VIP -->
         <div style="display: flex; gap: 0.5rem; margin-bottom: 0.85rem; background: rgba(0,0,0,0.3); padding: 0.4rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); overflow-x: auto;">
-          <button class="filter-pill active" id="tg-chan-vip" data-tg-channel="VIP" style="flex: 1; text-align: center; color: #4ade80; border-color: rgba(74, 222, 128, 0.5);">
+          <button class="filter-pill tg-chan-pill-vip active" id="tg-chan-vip" data-tg-channel="VIP" style="flex: 1; text-align: center;">
             🟢 CANAL VIP (Completo)
           </button>
-          <button class="filter-pill" id="tg-chan-pro" data-tg-channel="PRO" style="flex: 1; text-align: center; color: #38bdf8; border-color: rgba(56, 189, 248, 0.5);">
+          <button class="filter-pill tg-chan-pill-pro" id="tg-chan-pro" data-tg-channel="PRO" style="flex: 1; text-align: center;">
             🔵 CANAL PRO (Avanzado)
           </button>
-          <button class="filter-pill" id="tg-chan-free" data-tg-channel="FREE" style="flex: 1; text-align: center; color: #94a3b8; border-color: rgba(255, 255, 255, 0.2);">
+          <button class="filter-pill tg-chan-pill-free" id="tg-chan-free" data-tg-channel="FREE" style="flex: 1; text-align: center;">
             ⚪ CANAL FREE (Público)
           </button>
         </div>
@@ -1539,14 +1539,14 @@
         </div>
 
         <!-- 3 Distinct Segregated Tracks Switcher -->
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 0.6rem; border: 1px solid rgba(255,255,255,0.08); overflow-x: auto;" class="filter-pills">
-          <button class="filter-pill active" id="tr-track-real" data-tr-track="REAL_RESULTS" style="flex: 1; text-align: center; color: #4ade80; border-color: rgba(74, 222, 128, 0.5);">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 0.6rem; border: 1px solid rgba(255,255,255,0.08); overflow-x: auto;">
+          <button class="tr-track-pill tr-track-pill-real active" id="tr-track-real" data-tr-track="REAL_RESULTS">
             🛡️ RESULTADOS REALES (Ledger Inmutable)
           </button>
-          <button class="filter-pill" id="tr-track-paper" data-tr-track="PAPER_TRADING" style="flex: 1; text-align: center; color: #facc15; border-color: rgba(250, 204, 21, 0.5);">
+          <button class="tr-track-pill tr-track-pill-paper" id="tr-track-paper" data-tr-track="PAPER_TRADING">
             🧪 PAPER TRADING (Forward Test)
           </button>
-          <button class="filter-pill" id="tr-track-backtest" data-tr-track="BACKTEST" style="flex: 1; text-align: center; color: #38bdf8; border-color: rgba(56, 189, 248, 0.5);">
+          <button class="tr-track-pill tr-track-pill-backtest" id="tr-track-backtest" data-tr-track="BACKTEST">
             📈 BACKTEST (Histórico 3 Temp)
           </button>
         </div>
