@@ -510,6 +510,64 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
 
   const isPinOnTopEnabled = state.currentPlan !== 'FREE';
 
+  // Calculate live counts for Tracker Filter Pills
+  let trackerCountAll = 0;
+  let trackerCountHighAlerts = 0;
+  let trackerCountHighToday = 0;
+  let trackerCountToday = 0;
+  let trackerCountLive = 0;
+  let trackerCountOperating = 0;
+
+  state.activeLeagues.forEach(lid => {
+    const leagueInfo = Object.values(LEAGUES).find(l => l.id === lid);
+    if (!leagueInfo) return;
+
+    trackerCountAll++;
+
+    const emptyStreak = { current: 0, maxHistory: 0, previous: 0 };
+    const leagueStreaks = state.streaks[lid] || { 
+      draw: emptyStreak, 
+      over35: emptyStreak, 
+      htDraw: emptyStreak, 
+      bttsOver25: emptyStreak, 
+      btts1H: emptyStreak 
+    };
+
+    const hasGreenOrBlue = [
+      getStreakColorClass(leagueStreaks.draw.current, true),
+      getStreakColorClass(leagueStreaks.over35.current, true),
+      getStreakColorClass(leagueStreaks.htDraw.current, false),
+      getStreakColorClass(leagueStreaks.bttsOver25.current, false),
+      getStreakColorClass(leagueStreaks.btts1H.current, true)
+    ].some(c => c === 'streak-green' || c === 'streak-blue');
+
+    const isLive = liveMatches.some(m => m.leagueId === lid);
+    const validUpcoming = getValidUpcomingMatches(lid);
+    const isToday = isLive || (validUpcoming && validUpcoming.some(um => isDateToday(um.date)));
+    const isOperating = Object.keys(state.activeTrades).some(k => k.startsWith(`${lid}_`)) ||
+                        state.bankrollRawOps.some(op => op.status === 'Pendiente' && op.description.includes(leagueInfo.name));
+
+    if (hasGreenOrBlue) trackerCountHighAlerts++;
+    if (hasGreenOrBlue && isToday) trackerCountHighToday++;
+    if (isToday) trackerCountToday++;
+    if (isLive) trackerCountLive++;
+    if (isOperating) trackerCountOperating++;
+  });
+
+  const elCountAll = document.getElementById('tracker-fcount-all');
+  const elCountHighAlerts = document.getElementById('tracker-fcount-high_alerts');
+  const elCountHighToday = document.getElementById('tracker-fcount-high_today');
+  const elCountToday = document.getElementById('tracker-fcount-today');
+  const elCountLive = document.getElementById('tracker-fcount-live');
+  const elCountOperating = document.getElementById('tracker-fcount-operating');
+
+  if (elCountAll) elCountAll.innerText = trackerCountAll.toString();
+  if (elCountHighAlerts) elCountHighAlerts.innerText = trackerCountHighAlerts.toString();
+  if (elCountHighToday) elCountHighToday.innerText = trackerCountHighToday.toString();
+  if (elCountToday) elCountToday.innerText = trackerCountToday.toString();
+  if (elCountLive) elCountLive.innerText = trackerCountLive.toString();
+  if (elCountOperating) elCountOperating.innerText = trackerCountOperating.toString();
+
   // 1. Sort active leagues by threat priority (Pin on Top)
   const sortedLeagues = [...state.activeLeagues].sort((idA, idB) => {
     if (!isPinOnTopEnabled) return 0; // Natural order in Free plan
@@ -2925,16 +2983,14 @@ function updateStaticLanguageTexts() {
   const pillHigh = document.querySelector('[data-filter="high_alerts"]') as HTMLElement;
   const pillToday = document.querySelector('[data-filter="today"]') as HTMLElement;
   const pillLive = document.querySelector('[data-filter="live"]') as HTMLElement;
-  const pillUpcoming = document.querySelector('[data-filter="upcoming"]') as HTMLElement;
   const pillOperating = document.querySelector('[data-filter="operating"]') as HTMLElement;
 
-  if (pillAll) pillAll.innerText = lang.filters.all;
-  if (pillHighToday) pillHighToday.innerText = lang.filters.highToday;
-  if (pillHigh) pillHigh.innerText = lang.filters.highAlerts;
-  if (pillToday) pillToday.innerText = lang.filters.todayOnly;
-  if (pillLive) pillLive.innerText = lang.filters.liveOnly;
-  if (pillUpcoming) pillUpcoming.innerText = lang.filters.upcomingOnly;
-  if (pillOperating) pillOperating.innerText = lang.filters.operating;
+  if (pillAll) pillAll.innerHTML = `${lang.filters.all} (<span id="tracker-fcount-all">${document.getElementById('tracker-fcount-all')?.innerText || '0'}</span>)`;
+  if (pillHigh) pillHigh.innerHTML = `${lang.filters.highAlerts} (<span id="tracker-fcount-high_alerts">${document.getElementById('tracker-fcount-high_alerts')?.innerText || '0'}</span>)`;
+  if (pillHighToday) pillHighToday.innerHTML = `${lang.filters.highToday} (<span id="tracker-fcount-high_today">${document.getElementById('tracker-fcount-high_today')?.innerText || '0'}</span>)`;
+  if (pillToday) pillToday.innerHTML = `${lang.filters.todayOnly} (<span id="tracker-fcount-today">${document.getElementById('tracker-fcount-today')?.innerText || '0'}</span>)`;
+  if (pillLive) pillLive.innerHTML = `${lang.filters.liveOnly} (<span id="tracker-fcount-live">${document.getElementById('tracker-fcount-live')?.innerText || '0'}</span>)`;
+  if (pillOperating) pillOperating.innerHTML = `${lang.filters.operating} (<span id="tracker-fcount-operating">${document.getElementById('tracker-fcount-operating')?.innerText || '0'}</span>)`;
 
   // Counter Badges Labels
   const countLabels = document.querySelectorAll('.counter-label');
