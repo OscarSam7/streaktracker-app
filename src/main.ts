@@ -1725,9 +1725,6 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
 
     // Operational Banner inside the card (displayed for all opportunities)
     let actionBannerHTML = '';
-    const brokenAtText = opp.streakPrevious > 0 
-      ? `<span style="background: rgba(148, 163, 184, 0.2); color: #e2e8f0; border: 1px solid rgba(148, 163, 184, 0.4); padding: 0.05rem 0.4rem; border-radius: 4px; font-weight: 800; font-size: 0.62rem; display: inline-flex; align-items: center; gap: 0.2rem; box-shadow: 0 0 6px rgba(0,0,0,0.3);">✂️ ${lang.streaks.brokenAt} <strong style="color: #38bdf8;">${opp.streakPrevious}</strong> ${lang.streaks.matchesUnit}</span>`
-      : `<span style="background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px dashed rgba(148, 163, 184, 0.3); padding: 0.05rem 0.35rem; border-radius: 4px; font-size: 0.58rem;">✂️ ${lang.streaks.brokenAt} 1ª racha</span>`;
 
     if (isCurrentlyOperating) {
       actionBannerHTML = `
@@ -1739,7 +1736,6 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
                 ${lang.opportunitiesCenter.operatingTag} ${opp.actionMarketLabel}
                 <span class="opp-operating-pill">${lang.opportunitiesCenter.inProgressBadge}</span>
                 <span style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(239, 68, 68, 0.3)); color: #fdba74; border: 1px solid #f97316; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 900; font-size: 0.6rem; box-shadow: 0 0 8px rgba(249, 115, 22, 0.35);">🔥 Racha: ${opp.streakCurrent}</span>
-                ${brokenAtText}
               </div>
               <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.1rem;">
                 ${lang.opportunitiesCenter.monitoringBreak.replace('{streak}', opp.marketLabel)}
@@ -1760,7 +1756,6 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
               <div style="font-size: 0.68rem; font-weight: 900; color: #4ade80; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
                 <span>${lang.opportunitiesCenter.startTradeHeader} ${opp.actionMarketLabel}</span>
                 <span style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(239, 68, 68, 0.3)); color: #fdba74; border: 1px solid #f97316; padding: 0.05rem 0.35rem; border-radius: 4px; font-weight: 900; font-size: 0.6rem; box-shadow: 0 0 8px rgba(249, 115, 22, 0.35);">🔥 ${lang.opportunitiesCenter.currentStreakLabel}: ${opp.streakCurrent} ${lang.opportunitiesCenter.matchesSuffix}</span>
-                ${brokenAtText}
               </div>
               <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.05rem;">
                 ${lang.opportunitiesCenter.validatedSignal.replace('{streak}', opp.marketLabel).replace('{odds}', opp.suggestedOdds.toFixed(2))}
