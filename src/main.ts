@@ -1743,7 +1743,6 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
               </div>
               <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.1rem;">
                 ${lang.opportunitiesCenter.monitoringBreak.replace('{streak}', opp.marketLabel)}
-                ${opp.streakPrevious > 0 ? ` • <span style="color: #cbd5e1;">(Último corte registrado: <strong>${opp.streakPrevious} partidos</strong>)</span>` : ''}
               </div>
             </div>
           </div>
@@ -1765,7 +1764,6 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
               </div>
               <div style="font-size: 0.6rem; color: #e2e8f0; margin-top: 0.05rem;">
                 ${lang.opportunitiesCenter.validatedSignal.replace('{streak}', opp.marketLabel).replace('{odds}', opp.suggestedOdds.toFixed(2))}
-                ${opp.streakPrevious > 0 ? ` • <span style="color: #cbd5e1;">(Último corte: <strong>${opp.streakPrevious} partidos</strong>)</span>` : ''}
               </div>
             </div>
           </div>
