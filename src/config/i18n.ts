@@ -1,6 +1,13 @@
 export type Language = 'es' | 'en' | 'pt' | 'gn';
 
 export interface Translations {
+  bottomNav: {
+    explore: string;
+    trackers: string;
+    bankroll: string;
+    vipBot: string;
+    plans: string;
+  };
   appTitle: string;
   planLabel: string;
   plans: {
@@ -84,6 +91,8 @@ export interface Translations {
     leagueQualityLabel: string;
     pushAlertTitle: string;
     noOpportunities: string;
+    peopleAnalyzing: string;
+    topPick: string;
   };
   dashboard: {
     title: string;
@@ -133,6 +142,12 @@ export interface Translations {
     nextRoundTitle: string;
     nextRoundBadge: string;
     previousRoundsBadge: string;
+    statisticalValue: string;
+    detectedStreak: string;
+    historicalBehavior: string;
+    similarCases: string;
+    historicalResult: string;
+    currentEvaluation: string;
   };
   counters: {
     orange: string;
@@ -420,6 +435,33 @@ export interface Translations {
     newOpBtn: string;
     exportExcelBtn: string;
     exportCsvBtn: string;
+    newMovementBtn: string;
+    tabMovements: string;
+    filterPeriod: string;
+    fromLabel: string;
+    toLabel: string;
+    applyBtn: string;
+    allDatesBtn: string;
+    todayBtn: string;
+    last7DaysBtn: string;
+    thisMonthBtn: string;
+    reconciliationTitle: string;
+    reconciliationAudit: string;
+    fullHistoryTag: string;
+    recInitialCapital: string;
+    recInjections: string;
+    recWithdrawals: string;
+    recExpenses: string;
+    recTradingPnl: string;
+    recCurrentCapital: string;
+    excelModalTitle: string;
+    excelModalDesc: string;
+    excelRangeLabel: string;
+    excelAllOption: string;
+    excelCurrentOption: string;
+    excelCustomOption: string;
+    excelDownloadBtn: string;
+    excelCancelBtn: string;
     capitalInitial: string;
     capitalCurrent: string;
     totalPnl: string;
@@ -464,6 +506,13 @@ export interface Translations {
 
 export const I18N: Record<Language, Translations> = {
   "es": {
+    "bottomNav": {
+      "explore": "Explorar",
+      "trackers": "Rastreadores",
+      "bankroll": "Banca",
+      "vipBot": "Bot VIP",
+      "plans": "Planes"
+    },
     "appTitle": "Rastreador de Rachas",
     "planLabel": "Plan:",
     "plans": {
@@ -546,7 +595,9 @@ export const I18N: Record<Language, Translations> = {
       "suggestedOddsLabel": "CUOTA ESTIMADA",
       "leagueQualityLabel": "CALIDAD LIGA",
       "pushAlertTitle": "🔔 Configurar Alerta Push (10 min antes)",
-      "noOpportunities": "No hay oportunidades que coincidan con el filtro seleccionado."
+      "noOpportunities": "No hay oportunidades que coincidan con el filtro seleccionado.",
+      "peopleAnalyzing": "personas analizando",
+      "topPick": "Top Pick",
     },
     "dashboard": {
       "title": "RASTREADORES",
@@ -595,7 +646,13 @@ export const I18N: Record<Language, Translations> = {
       "closeDropdownBtn": "✕ Cerrar Vista de Jornadas",
       "nextRoundTitle": "Próxima Jornada a Disputarse",
       "nextRoundBadge": "PRÓXIMA JORNADA",
-      "previousRoundsBadge": "JORNADA ANTERIOR"
+      "previousRoundsBadge": "JORNADA ANTERIOR",
+      "statisticalValue": "Valor Estadístico",
+      "detectedStreak": "Racha detectada",
+      "historicalBehavior": "Comportamiento histórico",
+      "similarCases": "Casos similares",
+      "historicalResult": "Resultado histórico",
+      "currentEvaluation": "Evaluación actual",
     },
     "counters": {
       "orange": "Naranjas",
@@ -947,6 +1004,33 @@ export const I18N: Record<Language, Translations> = {
       "newOpBtn": "➕ Nueva Operación",
       "exportExcelBtn": "📥 Descargar Excel (.xlsx)",
       "exportCsvBtn": "📄 Exportar CSV",
+      "newMovementBtn": "💵 Movimiento de Capital",
+      "tabMovements": "💳 Flujo de Capital & Gastos",
+      "filterPeriod": "Filtrar Periodo:",
+      "fromLabel": "Desde:",
+      "toLabel": "Hasta:",
+      "applyBtn": "Aplicar",
+      "allDatesBtn": "🌐 Todas las Fechas",
+      "todayBtn": "Hoy",
+      "last7DaysBtn": "Últimos 7 días",
+      "thisMonthBtn": "Este Mes",
+      "reconciliationTitle": "CONCILIACIÓN & CUADRATURA DE BALANCE",
+      "reconciliationAudit": "Auditoría Contable Exacta",
+      "fullHistoryTag": "Historial Completo",
+      "recInitialCapital": "Capital Inicial",
+      "recInjections": "Inyecciones / Depósitos",
+      "recWithdrawals": "Extracciones / Retiros",
+      "recExpenses": "Gastos / Costos Actividad",
+      "recTradingPnl": "P&L Neto Trading",
+      "recCurrentCapital": "CAPITAL TOTAL ACTUAL",
+      "excelModalTitle": "📥 Descargar Informe en Excel (.xlsx)",
+      "excelModalDesc": "Exporta tu libro contable profesional con hojas de Resumen & Conciliación, Registro de Operaciones y Flujo de Capital.",
+      "excelRangeLabel": "Selecciona el rango de fechas a exportar:",
+      "excelAllOption": "Todas las Fechas (Historial Completo)",
+      "excelCurrentOption": "Periodo Filtrado en Pantalla",
+      "excelCustomOption": "Rango Personalizado (Desde / Hasta)",
+      "excelDownloadBtn": "📥 Generar y Descargar .xlsx",
+      "excelCancelBtn": "Cancelar",
       "capitalInitial": "Capital Inicial",
       "capitalCurrent": "Capital Actual",
       "totalPnl": "Resultado Neto (P&L)",
@@ -989,6 +1073,13 @@ export const I18N: Record<Language, Translations> = {
     }
   },
   "en": {
+    "bottomNav": {
+      "explore": "Explore",
+      "trackers": "Trackers",
+      "bankroll": "Bankroll",
+      "vipBot": "VIP Bot",
+      "plans": "Plans"
+    },
     "appTitle": "Streak Tracker",
     "planLabel": "Plan:",
     "plans": {
@@ -1071,7 +1162,9 @@ export const I18N: Record<Language, Translations> = {
       "suggestedOddsLabel": "ESTIMATED ODDS",
       "leagueQualityLabel": "LEAGUE TIER",
       "pushAlertTitle": "🔔 Set Push Alert (10 min before)",
-      "noOpportunities": "No opportunities found matching the selected filter."
+      "noOpportunities": "No opportunities found matching the selected filter.",
+      "peopleAnalyzing": "people analyzing",
+      "topPick": "Top Pick",
     },
     "dashboard": {
       "title": "LEAGUE TRACKERS",
@@ -1120,7 +1213,13 @@ export const I18N: Record<Language, Translations> = {
       "closeDropdownBtn": "✕ Close History",
       "nextRoundTitle": "Next Scheduled Matchday",
       "nextRoundBadge": "NEXT ROUND",
-      "previousRoundsBadge": "PAST ROUND"
+      "previousRoundsBadge": "PAST ROUND",
+      "statisticalValue": "Statistical Value",
+      "detectedStreak": "Detected streak",
+      "historicalBehavior": "Historical behavior",
+      "similarCases": "Similar cases",
+      "historicalResult": "Historical result",
+      "currentEvaluation": "Current evaluation",
     },
     "counters": {
       "orange": "Orange",
@@ -1470,6 +1569,33 @@ export const I18N: Record<Language, Translations> = {
       "newOpBtn": "➕ Log New Trade",
       "exportExcelBtn": "📥 Download Excel (.xlsx)",
       "exportCsvBtn": "📄 Export CSV",
+      "newMovementBtn": "💵 Capital Movement",
+      "tabMovements": "💳 Capital Flow & Expenses",
+      "filterPeriod": "Filter Period:",
+      "fromLabel": "From:",
+      "toLabel": "To:",
+      "applyBtn": "Apply",
+      "allDatesBtn": "🌐 All Dates",
+      "todayBtn": "Today",
+      "last7DaysBtn": "Last 7 Days",
+      "thisMonthBtn": "This Month",
+      "reconciliationTitle": "BALANCE RECONCILIATION & AUDIT",
+      "reconciliationAudit": "Exact Accounting Audit",
+      "fullHistoryTag": "Full History",
+      "recInitialCapital": "Initial Capital",
+      "recInjections": "Injections / Deposits",
+      "recWithdrawals": "Withdrawals",
+      "recExpenses": "Expenses / Operating Costs",
+      "recTradingPnl": "Net Trading P&L",
+      "recCurrentCapital": "CURRENT TOTAL CAPITAL",
+      "excelModalTitle": "📥 Download Excel Report (.xlsx)",
+      "excelModalDesc": "Export your professional accounting workbook with Summary & Reconciliation, Trade Journal, and Capital Flow sheets.",
+      "excelRangeLabel": "Select date range to export:",
+      "excelAllOption": "All Dates (Full History)",
+      "excelCurrentOption": "Current Screen Filtered Period",
+      "excelCustomOption": "Custom Date Range (From / To)",
+      "excelDownloadBtn": "📥 Generate and Download .xlsx",
+      "excelCancelBtn": "Cancel",
       "capitalInitial": "Starting Capital",
       "capitalCurrent": "Current Capital",
       "totalPnl": "Net Result (P&L)",
@@ -1512,6 +1638,13 @@ export const I18N: Record<Language, Translations> = {
     }
   },
   "pt": {
+    "bottomNav": {
+      "explore": "Explorar",
+      "trackers": "Rastreadores",
+      "bankroll": "Banca",
+      "vipBot": "Bot VIP",
+      "plans": "Planos"
+    },
     "appTitle": "Rastreador de Sequências",
     "planLabel": "Plano:",
     "plans": {
@@ -1594,7 +1727,9 @@ export const I18N: Record<Language, Translations> = {
       "suggestedOddsLabel": "ODD ESTIMADA",
       "leagueQualityLabel": "QUALIDADE LIGA",
       "pushAlertTitle": "🔔 Configurar Alerta Push (10 min antes)",
-      "noOpportunities": "Nenhuma oportunidade encontrada com o filtro selecionado."
+      "noOpportunities": "Nenhuma oportunidade encontrada com o filtro selecionado.",
+      "peopleAnalyzing": "pessoas analisando",
+      "topPick": "Destaque",
     },
     "dashboard": {
       "title": "RASTREADORES",
@@ -1643,7 +1778,13 @@ export const I18N: Record<Language, Translations> = {
       "closeDropdownBtn": "✕ Fechar Rodadas",
       "nextRoundTitle": "Próxima Rodada a Ser Disputada",
       "nextRoundBadge": "PRÓXIMA RODADA",
-      "previousRoundsBadge": "RODADA ANTERIOR"
+      "previousRoundsBadge": "RODADA ANTERIOR",
+      "statisticalValue": "Valor Estatístico",
+      "detectedStreak": "Sequência detectada",
+      "historicalBehavior": "Comportamento histórico",
+      "similarCases": "Casos similares",
+      "historicalResult": "Resultado histórico",
+      "currentEvaluation": "Avaliação atual",
     },
     "counters": {
       "orange": "Laranjas",
@@ -1995,6 +2136,33 @@ export const I18N: Record<Language, Translations> = {
       "newOpBtn": "➕ Nova Operação",
       "exportExcelBtn": "📥 Baixar Excel (.xlsx)",
       "exportCsvBtn": "📄 Exportar CSV",
+      "newMovementBtn": "💵 Movimentação de Capital",
+      "tabMovements": "💳 Fluxo de Capital & Despesas",
+      "filterPeriod": "Filtrar Período:",
+      "fromLabel": "De:",
+      "toLabel": "Até:",
+      "applyBtn": "Aplicar",
+      "allDatesBtn": "🌐 Todas as Datas",
+      "todayBtn": "Hoje",
+      "last7DaysBtn": "Últimos 7 dias",
+      "thisMonthBtn": "Este Mês",
+      "reconciliationTitle": "CONCILIAÇÃO & QUADRATURA DE BANCA",
+      "reconciliationAudit": "Auditoria Contábil Exata",
+      "fullHistoryTag": "Histórico Completo",
+      "recInitialCapital": "Capital Inicial",
+      "recInjections": "Aportes / Depósitos",
+      "recWithdrawals": "Retiradas / Saques",
+      "recExpenses": "Despesas / Custos Operacionais",
+      "recTradingPnl": "P&L Líquido Trading",
+      "recCurrentCapital": "CAPITAL TOTAL ATUAL",
+      "excelModalTitle": "📥 Baixar Relatório em Excel (.xlsx)",
+      "excelModalDesc": "Exporte seu livro contábil profissional com abas de Resumo & Conciliação, Diário de Operações e Fluxo de Capital.",
+      "excelRangeLabel": "Selecione o intervalo de datas a exportar:",
+      "excelAllOption": "Todas as Datas (Histórico Completo)",
+      "excelCurrentOption": "Período Filtrado na Tela",
+      "excelCustomOption": "Intervalo Personalizado (De / Até)",
+      "excelDownloadBtn": "📥 Gerar e Baixar .xlsx",
+      "excelCancelBtn": "Cancelar",
       "capitalInitial": "Capital Inicial",
       "capitalCurrent": "Capital Atual",
       "totalPnl": "Resultado Líquido (P&L)",
@@ -2037,6 +2205,13 @@ export const I18N: Record<Language, Translations> = {
     }
   },
   "gn": {
+    "bottomNav": {
+      "explore": "Eheka",
+      "trackers": "Rastreadores",
+      "bankroll": "Banca",
+      "vipBot": "Bot VIP",
+      "plans": "Planes"
+    },
     "appTitle": "Rastreador de Rachas",
     "planLabel": "Plan:",
     "plans": {
@@ -2119,7 +2294,9 @@ export const I18N: Record<Language, Translations> = {
       "suggestedOddsLabel": "CUOTA ESTIMADA",
       "leagueQualityLabel": "LIGA CALIDAD",
       "pushAlertTitle": "🔔 Emohenda Push Alerta (10 min mboyve)",
-      "noOpportunities": "Ndaipóri oportunidad ko filtro rupive."
+      "noOpportunities": "Ndaipóri oportunidad ko filtro rupive.",
+      "peopleAnalyzing": "tapicha ohesa'ỹijóva",
+      "topPick": "Top Pick",
     },
     "dashboard": {
       "title": "RASTREADORES",
@@ -2168,7 +2345,13 @@ export const I18N: Record<Language, Translations> = {
       "closeDropdownBtn": "✕ Mboty Jornadas",
       "nextRoundTitle": "Jornada Oúva Oñeha'ãta",
       "nextRoundBadge": "JORNADA OÚVA",
-      "previousRoundsBadge": "JORNADA MBOYVE"
+      "previousRoundsBadge": "JORNADA MBOYVE",
+      "statisticalValue": "Valor Estadístico",
+      "detectedStreak": "Racha ojejuhúva",
+      "historicalBehavior": "Comportamiento histórico",
+      "similarCases": "Casos similares",
+      "historicalResult": "Resultado histórico",
+      "currentEvaluation": "Evaluación actual",
     },
     "counters": {
       "orange": "Narãmby",
@@ -2518,6 +2701,33 @@ export const I18N: Record<Language, Translations> = {
       "newOpBtn": "➕ Operación Pyahu",
       "exportExcelBtn": "📥 Emboguejy Excel (.xlsx)",
       "exportCsvBtn": "📄 Exportar CSV",
+      "newMovementBtn": "💵 Capital Ñemomýi",
+      "tabMovements": "💳 Capital Syry & Ñembyai",
+      "filterPeriod": "Filtrar Periodo:",
+      "fromLabel": "Guive:",
+      "toLabel": "Peve:",
+      "applyBtn": "Aplicar",
+      "allDatesBtn": "🌐 Opaite Arange",
+      "todayBtn": "Ko ára",
+      "last7DaysBtn": "Ohasáva 7 ára",
+      "thisMonthBtn": "Ko Jasy",
+      "reconciliationTitle": "CONCILIACIÓN & CUADRATURA DE BALANCE",
+      "reconciliationAudit": "Auditoría Contable Exacta",
+      "fullHistoryTag": "Historial Completo",
+      "recInitialCapital": "Capital Inicial",
+      "recInjections": "Inyecciones / Depósitos",
+      "recWithdrawals": "Extracciones / Retiros",
+      "recExpenses": "Gastos / Costos Actividad",
+      "recTradingPnl": "P&L Neto Trading",
+      "recCurrentCapital": "CAPITAL TOTAL KO'ÁG̃AGUA",
+      "excelModalTitle": "📥 Descargar Informe en Excel (.xlsx)",
+      "excelModalDesc": "Exporta tu libro contable profesional.",
+      "excelRangeLabel": "Eiporavo arange:",
+      "excelAllOption": "Opaite Arange (Historial Completo)",
+      "excelCurrentOption": "Periodo Filtrado en Pantalla",
+      "excelCustomOption": "Rango Personalizado (Guive / Peve)",
+      "excelDownloadBtn": "📥 Descargar .xlsx",
+      "excelCancelBtn": "Cancelar",
       "capitalInitial": "Capital Inicial",
       "capitalCurrent": "Capital Ko'ág̃agua",
       "totalPnl": "Resultado Neto (P&L)",
@@ -2560,3 +2770,58 @@ export const I18N: Record<Language, Translations> = {
     }
   }
 };
+
+
+export const COUNTRY_NAMES: Record<string, Record<Language, string>> = {
+  "Argentina": { es: "Argentina", en: "Argentina", pt: "Argentina", gn: "Argentina" },
+  "Sudamérica": { es: "Sudamérica", en: "South America", pt: "América do Sul", gn: "Sudamérica" },
+  "Australia": { es: "Australia", en: "Australia", pt: "Austrália", gn: "Australia" },
+  "Azerbaiyán": { es: "Azerbaiyán", en: "Azerbaijan", pt: "Azerbaijão", gn: "Azerbaiyán" },
+  "Bélgica": { es: "Bélgica", en: "Belgium", pt: "Bélgica", gn: "Bélgica" },
+  "Bosnia": { es: "Bosnia", en: "Bosnia", pt: "Bósnia", gn: "Bosnia" },
+  "Brasil": { es: "Brasil", en: "Brazil", pt: "Brasil", gn: "Brasil" },
+  "Bulgaria": { es: "Bulgaria", en: "Bulgaria", pt: "Bulgária", gn: "Bulgaria" },
+  "Canadá": { es: "Canadá", en: "Canada", pt: "Canadá", gn: "Canadá" },
+  "Chile": { es: "Chile", en: "Chile", pt: "Chile", gn: "Chile" },
+  "Chipre": { es: "Chipre", en: "Cyprus", pt: "Chipre", gn: "Chipre" },
+  "Colombia": { es: "Colombia", en: "Colombia", pt: "Colômbia", gn: "Colombia" },
+  "Croacia": { es: "Croacia", en: "Croatia", pt: "Croácia", gn: "Croacia" },
+  "Dinamarca": { es: "Dinamarca", en: "Denmark", pt: "Dinamarca", gn: "Dinamarca" },
+  "Ecuador": { es: "Ecuador", en: "Ecuador", pt: "Equador", gn: "Ecuador" },
+  "Egipto": { es: "Egipto", en: "Egypt", pt: "Egito", gn: "Egipto" },
+  "Eslovenia": { es: "Eslovenia", en: "Slovenia", pt: "Eslovênia", gn: "Eslovenia" },
+  "España": { es: "España", en: "Spain", pt: "Espanha", gn: "España" },
+  "Estonia": { es: "Estonia", en: "Estonia", pt: "Estônia", gn: "Estonia" },
+  "Francia": { es: "Francia", en: "France", pt: "França", gn: "Francia" },
+  "Grecia": { es: "Grecia", en: "Greece", pt: "Grécia", gn: "Grecia" },
+  "Holanda": { es: "Holanda", en: "Netherlands", pt: "Holanda", gn: "Holanda" },
+  "Inglaterra": { es: "Inglaterra", en: "England", pt: "Inglaterra", gn: "Inglaterra" },
+  "Italia": { es: "Italia", en: "Italy", pt: "Itália", gn: "Italia" },
+  "Jordania": { es: "Jordania", en: "Jordan", pt: "Jordânia", gn: "Jordania" },
+  "Kuwait": { es: "Kuwait", en: "Kuwait", pt: "Kuwait", gn: "Kuwait" },
+  "Lituania": { es: "Lituania", en: "Lithuania", pt: "Lituânia", gn: "Lituania" },
+  "Malasia": { es: "Malasia", en: "Malaysia", pt: "Malásia", gn: "Malasia" },
+  "Marruecos": { es: "Marruecos", en: "Morocco", pt: "Marrocos", gn: "Marruecos" },
+  "Paraguay": { es: "Paraguay", en: "Paraguay", pt: "Paraguai", gn: "Paraguái" },
+  "Perú": { es: "Perú", en: "Peru", pt: "Peru", gn: "Perú" },
+  "Polonia": { es: "Polonia", en: "Poland", pt: "Polônia", gn: "Polonia" },
+  "Portugal": { es: "Portugal", en: "Portugal", pt: "Portugal", gn: "Portugal" },
+  "Qatar": { es: "Qatar", en: "Qatar", pt: "Catar", gn: "Qatar" },
+  "Rumania": { es: "Rumania", en: "Romania", pt: "Romênia", gn: "Rumania" },
+  "Tanzania": { es: "Tanzania", en: "Tanzania", pt: "Tanzânia", gn: "Tanzania" },
+  "Turquía": { es: "Turquía", en: "Turkey", pt: "Turquia", gn: "Turquía" },
+  "Uruguay": { es: "Uruguay", en: "Uruguay", pt: "Uruguai", gn: "Uruguay" },
+  "Hong Kong": { es: "Hong Kong", en: "Hong Kong", pt: "Hong Kong", gn: "Hong Kong" },
+  "Hungría": { es: "Hungría", en: "Hungary", pt: "Hungria", gn: "Hungría" },
+  "México": { es: "México", en: "Mexico", pt: "México", gn: "México" },
+  "Panamá": { es: "Panamá", en: "Panama", pt: "Panamá", gn: "Panamá" },
+  "Letonia": { es: "Letonia", en: "Latvia", pt: "Letônia", gn: "Letonia" },
+  "Internacional": { es: "Internacional", en: "International", pt: "Internacional", gn: "Internacional" }
+};
+
+export function getTranslatedCountry(country: string, lang: Language): string {
+  if (!country) return '';
+  const entry = COUNTRY_NAMES[country];
+  if (entry && entry[lang]) return entry[lang];
+  return country;
+}

@@ -1326,14 +1326,14 @@
           <div class="bankroll-date-filter-bar" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <span style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 0.35rem;">
-                📅 <span>Filtrar Periodo:</span>
+                📅 <span id="bankroll-lbl-filter-period">Filtrar Periodo:</span>
               </span>
               <div style="display: flex; align-items: center; gap: 0.35rem;">
-                <label for="bankroll-filter-from" style="font-size: 0.72rem; color: #94a3b8; margin: 0;">Desde:</label>
+                <label for="bankroll-filter-from" id="bankroll-lbl-from" style="font-size: 0.72rem; color: #94a3b8; margin: 0;">Desde:</label>
                 <input type="date" id="bankroll-filter-from" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.35rem; color: #fff;" />
               </div>
               <div style="display: flex; align-items: center; gap: 0.35rem;">
-                <label for="bankroll-filter-to" style="font-size: 0.72rem; color: #94a3b8; margin: 0;">Hasta:</label>
+                <label for="bankroll-filter-to" id="bankroll-lbl-to" style="font-size: 0.72rem; color: #94a3b8; margin: 0;">Hasta:</label>
                 <input type="date" id="bankroll-filter-to" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.35rem; color: #fff;" />
               </div>
               <button id="bankroll-filter-apply-btn" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.25rem 0.7rem; border-radius: 0.35rem;">🔍 Aplicar</button>
@@ -1350,40 +1350,40 @@
           <!-- Balance Reconciliation Equation Box -->
           <div id="bankroll-reconciliation-box" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.75rem; padding: 0.85rem 1.15rem; margin-bottom: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.4rem;">
-              <span style="font-size: 0.82rem; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 0.4rem;">
-                ⚖️ CONCILIACIÓN & CUADRATURA DE BALANCE
+              <span id="bankroll-reconciliation-title" style="font-size: 0.82rem; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 0.4rem;">
+                ⚖️ <span id="rec-lbl-title">CONCILIACIÓN & CUADRATURA DE BALANCE</span>
                 <span id="bankroll-filter-status-tag" style="font-size: 0.68rem; font-weight: 600; color: #94a3b8; margin-left: 0.4rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 0.3rem;">(Historial Completo)</span>
               </span>
-              <span style="font-size: 0.7rem; color: #4ade80; font-weight: 700;">Auditoría Contable Exacta</span>
+              <span id="rec-lbl-audit" style="font-size: 0.7rem; color: #4ade80; font-weight: 700;">Auditoría Contable Exacta</span>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; font-size: 0.78rem;">
               <div>
-                <span style="color: #94a3b8; display: block; font-size: 0.68rem;">Capital Inicial</span>
+                <span id="rec-lbl-init" style="color: #94a3b8; display: block; font-size: 0.68rem;">Capital Inicial</span>
                 <strong id="rec-init-cap" style="color: #fff;">$1,000.00</strong>
               </div>
               <span style="color: #4ade80; font-weight: 900; font-size: 1rem;">+</span>
               <div>
-                <span style="color: #94a3b8; display: block; font-size: 0.68rem;">Inyecciones / Depósitos</span>
+                <span id="rec-lbl-inj" style="color: #94a3b8; display: block; font-size: 0.68rem;">Inyecciones / Depósitos</span>
                 <strong id="rec-total-inj" style="color: #4ade80;">+$500.00</strong>
               </div>
               <span style="color: #f87171; font-weight: 900; font-size: 1rem;">-</span>
               <div>
-                <span style="color: #94a3b8; display: block; font-size: 0.68rem;">Extracciones / Retiros</span>
+                <span id="rec-lbl-with" style="color: #94a3b8; display: block; font-size: 0.68rem;">Extracciones / Retiros</span>
                 <strong id="rec-total-with" style="color: #f87171;">-$100.00</strong>
               </div>
               <span style="color: #fb923c; font-weight: 900; font-size: 1rem;">-</span>
               <div>
-                <span style="color: #94a3b8; display: block; font-size: 0.68rem;">Gastos / Costos Actividad</span>
+                <span id="rec-lbl-exp" style="color: #94a3b8; display: block; font-size: 0.68rem;">Gastos / Costos Actividad</span>
                 <strong id="rec-total-exp" style="color: #fb923c;">-$39.00</strong>
               </div>
               <span style="color: #38bdf8; font-weight: 900; font-size: 1rem;">+</span>
               <div>
-                <span style="color: #94a3b8; display: block; font-size: 0.68rem;">P&L Neto Trading</span>
+                <span id="rec-lbl-pnl" style="color: #94a3b8; display: block; font-size: 0.68rem;">P&L Neto Trading</span>
                 <strong id="rec-trading-pnl" style="color: #38bdf8;">+$93.00</strong>
               </div>
               <span style="color: #fff; font-weight: 900; font-size: 1.1rem;">=</span>
               <div style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); padding: 0.35rem 0.75rem; border-radius: 0.5rem; text-align: center;">
-                <span style="color: #38bdf8; display: block; font-size: 0.68rem; font-weight: 800;">CAPITAL TOTAL ACTUAL</span>
+                <span id="rec-lbl-current" style="color: #38bdf8; display: block; font-size: 0.68rem; font-weight: 800;">CAPITAL TOTAL ACTUAL</span>
                 <strong id="rec-final-balance" style="color: #fff; font-size: 1.1rem;">$1,454.00</strong>
               </div>
             </div>
@@ -1691,36 +1691,36 @@
       <!-- Sub-Modal: Descargar Excel con Filtro de Fechas -->
       <dialog id="bankroll-excel-export-modal" class="custom-dialog" style="width: 90vw; max-width: 480px; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.3); color: var(--text-main); background: #0f172a; box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
-          <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem;">📥 Descargar Informe en Excel (.xlsx)</h3>
+          <h3 id="excel-export-modal-title" style="font-size: 1.05rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem;">📥 Descargar Informe en Excel (.xlsx)</h3>
           <button id="close-excel-export-modal" class="btn" style="padding: 0.2rem 0.5rem;">✕</button>
         </div>
         <div>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <p id="excel-export-modal-desc" style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem;">
             Exporta tu libro contable profesional con hojas de <strong>Resumen & Conciliación</strong>, <strong>Registro de Operaciones</strong> y <strong>Flujo de Capital</strong>.
           </p>
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem; padding: 0.85rem; margin-bottom: 1rem;">
-            <label style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 0.6rem;">Selecciona el rango de fechas a exportar:</label>
+            <label id="excel-export-range-label" style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 0.6rem;">Selecciona el rango de fechas a exportar:</label>
             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; cursor: pointer; color: #fff;">
                 <input type="radio" name="excel-export-mode" value="all" checked id="excel-export-mode-all" />
-                <span><strong>Todas las Fechas</strong> (Historial Completo)</span>
+                <span id="excel-export-lbl-all"><strong>Todas las Fechas</strong> (Historial Completo)</span>
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; cursor: pointer; color: #fff;">
                 <input type="radio" name="excel-export-mode" value="current" id="excel-export-mode-current" />
-                <span><strong>Periodo Filtrado en Pantalla</strong></span>
+                <span id="excel-export-lbl-current"><strong>Periodo Filtrado en Pantalla</strong></span>
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; cursor: pointer; color: #fff;">
                 <input type="radio" name="excel-export-mode" value="custom" id="excel-export-mode-custom" />
-                <span><strong>Rango Personalizado</strong> (Desde / Hasta)</span>
+                <span id="excel-export-lbl-custom"><strong>Rango Personalizado</strong> (Desde / Hasta)</span>
               </label>
             </div>
             <div id="excel-export-range-controls" style="display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); gap: 0.5rem; flex-wrap: wrap;">
               <div style="flex: 1; min-width: 140px;">
-                <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">Desde:</label>
+                <label id="excel-export-lbl-from" style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">Desde:</label>
                 <input type="date" id="excel-export-from" style="width: 100%; padding: 0.35rem 0.5rem; font-size: 0.75rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.35rem; color: #fff;" />
               </div>
               <div style="flex: 1; min-width: 140px;">
-                <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">Hasta:</label>
+                <label id="excel-export-lbl-to" style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">Hasta:</label>
                 <input type="date" id="excel-export-to" style="width: 100%; padding: 0.35rem 0.5rem; font-size: 0.75rem; background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.35rem; color: #fff;" />
               </div>
             </div>

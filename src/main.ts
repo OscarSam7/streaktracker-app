@@ -44,7 +44,7 @@ import {
   type OperationStatus,
   type CapitalMovementType
 } from './logic/bankroll';
-import { I18N, type Language, type Translations } from './config/i18n';
+import { I18N, type Language, type Translations, getTranslatedCountry } from './config/i18n';
 import { runHistoricalBacktest } from './logic/backtest';
 import { getAuditStats } from './logic/audit';
 import { getAcademyLessons } from './logic/academy';
@@ -433,7 +433,8 @@ function startLiveSecondsTicker() {
       if (!matchId) return;
       const match = state.liveMatches.find(m => m.id === matchId);
       if (match) {
-        const timerText = `EN VIVO • ${formatLiveElapsedWithSeconds(match)}`;
+        const liveLabel = (t().opportunitiesCenter.fLive || '🔴 EN VIVO').replace(/🔴\s*/, '').trim();
+        const timerText = `${liveLabel} • ${formatLiveElapsedWithSeconds(match)}`;
         if (el.textContent !== timerText) {
           el.textContent = timerText;
         }
@@ -814,25 +815,26 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
         marketLabel,
         streakInfo.current,
         streakInfo.previous,
-        liveMatch ? `${liveMatch.homeTeam} vs ${liveMatch.awayTeam}` : 'Próximo partido'
+        liveMatch ? `${liveMatch.homeTeam} vs ${liveMatch.awayTeam}` : (lang.dashboard.waitingSchedule || 'Próximo partido'),
+        state.currentLang
       );
 
       const signalScoreBadge = isAlert ? `
         <div style="margin-top:0.25rem; font-size:0.62rem; background:rgba(0,0,0,0.35); padding:0.25rem 0.35rem; border-radius:5px; border:1px solid ${signalData.tierColor}30; display:flex; flex-direction:column; gap:0.15rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.15rem;">
             <span style="font-weight:800; color:${signalData.tierColor}; display:inline-flex; align-items:center; gap:0.2rem;">
-              ⚡ Valor Estadístico: <strong>${signalData.signalScore}</strong>/100 [${signalData.tier}]
+              ⚡ ${lang.streaks.statisticalValue || 'Valor Estadístico'}: <strong>${signalData.signalScore}</strong>/100 [${signalData.tier}]
             </span>
             <span style="color:#94a3b8;" title="Cuota de mercado y probabilidad implícita">
               🎯 @<strong>${signalData.suggestedOdds.toFixed(2)}</strong> (${signalData.impliedProbabilityPct}%)
             </span>
           </div>
           <div style="font-size:0.58rem; color:#94a3b8; display:flex; flex-direction:column; gap:0.08rem; padding-top:0.05rem;">
-            <div>• <span style="color:#cbd5e1;">Racha detectada:</span> <strong>${signalData.opportunity.detectedStreakSummary}</strong></div>
-            <div>• <span style="color:#cbd5e1;">Comportamiento histórico:</span> ${signalData.opportunity.historicalBehaviorSummary}</div>
-            <div>• <span style="color:#cbd5e1;">Casos similares:</span> ${signalData.opportunity.similarCasesSummary}</div>
-            <div>• <span style="color:#cbd5e1;">Resultado histórico:</span> ${signalData.opportunity.historicalResultSummary}</div>
-            <div>• <span style="color:#38bdf8;">Evaluación actual:</span> ${signalData.opportunity.currentEvaluationSummary}</div>
+            <div>• <span style="color:#cbd5e1;">${lang.streaks.detectedStreak || 'Racha detectada'}:</span> <strong>${signalData.opportunity.detectedStreakSummary}</strong></div>
+            <div>• <span style="color:#cbd5e1;">${lang.streaks.historicalBehavior || 'Comportamiento histórico'}:</span> ${signalData.opportunity.historicalBehaviorSummary}</div>
+            <div>• <span style="color:#cbd5e1;">${lang.streaks.similarCases || 'Casos similares'}:</span> ${signalData.opportunity.similarCasesSummary}</div>
+            <div>• <span style="color:#cbd5e1;">${lang.streaks.historicalResult || 'Resultado histórico'}:</span> ${signalData.opportunity.historicalResultSummary}</div>
+            <div>• <span style="color:#38bdf8;">${lang.streaks.currentEvaluation || 'Evaluación actual'}:</span> ${signalData.opportunity.currentEvaluationSummary}</div>
           </div>
           <div style="margin-top:0.15rem; padding-top:0.15rem; border-top:1px dashed rgba(255,255,255,0.06); font-size:0.56rem; display:flex; flex-direction:column; gap:0.05rem;">
             <div style="font-weight:800; color:${signalData.confidence.color}; display:flex; align-items:center; gap:0.2rem;">
@@ -1604,14 +1606,15 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       const colorClass = getStreakColorClass(m.info.current, m.isG1);
       // Incluir solo si es una alerta activa detectable (Amarilla, Naranja, Azul, Verde)
       if (colorClass !== '') {
-        const sig = computeSignalScore(lid, m.key, m.label, m.info.current, m.info.previous, fixtureName);
+        const sig = computeSignalScore(lid, m.key, m.label, m.info.current, m.info.previous, fixtureName, state.currentLang);
         const leagueVal = validateLeagueEligibility(lid);
         const actionLabel = getActionMarketLabel(m.key, lang).replace(/^🎯\s*(?:Operar|Action):\s*/i, '');
+        const translatedCountry = getTranslatedCountry(leagueInfo.country, state.currentLang);
 
         allOpportunities.push({
           leagueId: lid,
           leagueName: leagueInfo.name,
-          country: leagueInfo.country,
+          country: translatedCountry,
           flag: leagueInfo.flag || '⚽',
           fixtureName,
           matchTimeStr,
@@ -1957,10 +1960,10 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       <!-- Social Proof & Live Watchers Footer -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.45rem; padding-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.62rem; color: #94a3b8;">
         <span style="display: flex; align-items: center; gap: 0.25rem;">
-          <span>👁</span> <strong style="color: #cbd5e1;">${135 + ((opp.leagueId * 17 + opp.signalScore * 3) % 185)}</strong> personas analizando
+          <span>👁</span> <strong style="color: #cbd5e1;">${135 + ((opp.leagueId * 17 + opp.signalScore * 3) % 185)}</strong> ${lang.opportunitiesCenter.peopleAnalyzing || 'personas analizando'}
         </span>
         <span style="color: #4ade80; font-weight: 800; display: inline-flex; align-items: center; gap: 0.25rem;">
-          <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block; box-shadow: 0 0 6px #4ade80;"></span> Top Pick
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block; box-shadow: 0 0 6px #4ade80;"></span> ${lang.opportunitiesCenter.topPick || 'Top Pick'}
         </span>
       </div>
     `;
@@ -2877,17 +2880,103 @@ function updateBankrollModalTexts() {
   const newOpBtn = document.getElementById('bankroll-new-op-btn');
   if (newOpBtn) newOpBtn.innerText = lang.bankroll.newOpBtn;
 
+  const newMovBtn = document.getElementById('bankroll-new-movement-btn');
+  if (newMovBtn) newMovBtn.innerText = lang.bankroll.newMovementBtn;
+
   const xlsxBtn = document.getElementById('bankroll-download-xlsx-btn');
   if (xlsxBtn) xlsxBtn.innerText = lang.bankroll.exportExcelBtn;
 
   const tabDash = document.querySelector('[data-tab="tab-dashboard"]') as HTMLElement;
   const tabOps = document.querySelector('[data-tab="tab-operations"]') as HTMLElement;
+  const tabMovs = document.querySelector('[data-tab="tab-movements"]') as HTMLElement;
   const tabCalc = document.querySelector('[data-tab="tab-calculator"]') as HTMLElement;
   const tabCfg = document.querySelector('[data-tab="tab-config"]') as HTMLElement;
   if (tabDash) tabDash.innerText = lang.bankroll.tabDashboard;
   if (tabOps) tabOps.innerText = lang.bankroll.tabOperations;
+  if (tabMovs) tabMovs.innerText = lang.bankroll.tabMovements;
   if (tabCalc) tabCalc.innerText = lang.bankroll.tabCalculator;
   if (tabCfg) tabCfg.innerText = lang.bankroll.tabConfig;
+
+  // Date Filter Bar
+  const lblFilterPeriod = document.getElementById('bankroll-lbl-filter-period');
+  if (lblFilterPeriod) lblFilterPeriod.innerText = lang.bankroll.filterPeriod;
+
+  const lblFrom = document.getElementById('bankroll-lbl-from');
+  if (lblFrom) lblFrom.innerText = lang.bankroll.fromLabel;
+
+  const lblTo = document.getElementById('bankroll-lbl-to');
+  if (lblTo) lblTo.innerText = lang.bankroll.toLabel;
+
+  const filterApplyBtn = document.getElementById('bankroll-filter-apply-btn');
+  if (filterApplyBtn) filterApplyBtn.innerText = lang.bankroll.applyBtn;
+
+  const filterAllBtn = document.getElementById('bankroll-filter-all-btn');
+  if (filterAllBtn) filterAllBtn.innerText = lang.bankroll.allDatesBtn;
+
+  const filterTodayBtn = document.getElementById('bankroll-filter-today-btn');
+  if (filterTodayBtn) filterTodayBtn.innerText = lang.bankroll.todayBtn;
+
+  const filter7daysBtn = document.getElementById('bankroll-filter-7days-btn');
+  if (filter7daysBtn) filter7daysBtn.innerText = lang.bankroll.last7DaysBtn;
+
+  const filterMonthBtn = document.getElementById('bankroll-filter-month-btn');
+  if (filterMonthBtn) filterMonthBtn.innerText = lang.bankroll.thisMonthBtn;
+
+  // Reconciliation Box
+  const recTitle = document.getElementById('rec-lbl-title');
+  if (recTitle) recTitle.innerText = lang.bankroll.reconciliationTitle;
+
+  const recAudit = document.getElementById('rec-lbl-audit');
+  if (recAudit) recAudit.innerText = lang.bankroll.reconciliationAudit;
+
+  const recInit = document.getElementById('rec-lbl-init');
+  if (recInit) recInit.innerText = lang.bankroll.recInitialCapital;
+
+  const recInj = document.getElementById('rec-lbl-inj');
+  if (recInj) recInj.innerText = lang.bankroll.recInjections;
+
+  const recWith = document.getElementById('rec-lbl-with');
+  if (recWith) recWith.innerText = lang.bankroll.recWithdrawals;
+
+  const recExp = document.getElementById('rec-lbl-exp');
+  if (recExp) recExp.innerText = lang.bankroll.recExpenses;
+
+  const recPnl = document.getElementById('rec-lbl-pnl');
+  if (recPnl) recPnl.innerText = lang.bankroll.recTradingPnl;
+
+  const recCurrent = document.getElementById('rec-lbl-current');
+  if (recCurrent) recCurrent.innerText = lang.bankroll.recCurrentCapital;
+
+  // Excel Export Modal Texts
+  const excelTitle = document.getElementById('excel-export-modal-title');
+  if (excelTitle) excelTitle.innerHTML = lang.bankroll.excelModalTitle;
+
+  const excelDesc = document.getElementById('excel-export-modal-desc');
+  if (excelDesc) excelDesc.innerHTML = lang.bankroll.excelModalDesc;
+
+  const excelRange = document.getElementById('excel-export-range-label');
+  if (excelRange) excelRange.innerText = lang.bankroll.excelRangeLabel;
+
+  const excelAll = document.getElementById('excel-export-lbl-all');
+  if (excelAll) excelAll.innerHTML = lang.bankroll.excelAllOption;
+
+  const excelCur = document.getElementById('excel-export-lbl-current');
+  if (excelCur) excelCur.innerHTML = lang.bankroll.excelCurrentOption;
+
+  const excelCus = document.getElementById('excel-export-lbl-custom');
+  if (excelCus) excelCus.innerHTML = lang.bankroll.excelCustomOption;
+
+  const excelFrom = document.getElementById('excel-export-lbl-from');
+  if (excelFrom) excelFrom.innerText = lang.bankroll.fromLabel;
+
+  const excelTo = document.getElementById('excel-export-lbl-to');
+  if (excelTo) excelTo.innerText = lang.bankroll.toLabel;
+
+  const excelCancelBtn = document.getElementById('cancel-excel-export-btn');
+  if (excelCancelBtn) excelCancelBtn.innerText = lang.bankroll.excelCancelBtn;
+
+  const excelConfirmBtn = document.getElementById('confirm-excel-export-btn');
+  if (excelConfirmBtn) excelConfirmBtn.innerText = lang.bankroll.excelDownloadBtn;
 
   const calcH3 = modal.querySelector('#tab-calculator h3');
   if (calcH3) calcH3.textContent = lang.bankroll.calcTitle;
@@ -3204,6 +3293,19 @@ function updateStaticLanguageTexts() {
 
   if (generateTelegramAlertBtn) generateTelegramAlertBtn.innerText = lang.telegramModal.generateBtn;
   if (copyTelegramAlertBtn) copyTelegramAlertBtn.innerText = lang.telegramModal.copyBtn;
+
+  // Bottom Navigation Bar
+  const bnavOpps = document.querySelector('#bnav-opps .bnav-text') as HTMLElement;
+  const bnavTrackers = document.querySelector('#bnav-trackers .bnav-text') as HTMLElement;
+  const bnavBankroll = document.querySelector('#bnav-bankroll .bnav-text') as HTMLElement;
+  const bnavTelegram = document.querySelector('#bnav-telegram .bnav-text') as HTMLElement;
+  const bnavPlans = document.querySelector('#bnav-plans .bnav-text') as HTMLElement;
+
+  if (bnavOpps && lang.bottomNav?.explore) bnavOpps.innerText = lang.bottomNav.explore;
+  if (bnavTrackers && lang.bottomNav?.trackers) bnavTrackers.innerText = lang.bottomNav.trackers;
+  if (bnavBankroll && lang.bottomNav?.bankroll) bnavBankroll.innerText = lang.bottomNav.bankroll;
+  if (bnavTelegram && lang.bottomNav?.vipBot) bnavTelegram.innerText = lang.bottomNav.vipBot;
+  if (bnavPlans && lang.bottomNav?.plans) bnavPlans.innerText = lang.bottomNav.plans;
 }
 
 // ---------------------------------------------------------
@@ -5565,13 +5667,18 @@ function refreshBankrollUI() {
 
   // Update Period Filter Status Tag
   const filterTag = document.getElementById('bankroll-filter-status-tag');
+  const lang = t();
   if (filterTag) {
     if (state.bankrollFilterFrom || state.bankrollFilterTo) {
-      filterTag.innerText = `(Periodo: ${state.bankrollFilterFrom || 'Inicio'} a ${state.bankrollFilterTo || 'Hoy'})`;
+      const pStart = state.bankrollFilterFrom || (state.currentLang === 'en' ? 'Start' : (state.currentLang === 'pt' ? 'Início' : 'Inicio'));
+      const pEnd = state.bankrollFilterTo || (state.currentLang === 'en' ? 'Today' : (state.currentLang === 'pt' ? 'Hoje' : 'Hoy'));
+      const pWord = state.currentLang === 'en' ? 'Period' : (state.currentLang === 'pt' ? 'Período' : 'Periodo');
+      const toWord = state.currentLang === 'en' ? 'to' : (state.currentLang === 'pt' ? 'a' : 'a');
+      filterTag.innerText = `(${pWord}: ${pStart} ${toWord} ${pEnd})`;
       filterTag.style.color = '#38bdf8';
       filterTag.style.background = 'rgba(56, 189, 248, 0.15)';
     } else {
-      filterTag.innerText = `(Historial Completo)`;
+      filterTag.innerText = `(${lang.bankroll?.fullHistoryTag || (state.currentLang === 'en' ? 'Full History' : 'Historial Completo')})`;
       filterTag.style.color = '#94a3b8';
       filterTag.style.background = 'rgba(255, 255, 255, 0.06)';
     }
