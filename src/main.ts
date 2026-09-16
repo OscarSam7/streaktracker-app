@@ -214,7 +214,7 @@ async function run() {
   setupTelegramModal();
   setupLeagueModal();
   setupPricingModal();
-  setupExportCsv();
+  setupStreaksReportModule();
   setupPlanSelector();
   setupBankrollModule();
   setupBacktestModule();
@@ -1068,9 +1068,9 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
     }
   }
 
-  // Export CSV button visibility
+  // Export CSV / Streaks Report button visibility
   if (exportCsvBtn) {
-    exportCsvBtn.style.display = state.currentPlan === 'VIP' ? 'inline-flex' : 'none';
+    exportCsvBtn.style.display = 'inline-flex';
   }
 }
 
@@ -2937,7 +2937,7 @@ function updateStaticLanguageTexts() {
   const bankrollBtn = document.getElementById('bankroll-btn');
   if (bankrollBtn) bankrollBtn.innerText = lang.header.bankroll;
 
-  if (exportCsvBtn) exportCsvBtn.innerText = lang.header.exportCsv;
+  if (exportCsvBtn) exportCsvBtn.innerHTML = `<span class="tool-icon">📋</span> ${lang.header.exportCsv.replace(/^[^\w\s]+/, '').trim()}`;
   if (telegramBtn) telegramBtn.innerText = lang.header.telegram;
   if (pricingBtn) pricingBtn.innerText = lang.header.pricing;
   if (refreshBtn) refreshBtn.title = lang.header.refreshTitle;
@@ -4677,17 +4677,20 @@ function updateLeagueModalToggles() {
 // EXPORT CSV (SYNDICATE VIP FEATURE)
 // ---------------------------------------------------------
 
-function setupExportCsv() {
-  if (!exportCsvBtn) return;
+function setupStreaksReportModule() {
+  const streaksReportModal = document.getElementById('streaks-report-modal') as HTMLDialogElement;
+  const closeStreaksReportModal = document.getElementById('close-streaks-report-modal') as HTMLButtonElement;
+  const reportDownloadCsvBtn = document.getElementById('streaks-report-download-csv-btn') as HTMLButtonElement;
+  const reportSearchInput = document.getElementById('streaks-report-search-input') as HTMLInputElement;
+  const reportFilterPills = document.querySelectorAll('#streaks-report-filter-pills .filter-pill') as NodeListOf<HTMLButtonElement>;
+  const reportCardsGrid = document.getElementById('streaks-report-cards-grid') as HTMLDivElement;
 
-  exportCsvBtn.addEventListener('click', () => {
-    const auth = authorizeAccess('VIP');
-    if (!auth.allowed) {
-      alert('🔒 La exportación a CSV/Excel es una función exclusiva de miembros VIP activos.');
-      pricingModal.showModal();
-      return;
-    }
+  if (!exportCsvBtn || !streaksReportModal) return;
 
+  let currentReportFilter: 'all' | 'alerts_only' | 'today' = 'all';
+  let currentReportSearch = '';
+
+  function executeCsvDownload() {
     const lang = t();
     const rows = [
       ['Liga', 'Pais', lang.markets.draw, lang.markets.over35, lang.markets.htDraw, lang.markets.bttsOver25, lang.markets.btts1H, 'Estado']
@@ -4715,11 +4718,278 @@ function setupExportCsv() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `REPORTE_RACHAS_MADURAS_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `INFORME_RACHAS_CONSOLIDADO_${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  function renderStreaksReportCards() {
+    if (!reportCardsGrid) return;
+    const lang = t();
+
+    let countGreen = 0;
+    let countBlue = 0;
+    let countYellow = 0;
+    let countOrange = 0;
+
+    const leaguesData: Array<{
+      leagueId: number;
+      name: string;
+      country: string;
+      flag: string;
+      qualityScore: number;
+      isLive: boolean;
+      isToday: boolean;
+      hasHighAlert: boolean;
+      markets: Array<{
+        key: string;
+        label: string;
+        current: number;
+        previous: number;
+        colorClass: string;
+        statusText: string;
+        badgeColor: string;
+        isG1: boolean;
+      }>;
+    }> = [];
+
+    state.activeLeagues.forEach(lid => {
+      const leagueInfo = Object.values(LEAGUES).find(l => l.id === lid);
+      if (!leagueInfo) return;
+
+      const emptyStreak = { current: 0, maxHistory: 0, previous: 0 };
+      const s = state.streaks[lid] || { 
+        draw: emptyStreak, 
+        over35: emptyStreak, 
+        htDraw: emptyStreak, 
+        bttsOver25: emptyStreak, 
+        btts1H: emptyStreak 
+      };
+
+      const leagueVal = validateLeagueEligibility(lid);
+      const isLive = state.liveMatches.some(m => m.leagueId === lid);
+      const validUpcoming = getValidUpcomingMatches(lid);
+      const isToday = isLive || (validUpcoming && validUpcoming.some(um => isDateToday(um.date)));
+
+      const rawMarkets = [
+        { key: 'draw', label: lang.markets.draw, info: s.draw, isG1: true },
+        { key: 'over35', label: lang.markets.over35, info: s.over35, isG1: true },
+        { key: 'htDraw', label: lang.markets.htDraw, info: s.htDraw, isG1: false },
+        { key: 'bttsOver25', label: lang.markets.bttsOver25, info: s.bttsOver25, isG1: false },
+        { key: 'btts1H', label: lang.markets.btts1H, info: s.btts1H, isG1: true }
+      ];
+
+      let leagueHasHighAlert = false;
+
+      const mappedMarkets = rawMarkets.map(m => {
+        const colorClass = getStreakColorClass(m.info.current, m.isG1);
+        if (colorClass === 'streak-green') { countGreen++; leagueHasHighAlert = true; }
+        else if (colorClass === 'streak-blue') { countBlue++; leagueHasHighAlert = true; }
+        else if (colorClass === 'streak-yellow') countYellow++;
+        else if (colorClass === 'streak-orange') countOrange++;
+
+        let statusText = 'Normal';
+        let badgeColor = '#64748b';
+
+        if (colorClass === 'streak-green') {
+          statusText = '🔥 MADURA';
+          badgeColor = '#4ade80';
+        } else if (colorClass === 'streak-blue') {
+          statusText = '⚡ FUERTE';
+          badgeColor = '#38bdf8';
+        } else if (colorClass === 'streak-orange') {
+          statusText = '🟠 MADURANDO';
+          badgeColor = '#fb923c';
+        } else if (colorClass === 'streak-yellow') {
+          statusText = '🟡 ATENCIÓN';
+          badgeColor = '#facc15';
+        }
+
+        return {
+          key: m.key,
+          label: m.label,
+          current: m.info.current,
+          previous: m.info.previous,
+          colorClass,
+          statusText,
+          badgeColor,
+          isG1: m.isG1
+        };
+      });
+
+      leaguesData.push({
+        leagueId: lid,
+        name: leagueInfo.name,
+        country: leagueInfo.country,
+        flag: leagueInfo.flag || '⚽',
+        qualityScore: leagueVal.quality.overallScore,
+        isLive,
+        isToday,
+        hasHighAlert: leagueHasHighAlert,
+        markets: mappedMarkets
+      });
+    });
+
+    // Update KPI Summary Badges
+    const elKpiLeagues = document.getElementById('report-kpi-leagues');
+    const elKpiGreen = document.getElementById('report-kpi-green');
+    const elKpiBlue = document.getElementById('report-kpi-blue');
+    const elKpiObs = document.getElementById('report-kpi-obs');
+
+    if (elKpiLeagues) elKpiLeagues.innerText = state.activeLeagues.length.toString();
+    if (elKpiGreen) elKpiGreen.innerText = countGreen.toString();
+    if (elKpiBlue) elKpiBlue.innerText = countBlue.toString();
+    if (elKpiObs) elKpiObs.innerText = (countYellow + countOrange).toString();
+
+    // Update Filter Pill Counts
+    const elFAll = document.getElementById('report-fcount-all');
+    const elFAlerts = document.getElementById('report-fcount-alerts');
+    const elFToday = document.getElementById('report-fcount-today');
+
+    if (elFAll) elFAll.innerText = leaguesData.length.toString();
+    if (elFAlerts) elFAlerts.innerText = leaguesData.filter(l => l.hasHighAlert).length.toString();
+    if (elFToday) elFToday.innerText = leaguesData.filter(l => l.isToday).length.toString();
+
+    // Filter leagues
+    const filteredLeagues = leaguesData.filter(l => {
+      if (currentReportFilter === 'alerts_only' && !l.hasHighAlert) return false;
+      if (currentReportFilter === 'today' && !l.isToday) return false;
+
+      if (currentReportSearch.trim() !== '') {
+        const q = currentReportSearch.toLowerCase();
+        const matchesLeague = l.name.toLowerCase().includes(q) || l.country.toLowerCase().includes(q);
+        const matchesMarket = l.markets.some(m => m.label.toLowerCase().includes(q));
+        if (!matchesLeague && !matchesMarket) return false;
+      }
+      return true;
+    });
+
+    // Render Cards
+    reportCardsGrid.innerHTML = '';
+
+    if (filteredLeagues.length === 0) {
+      reportCardsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem; background: rgba(15, 23, 42, 0.5); border-radius: 0.75rem; border: 1px dashed rgba(255,255,255,0.15);">
+          <span style="font-size: 1.8rem;">🔍</span>
+          <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.5rem; margin-bottom: 0;">No se encontraron ligas en el informe con los criterios seleccionados.</p>
+        </div>
+      `;
+      return;
+    }
+
+    filteredLeagues.forEach(league => {
+      const card = document.createElement('div');
+      card.className = 'streaks-report-card';
+      card.style.background = 'rgba(15, 23, 42, 0.85)';
+      card.style.border = league.hasHighAlert ? '1.5px solid rgba(56, 189, 248, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)';
+      card.style.borderRadius = '0.75rem';
+      card.style.padding = '0.85rem';
+      card.style.boxShadow = league.hasHighAlert ? '0 0 20px rgba(56, 189, 248, 0.12)' : 'none';
+
+      const marketsHTML = league.markets.map(m => {
+        const isHighlight = m.colorClass !== '';
+        const cutInfoHTML = m.previous > 0
+          ? `<span style="font-size: 0.58rem; color: #cbd5e1; font-weight: 700;">✂️ ${lang.streaks.brokenAt} <strong style="color:#38bdf8;">${m.previous}</strong></span>`
+          : `<span style="font-size: 0.55rem; color: #64748b;">✂️ 1ª racha</span>`;
+
+        return `
+          <div style="background: ${isHighlight ? 'rgba(30, 41, 59, 0.8)' : 'rgba(0,0,0,0.25)'}; border: 1px solid ${isHighlight ? m.badgeColor + '50' : 'rgba(255,255,255,0.05)'}; border-radius: 6px; padding: 0.4rem 0.55rem; display: flex; justify-content: space-between; align-items: center; gap: 0.4rem;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 0.7rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${m.label}
+              </div>
+              <div style="margin-top: 0.1rem;">
+                ${cutInfoHTML}
+              </div>
+            </div>
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.15rem;">
+              <div class="streak-badge ${m.colorClass}" style="font-size: 0.72rem; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 900; box-shadow: 0 0 8px ${m.badgeColor}40;">
+                ${m.current}
+              </div>
+              <span style="font-size: 0.55rem; font-weight: 800; color: ${m.badgeColor};">
+                ${m.statusText}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.6rem;">
+          <div style="display: flex; align-items: center; gap: 0.45rem;">
+            <span style="font-size: 1.15rem;">${league.flag}</span>
+            <div>
+              <h4 style="font-size: 0.85rem; font-weight: 800; color: #fff; margin: 0; line-height: 1.2;">${league.name}</h4>
+              <span style="font-size: 0.65rem; color: #94a3b8;">${league.country} • Calidad: ${league.qualityScore} pts</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.3rem; align-items: center;">
+            ${league.isLive ? '<span class="badge-live-pulse" style="font-size: 0.58rem; padding: 0.1rem 0.35rem;">🔴 EN VIVO</span>' : (league.isToday ? '<span style="font-size: 0.58rem; color: #f97316; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 4px; padding: 0.1rem 0.35rem; font-weight: 800;">🔥 HOY</span>' : '')}
+            <button class="btn btn-report-jump-league" data-league-id="${league.leagueId}" style="padding: 0.2rem 0.45rem; font-size: 0.65rem; font-weight: 700; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; cursor: pointer;" title="Ir a esta liga en el tablero principal">
+              🎯 Ver
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; gap: 0.35rem;">
+          ${marketsHTML}
+        </div>
+      `;
+
+      // Jump button click
+      const jumpBtn = card.querySelector('.btn-report-jump-league');
+      if (jumpBtn) {
+        jumpBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          streaksReportModal.close();
+          const targetCard = document.getElementById(`card-league-${league.leagueId}`);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.querySelectorAll('.league-card-highlighted').forEach(el => el.classList.remove('league-card-highlighted'));
+            targetCard.classList.add('league-card-highlighted');
+            setTimeout(() => targetCard.classList.remove('league-card-highlighted'), 2800);
+          }
+        });
+      }
+
+      reportCardsGrid.appendChild(card);
+    });
+  }
+
+  // Open modal button
+  exportCsvBtn.addEventListener('click', () => {
+    renderStreaksReportCards();
+    streaksReportModal.showModal();
+  });
+
+  if (closeStreaksReportModal) {
+    closeStreaksReportModal.addEventListener('click', () => {
+      streaksReportModal.close();
+    });
+  }
+
+  if (reportDownloadCsvBtn) {
+    reportDownloadCsvBtn.addEventListener('click', () => {
+      executeCsvDownload();
+    });
+  }
+
+  if (reportSearchInput) {
+    reportSearchInput.addEventListener('input', () => {
+      currentReportSearch = reportSearchInput.value;
+      renderStreaksReportCards();
+    });
+  }
+
+  reportFilterPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      reportFilterPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentReportFilter = (pill.getAttribute('data-report-filter') || 'all') as 'all' | 'alerts_only' | 'today';
+      renderStreaksReportCards();
+    });
   });
 }
 

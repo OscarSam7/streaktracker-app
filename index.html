@@ -141,7 +141,9 @@
         <a href="/landing.html" id="portal-web-btn" class="sports-tool-chip chip-portal" title="Ver Landing Page informativa">
           <span class="tool-icon">🌐</span> Portal Web
         </a>
-        <button id="export-csv-btn" class="btn" style="display: none;" title="Exportar resumen a Excel/CSV">📥 Exportar CSV</button>
+        <button id="export-csv-btn" class="sports-tool-chip chip-report" title="Ver Informe Visual Consolidado de Rachas en Pantalla">
+          <span class="tool-icon">📋</span> Informe de Rachas
+        </button>
         <button id="admin-panel-btn" class="btn" style="display: none;" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
       </div>
     </div>
@@ -252,6 +254,80 @@
         </div>
         <div id="telegram-copy-notice" style="display: none; text-align: center; color: #4ade80; font-size: 0.75rem; margin-top: 0.5rem; font-weight: 600;">
           ¡Copiado al portapapeles!
+        </div>
+      </dialog>
+
+      <!-- Modal Informe Visual Consolidado de Rachas (Tarjetas / Cards) -->
+      <dialog id="streaks-report-modal" class="custom-dialog" style="width: 95vw; max-width: 1150px; padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.4); color: var(--text-main); background: #0b1320; box-shadow: 0 0 50px rgba(0,0,0,0.85); overflow-y: auto; max-height: 90vh;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #059669, #10b981); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);">
+              📋
+            </div>
+            <div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+                Informe Consolidado de Rachas & Mercados
+                <span style="font-size: 0.65rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.1rem 0.45rem; border-radius: 9999px;">VISTA TARJETAS</span>
+              </h3>
+              <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.15rem; margin-bottom: 0;">Resumen ejecutivo en pantalla de todas las ligas activas y sus 5 mercados estadísticos</p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button id="streaks-report-download-csv-btn" class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.4rem 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Descargar copia del reporte en archivo CSV">
+              📥 Descargar CSV
+            </button>
+            <button id="close-streaks-report-modal" class="btn" style="padding: 0.35rem 0.75rem;">✕ Cerrar</button>
+          </div>
+        </div>
+
+        <!-- Global KPI Metric Cards (Tarjetas de Resumen Superior) -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.65rem; margin-bottom: 1rem;">
+          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.6rem; padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem;">
+            <span style="font-size: 1.5rem;">🏟️</span>
+            <div>
+              <span style="font-size: 0.68rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Ligas Activas</span>
+              <div id="report-kpi-leagues" style="font-size: 1.15rem; font-weight: 900; color: #fff;">0</div>
+            </div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(74, 222, 128, 0.3); border-radius: 0.6rem; padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 0 15px rgba(74, 222, 128, 0.1);">
+            <span style="font-size: 1.5rem;">🟢</span>
+            <div>
+              <span style="font-size: 0.68rem; color: #86efac; font-weight: 700; text-transform: uppercase;">Alertas Verdes (Max)</span>
+              <div id="report-kpi-green" style="font-size: 1.15rem; font-weight: 900; color: #4ade80;">0</div>
+            </div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 0.6rem; padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem; box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);">
+            <span style="font-size: 1.5rem;">🔵</span>
+            <div>
+              <span style="font-size: 0.68rem; color: #7dd3fc; font-weight: 700; text-transform: uppercase;">Alertas Azules (Fuerte)</span>
+              <div id="report-kpi-blue" style="font-size: 1.15rem; font-weight: 900; color: #38bdf8;">0</div>
+            </div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(250, 204, 21, 0.3); border-radius: 0.6rem; padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem;">
+            <span style="font-size: 1.5rem;">🟡</span>
+            <div>
+              <span style="font-size: 0.68rem; color: #fde047; font-weight: 700; text-transform: uppercase;">En Observación</span>
+              <div id="report-kpi-obs" style="font-size: 1.15rem; font-weight: 900; color: #facc15;">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar inside Report Modal -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; background: rgba(0,0,0,0.35); padding: 0.6rem 0.85rem; border-radius: 0.6rem; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="flex: 1; min-width: 240px; position: relative;">
+            <input type="text" id="streaks-report-search-input" placeholder="🔍 Filtrar por liga, país o mercado en el informe..." style="width: 100%; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.15); border-radius: 0.4rem; padding: 0.45rem 0.75rem; color: #fff; font-size: 0.82rem;" />
+          </div>
+          <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;" id="streaks-report-filter-pills">
+            <button class="filter-pill active" data-report-filter="all" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;">🔘 Todas (<span id="report-fcount-all">0</span>)</button>
+            <button class="filter-pill pill-alert-high" data-report-filter="alerts_only" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;">🟢🔵 Con Alertas (<span id="report-fcount-alerts">0</span>)</button>
+            <button class="filter-pill pill-today" data-report-filter="today" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;">🔥 Partidos Hoy (<span id="report-fcount-today">0</span>)</button>
+          </div>
+        </div>
+
+        <!-- Main Cards Grid for the Report -->
+        <div id="streaks-report-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.85rem;">
+          <!-- Generated dynamically via JS -->
         </div>
       </dialog>
 

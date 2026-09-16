@@ -3279,3 +3279,27 @@ html, body {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* =========================================================
+   STREAKS VISUAL REPORT CARDS & MODAL
+   ========================================================= */
+.streaks-report-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.streaks-report-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.2) !important;
+}
+
+.btn-report-jump-league {
+  transition: all 0.2s ease;
+}
+
+.btn-report-jump-league:hover {
+  background: rgba(56, 189, 248, 0.3) !important;
+  color: #ffffff !important;
+  transform: scale(1.05);
+}
+
