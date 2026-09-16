@@ -52,6 +52,8 @@ export interface Translations {
     close: string;
   };
   filters: {
+    trackerFiltersTitle: string;
+    officialLeaguesBadge: string;
     searchPlaceholder: string;
     searchBtn: string;
     all: string;
@@ -62,6 +64,13 @@ export interface Translations {
     todayOnly: string;
     todayBadge: string;
     operating: string;
+  };
+  pulseCard: {
+    title: string;
+    subtitle: string;
+    highConfidence: string;
+    strongSignals: string;
+    histAccuracy: string;
   };
   opportunitiesCenter: {
     title: string;
@@ -569,6 +578,8 @@ export const I18N: Record<Language, Translations> = {
       "close": "✓ Aceptar"
     },
     "filters": {
+      "trackerFiltersTitle": "Filtros de Rastreadores por Liga",
+      "officialLeaguesBadge": "+51 Ligas Oficiales",
       "searchPlaceholder": "🔍 Buscar liga o país...",
       "searchBtn": "🔍 Buscar",
       "all": "🔘 Todas Ligas",
@@ -579,6 +590,13 @@ export const I18N: Record<Language, Translations> = {
       "operating": "⚡ Operando",
       "todayOnly": "🔥 Partidos Hoy",
       "todayBadge": "🔥 JUEGA HOY"
+    },
+    "pulseCard": {
+      "title": "ENRACHAS PULSE • Motor Cuantitativo",
+      "subtitle": "+51 Ligas Oficiales Monitoreadas 24/7 en Tiempo Real",
+      "highConfidence": "🔥 ALTA CONFIANZA",
+      "strongSignals": "⚡ SEÑALES FUERTES",
+      "histAccuracy": "📈 ACIERTO HIST."
     },
     "opportunitiesCenter": {
       "title": "CENTRO DE OPORTUNIDADES",
@@ -1148,6 +1166,8 @@ export const I18N: Record<Language, Translations> = {
       "close": "✓ OK"
     },
     "filters": {
+      "trackerFiltersTitle": "League Tracker Filters",
+      "officialLeaguesBadge": "+51 Official Leagues",
       "searchPlaceholder": "🔍 Search league or country...",
       "searchBtn": "🔍 Search",
       "all": "🔘 All Leagues",
@@ -1158,6 +1178,13 @@ export const I18N: Record<Language, Translations> = {
       "operating": "⚡ In Operation",
       "todayOnly": "🔥 Matches Today",
       "todayBadge": "🔥 PLAYS TODAY"
+    },
+    "pulseCard": {
+      "title": "ENRACHAS PULSE • Quantitative Engine",
+      "subtitle": "+51 Official Leagues Monitored 24/7 in Real Time",
+      "highConfidence": "🔥 HIGH CONFIDENCE",
+      "strongSignals": "⚡ STRONG SIGNALS",
+      "histAccuracy": "📈 HIST. ACCURACY"
     },
     "opportunitiesCenter": {
       "title": "OPPORTUNITY RADAR",
@@ -1725,6 +1752,8 @@ export const I18N: Record<Language, Translations> = {
       "close": "✓ Aceitar"
     },
     "filters": {
+      "trackerFiltersTitle": "Filtros de Rastreadores por Liga",
+      "officialLeaguesBadge": "+51 Ligas Oficiais",
       "searchPlaceholder": "🔍 Buscar liga ou país...",
       "searchBtn": "🔍 Buscar",
       "all": "🔘 Todas Ligas",
@@ -1735,6 +1764,13 @@ export const I18N: Record<Language, Translations> = {
       "operating": "⚡ Operando",
       "todayOnly": "🔥 Jogos de Hoje",
       "todayBadge": "🔥 JOGA HOJE"
+    },
+    "pulseCard": {
+      "title": "ENRACHAS PULSE • Motor Quantitativo",
+      "subtitle": "+51 Ligas Oficiais Monitoradas 24/7 em Tempo Real",
+      "highConfidence": "🔥 ALTA CONFIANÇA",
+      "strongSignals": "⚡ SINAIS FORTES",
+      "histAccuracy": "📈 ACERTO HIST."
     },
     "opportunitiesCenter": {
       "title": "CENTRO DE OPORTUNIDADES",
@@ -2304,6 +2340,8 @@ export const I18N: Record<Language, Translations> = {
       "close": "✓ Mboaje"
     },
     "filters": {
+      "trackerFiltersTitle": "Filtros de Rastreadores Liga-rehe",
+      "officialLeaguesBadge": "+51 Ligakuéra Oficial",
       "searchPlaceholder": "🔍 Eheka liga térã tetã...",
       "searchBtn": "🔍 Eheka",
       "all": "🔘 Opaite Ligakuéra",
@@ -2314,6 +2352,13 @@ export const I18N: Record<Language, Translations> = {
       "operating": "⚡ Jaoperahína",
       "todayOnly": "🔥 Ko'árape Oñeha'ãva",
       "todayBadge": "🔥 OHA'Ã KO'ÁG̃A"
+    },
+    "pulseCard": {
+      "title": "ENRACHAS PULSE • Motor Cuantitativo",
+      "subtitle": "+51 Ligakuéra Oficial Oñemaña 24/7 Ko'ág̃a",
+      "highConfidence": "🔥 JEROVIA TUICHA",
+      "strongSignals": "⚡ SEÑAL MBARATE",
+      "histAccuracy": "📈 JEPORU HISTÓRICO"
     },
     "opportunitiesCenter": {
       "title": "OPORTUNIDADES RENDA",

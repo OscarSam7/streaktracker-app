@@ -3194,6 +3194,29 @@ function updateStaticLanguageTexts() {
   const trialVipBtn = document.getElementById('trial-upgrade-vip-btn');
   if (trialVipBtn) trialVipBtn.innerText = lang.trialBanner.upgradeVip;
 
+  // AI Pulse Summary Card
+  const pulseTitle = document.getElementById('pulse-card-title');
+  if (pulseTitle && lang.pulseCard?.title) pulseTitle.innerText = lang.pulseCard.title;
+
+  const pulseSub = document.getElementById('pulse-card-sub');
+  if (pulseSub && lang.pulseCard?.subtitle) pulseSub.innerText = lang.pulseCard.subtitle;
+
+  const pulseHighConfLbl = document.getElementById('pulse-lbl-high-conf');
+  if (pulseHighConfLbl && lang.pulseCard?.highConfidence) pulseHighConfLbl.innerText = lang.pulseCard.highConfidence;
+
+  const pulseStrongSigLbl = document.getElementById('pulse-lbl-strong-sig');
+  if (pulseStrongSigLbl && lang.pulseCard?.strongSignals) pulseStrongSigLbl.innerText = lang.pulseCard.strongSignals;
+
+  const pulseHistAccLbl = document.getElementById('pulse-lbl-hist-acc');
+  if (pulseHistAccLbl && lang.pulseCard?.histAccuracy) pulseHistAccLbl.innerText = lang.pulseCard.histAccuracy;
+
+  // Tracker Filter Header
+  const trackerFilterTitle = document.getElementById('tracker-filter-title');
+  if (trackerFilterTitle && lang.filters?.trackerFiltersTitle) trackerFilterTitle.innerText = lang.filters.trackerFiltersTitle;
+
+  const trackerFilterBadge = document.getElementById('tracker-filter-official-badge');
+  if (trackerFilterBadge && lang.filters?.officialLeaguesBadge) trackerFilterBadge.innerText = lang.filters.officialLeaguesBadge;
+
   // Search input & Action button
   if (searchInput) searchInput.placeholder = lang.filters.searchPlaceholder;
   const searchActionBtn = document.getElementById('search-action-btn');
