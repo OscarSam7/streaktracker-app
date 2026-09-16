@@ -135,6 +135,18 @@ function saveActiveLeagues(leagues: number[]) {
   } catch (e) {}
 }
 
+const STORAGE_KEY_LANG = 'football_streaks_lang_v1';
+
+function loadCurrentLanguage(): Language {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY_LANG);
+    if (saved && (saved === 'es' || saved === 'en' || saved === 'pt' || saved === 'gn')) {
+      return saved as Language;
+    }
+  } catch (e) {}
+  return 'es';
+}
+
 const initialUserProfile = loadUserProfile();
 const initialPlan = (initialUserProfile.subscription?.status === 'TRIAL' ? 'TRIAL' : initialUserProfile.subscription?.plan) || 'FREE';
 
@@ -155,7 +167,7 @@ const state = {
   liveMatches: [] as any[],
   currentPlan: initialPlan as SubscriptionPlan,
   userProfile: initialUserProfile as UserProfile,
-  currentLang: 'es' as Language,
+  currentLang: loadCurrentLanguage() as Language,
   searchQuery: '',
   currentFilter: 'all' as QuickFilter,
   bankrollConfig: loadBankrollConfig(),
@@ -1703,8 +1715,8 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
 
   // Update filter counters
   const cAll = allOpportunities.length;
-  const cPrem = allOpportunities.filter(o => o.tier === 'PREMIUM').length;
-  const cStrong = allOpportunities.filter(o => o.tier === 'FUERTE').length;
+  const cPrem = allOpportunities.filter(o => o.signalScore >= 90).length;
+  const cStrong = allOpportunities.filter(o => o.signalScore >= 75 && o.signalScore < 90).length;
   const cLive = allOpportunities.filter(o => o.isLive).length;
   const cUpc = allOpportunities.filter(o => o.hasUpcoming).length;
   const cOperating = allOpportunities.filter(isOppOperating).length;
@@ -1733,8 +1745,8 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
 
   // Apply oppFilter
   const filtered = allOpportunities.filter(o => {
-    if (state.oppFilter === 'premium') return o.tier === 'PREMIUM';
-    if (state.oppFilter === 'strong') return o.tier === 'FUERTE';
+    if (state.oppFilter === 'premium') return o.signalScore >= 90;
+    if (state.oppFilter === 'strong') return o.signalScore >= 75 && o.signalScore < 90;
     if (state.oppFilter === 'live') return o.isLive;
     if (state.oppFilter === 'upcoming') return o.hasUpcoming;
     if (state.oppFilter === 'operating') return isOppOperating(o);
@@ -2334,6 +2346,9 @@ function setupLanguageSelector() {
 
   langSelect.addEventListener('change', () => {
     state.currentLang = langSelect.value as Language;
+    try {
+      localStorage.setItem(STORAGE_KEY_LANG, state.currentLang);
+    } catch (e) {}
     updateStaticLanguageTexts();
     renderDashboard();
     renderOpportunitiesCenter();
@@ -2977,6 +2992,39 @@ function updateBankrollModalTexts() {
 
   const excelConfirmBtn = document.getElementById('confirm-excel-export-btn');
   if (excelConfirmBtn) excelConfirmBtn.innerText = lang.bankroll.excelDownloadBtn;
+
+  // New Movement Modal Texts
+  if (lang.newMovementModal) {
+    const movTitle = document.getElementById('new-mov-title');
+    if (movTitle) movTitle.innerHTML = `<span>💵</span> ${lang.newMovementModal.title.replace(/^[^\w\s]+/, '').trim()}`;
+
+    const lblMovType = document.getElementById('lbl-mov-type');
+    if (lblMovType) lblMovType.innerText = lang.newMovementModal.movementType;
+
+    const lblMovCategory = document.getElementById('lbl-mov-category');
+    if (lblMovCategory) lblMovCategory.innerText = lang.newMovementModal.movementCategory;
+
+    const lblMovDate = document.getElementById('lbl-mov-date');
+    if (lblMovDate) lblMovDate.innerText = lang.newMovementModal.date;
+
+    const lblMovTime = document.getElementById('lbl-mov-time');
+    if (lblMovTime) lblMovTime.innerText = lang.newMovementModal.time;
+
+    const lblMovAmount = document.getElementById('lbl-mov-amount');
+    if (lblMovAmount) lblMovAmount.innerText = lang.newMovementModal.amount;
+
+    const lblMovDesc = document.getElementById('lbl-mov-desc');
+    if (lblMovDesc) lblMovDesc.innerText = lang.newMovementModal.desc;
+
+    const lblMovNotes = document.getElementById('lbl-mov-notes');
+    if (lblMovNotes) lblMovNotes.innerText = lang.newMovementModal.notes;
+
+    const cancelMovBtn = document.getElementById('cancel-new-movement-btn');
+    if (cancelMovBtn) cancelMovBtn.innerText = lang.newMovementModal.cancelBtn;
+
+    const saveMovBtn = document.getElementById('save-new-movement-btn');
+    if (saveMovBtn) saveMovBtn.innerText = lang.newMovementModal.saveBtn;
+  }
 
   const calcH3 = modal.querySelector('#tab-calculator h3');
   if (calcH3) calcH3.textContent = lang.bankroll.calcTitle;

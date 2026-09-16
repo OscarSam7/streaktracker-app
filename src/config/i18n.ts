@@ -170,6 +170,18 @@ export interface Translations {
     cancelBtn: string;
     saveBtn: string;
   };
+  newMovementModal: {
+    title: string;
+    movementType: string;
+    movementCategory: string;
+    date: string;
+    time: string;
+    amount: string;
+    desc: string;
+    notes: string;
+    cancelBtn: string;
+    saveBtn: string;
+  };
   leaguesModal: {
     title: string;
     selectAll: string;
@@ -674,6 +686,18 @@ export const I18N: Record<Language, Translations> = {
       "notes": "Observaciones (Opcional)",
       "cancelBtn": "Cancelar",
       "saveBtn": "💾 Guardar Operación"
+    },
+    "newMovementModal": {
+      "title": "💵 Registrar Movimiento de Capital",
+      "movementType": "Tipo de Movimiento",
+      "movementCategory": "Categoría del Movimiento",
+      "date": "Fecha",
+      "time": "Hora",
+      "amount": "Monto a Registrar",
+      "desc": "Concepto / Descripción",
+      "notes": "Observaciones / Notas (Opcional)",
+      "cancelBtn": "Cancelar",
+      "saveBtn": "💾 Guardar Movimiento"
     },
     "leaguesModal": {
       "title": "Ligas Activas",
@@ -1242,6 +1266,18 @@ export const I18N: Record<Language, Translations> = {
       "cancelBtn": "Cancel",
       "saveBtn": "💾 Save Trade"
     },
+    "newMovementModal": {
+      "title": "💵 Record Capital Movement",
+      "movementType": "Movement Type",
+      "movementCategory": "Movement Category",
+      "date": "Date",
+      "time": "Time",
+      "amount": "Amount to Record",
+      "desc": "Description / Purpose",
+      "notes": "Notes (Optional)",
+      "cancelBtn": "Cancel",
+      "saveBtn": "💾 Save Movement"
+    },
     "leaguesModal": {
       "title": "Active Monitored Leagues",
       "selectAll": "Select All Leagues",
@@ -1807,6 +1843,18 @@ export const I18N: Record<Language, Translations> = {
       "cancelBtn": "Cancelar",
       "saveBtn": "💾 Salvar Operação"
     },
+    "newMovementModal": {
+      "title": "💵 Registrar Movimentação de Capital",
+      "movementType": "Tipo de Movimentação",
+      "movementCategory": "Categoria da Movimentação",
+      "date": "Data",
+      "time": "Hora",
+      "amount": "Valor a Registrar",
+      "desc": "Conceito / Descrição",
+      "notes": "Observações / Notas (Opcional)",
+      "cancelBtn": "Cancelar",
+      "saveBtn": "💾 Salvar Movimentação"
+    },
     "leaguesModal": {
       "title": "Ligas Ativas",
       "selectAll": "Selecionar Todas",
@@ -2371,8 +2419,20 @@ export const I18N: Record<Language, Translations> = {
       "odds": "Cuota / Multiplicador",
       "status": "Estado Inicial",
       "notes": "Observaciones (Opcional)",
-      "cancelBtn": "Embogue",
-      "saveBtn": "💾 Eñongatu Operación"
+      "cancelBtn": "Mboty",
+      "saveBtn": "💾 Ñongatu Operación"
+    },
+    "newMovementModal": {
+      "title": "💵 Emoinge Movimiento de Capital",
+      "movementType": "Tipo de Movimiento",
+      "movementCategory": "Categoría del Movimiento",
+      "date": "Ára (Fecha)",
+      "time": "Hora",
+      "amount": "Monto Oñemoingétava",
+      "desc": "Concepto / Descripción",
+      "notes": "Observaciones (Opcional)",
+      "cancelBtn": "Mboty",
+      "saveBtn": "💾 Ñongatu Movimiento"
     },
     "leaguesModal": {
       "title": "Ligakuéra Oĩva Activo",
