@@ -1,3 +1,5 @@
+import ExcelJS from 'exceljs';
+
 export type OperationStatus = 'Ganada' | 'Perdida' | 'Pendiente' | 'Cancelada' | 'Reembolsada' | 'Nula';
 export type CapitalMovementType = 'INYECCION' | 'EXTRACCION' | 'GASTO';
 
@@ -627,5 +629,363 @@ export function simulateMartingaleSequence(
   }
 
   return steps;
+}
+
+// ---------------------------------------------------------
+// FILTRADO DE BANCA Y CONCILIACIÓN POR FECHAS
+// ---------------------------------------------------------
+
+export interface BankrollFilterResult {
+  filteredOps: BankrollOperation[];
+  filteredMovements: CapitalMovement[];
+  effectiveInitialCapital: number;
+  priorInjections: number;
+  priorWithdrawals: number;
+  priorExpenses: number;
+  priorTradingPnl: number;
+  periodInjections: number;
+  periodWithdrawals: number;
+  periodExpenses: number;
+  periodTradingPnl: number;
+  finalBalance: number;
+  kpis: BankrollKPIs;
+}
+
+/**
+ * Filtra operaciones y movimientos de capital por rango de fechas (Desde / Hasta)
+ * recalculando con exactitud matemática el capital inicial acumulado del periodo,
+ * los flujos de caja y la ecuación de balance.
+ */
+export function filterBankrollByDate(
+  allRawOps: BankrollOperation[],
+  allMovements: CapitalMovement[],
+  config: BankrollConfig,
+  fromDate?: string | null,
+  toDate?: string | null
+): BankrollFilterResult {
+  const processedAllOps = calculateProcessedOperations(allRawOps, config);
+  
+  const from = fromDate ? fromDate.trim() : '';
+  const to = toDate ? toDate.trim() : '';
+  
+  if (!from && !to) {
+    const kpis = computeBankrollKPIs(processedAllOps, config, allMovements);
+    return {
+      filteredOps: processedAllOps,
+      filteredMovements: allMovements,
+      effectiveInitialCapital: config.initialCapital,
+      priorInjections: 0,
+      priorWithdrawals: 0,
+      priorExpenses: 0,
+      priorTradingPnl: 0,
+      periodInjections: kpis.totalInjections,
+      periodWithdrawals: kpis.totalWithdrawals,
+      periodExpenses: kpis.totalExpenses,
+      periodTradingPnl: kpis.tradingPnl,
+      finalBalance: kpis.currentCapital,
+      kpis
+    };
+  }
+
+  // Segmentar movimientos previos vs dentro del periodo
+  let priorInjections = 0;
+  let priorWithdrawals = 0;
+  let priorExpenses = 0;
+  let periodInjections = 0;
+  let periodWithdrawals = 0;
+  let periodExpenses = 0;
+  const filteredMovements: CapitalMovement[] = [];
+
+  allMovements.forEach(m => {
+    const mDate = m.date;
+    if (from && mDate < from) {
+      if (m.type === 'INYECCION') priorInjections += m.amount;
+      else if (m.type === 'EXTRACCION') priorWithdrawals += m.amount;
+      else if (m.type === 'GASTO') priorExpenses += m.amount;
+    } else if ((!from || mDate >= from) && (!to || mDate <= to)) {
+      filteredMovements.push(m);
+      if (m.type === 'INYECCION') periodInjections += m.amount;
+      else if (m.type === 'EXTRACCION') periodWithdrawals += m.amount;
+      else if (m.type === 'GASTO') periodExpenses += m.amount;
+    }
+  });
+
+  // Segmentar operaciones previas vs dentro del periodo
+  let priorTradingPnl = 0;
+  const filteredOps: BankrollOperation[] = [];
+  processedAllOps.forEach(op => {
+    const opDate = op.date;
+    if (from && opDate < from) {
+      priorTradingPnl += (op.pnl || 0);
+    } else if ((!from || opDate >= from) && (!to || opDate <= to)) {
+      filteredOps.push(op);
+    }
+  });
+
+  const effectiveInitialCapital = config.initialCapital + priorInjections - priorWithdrawals - priorExpenses + priorTradingPnl;
+
+  const tempConfig: BankrollConfig = {
+    ...config,
+    initialCapital: effectiveInitialCapital
+  };
+
+  const kpis = computeBankrollKPIs(filteredOps, tempConfig, filteredMovements);
+
+  return {
+    filteredOps,
+    filteredMovements,
+    effectiveInitialCapital,
+    priorInjections,
+    priorWithdrawals,
+    priorExpenses,
+    priorTradingPnl,
+    periodInjections,
+    periodWithdrawals,
+    periodExpenses,
+    periodTradingPnl: kpis.tradingPnl,
+    finalBalance: kpis.currentCapital,
+    kpis
+  };
+}
+
+// ---------------------------------------------------------
+// EXPORTACIÓN PROFESIONAL A EXCEL (.XLSX) CON EXCELJS
+// ---------------------------------------------------------
+
+export interface ExportBankrollExcelOptions {
+  allRawOps: BankrollOperation[];
+  allMovements: CapitalMovement[];
+  config: BankrollConfig;
+  fromDate?: string | null;
+  toDate?: string | null;
+}
+
+export async function exportBankrollToExcel(options: ExportBankrollExcelOptions): Promise<void> {
+  const { allRawOps, allMovements, config, fromDate, toDate } = options;
+  const filteredData = filterBankrollByDate(allRawOps, allMovements, config, fromDate, toDate);
+  const { filteredOps, filteredMovements, kpis, effectiveInitialCapital } = filteredData;
+  const curr = config.currencyCode || 'USD';
+
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'ENRACHAS - Control de Banca';
+  workbook.lastModifiedBy = 'ENRACHAS System';
+  workbook.created = new Date();
+  workbook.modified = new Date();
+
+  // 1. HOJA 1: RESUMEN Y CONCILIACIÓN
+  const wsSummary = workbook.addWorksheet('📊 Resumen & Conciliación', {
+    views: [{ showGridLines: true }]
+  });
+
+  wsSummary.columns = [
+    { width: 35 },
+    { width: 25 },
+    { width: 30 },
+    { width: 20 }
+  ];
+
+  // Header Title
+  wsSummary.mergeCells('A1:D1');
+  const titleCell = wsSummary.getCell('A1');
+  titleCell.value = '💼 ENRACHAS — INFORME DE CONTROL DE BANCA Y AUDITORÍA CONTABLE';
+  titleCell.font = { name: 'Calibri', size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
+  titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
+  titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+  wsSummary.getRow(1).height = 30;
+
+  // Subtitle / Date range
+  wsSummary.mergeCells('A2:D2');
+  const subCell = wsSummary.getCell('A2');
+  const dateRangeText = (fromDate || toDate)
+    ? `Periodo Filtrado: ${fromDate || 'Inicio Histórico'} hasta ${toDate || 'Hoy'} | Moneda: ${curr}`
+    : `Periodo: Historial Completo | Moneda: ${curr}`;
+  subCell.value = `${dateRangeText} | Generado el: ${new Date().toLocaleString()}`;
+  subCell.font = { name: 'Calibri', size: 10, italic: true, color: { argb: 'FF94A3B8' } };
+  subCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+  subCell.alignment = { horizontal: 'center', vertical: 'middle' };
+  wsSummary.getRow(2).height = 20;
+
+  wsSummary.addRow([]);
+
+  // Section Header: Conciliación Contable
+  wsSummary.mergeCells('A4:D4');
+  const sec1 = wsSummary.getCell('A4');
+  sec1.value = '⚖️ ECUACIÓN DE BALANCE & CONCILIACIÓN CONTABLE';
+  sec1.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF38BDF8' } };
+  sec1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
+  wsSummary.getRow(4).height = 24;
+
+  const recRows = [
+    ['Concepto Contable', 'Monto en Moneda (' + curr + ')', 'Impacto en Balance', 'Estado'],
+    ['Capital Inicial del Periodo', effectiveInitialCapital, 'Base de Capital', 'Consolidado'],
+    ['(+) Inyecciones / Depósitos', filteredData.periodInjections, 'Aumento de Capital', 'Aprobado'],
+    ['(-) Extracciones / Retiros', -filteredData.periodWithdrawals, 'Reducción de Capital', 'Procesado'],
+    ['(-) Gastos de la Actividad', -filteredData.periodExpenses, 'Costos Operativos / Software', 'Deducido'],
+    ['(+) P&L Neto de Operaciones (Trading)', filteredData.periodTradingPnl, 'Resultado Operativo', filteredData.periodTradingPnl >= 0 ? 'Superávit' : 'Déficit'],
+    ['(=) CAPITAL TOTAL RESULTANTE', filteredData.finalBalance, 'Saldo Líquido Auditado', 'CUADRADO EXACTO']
+  ];
+
+  recRows.forEach((r, idx) => {
+    const row = wsSummary.addRow(r);
+    if (idx === 0) {
+      row.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF334155' } };
+    } else if (idx === recRows.length - 1) {
+      row.font = { bold: true, size: 11, color: { argb: 'FF38BDF8' } };
+      row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+    }
+  });
+
+  wsSummary.addRow([]);
+
+  // Section Header: KPIs de Rendimiento
+  wsSummary.mergeCells('A13:D13');
+  const sec2 = wsSummary.getCell('A13');
+  sec2.value = '📊 MÉTRICAS CLAVE DE RENDIMIENTO Y CONTROL DE RIESGO';
+  sec2.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF4ADE80' } };
+  sec2.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
+  wsSummary.getRow(13).height = 24;
+
+  const kpiRows = [
+    ['Métrica / Indicador', 'Valor', 'Referencia / Benchmark'],
+    ['Rentabilidad (ROI %)', `${(kpis.roi * 100).toFixed(2)}%`, kpis.roi >= 0 ? '🟢 Positivo' : '🔴 Negativo'],
+    ['Yield Trading %', `${(kpis.yieldPct * 100).toFixed(2)}%`, 'Rendimiento sobre volumen apostado'],
+    ['Tasa de Acierto (Winrate)', `${(kpis.winrate * 100).toFixed(2)}%`, `Ganadas: ${kpis.wonOps} | Perdidas: ${kpis.lostOps} | Pendientes: ${kpis.pendingOps}`],
+    ['Profit Factor', kpis.profitFactor.toFixed(2), kpis.profitFactor >= 1.5 ? '🟢 Excelente' : kpis.profitFactor >= 1.0 ? '🟡 Aceptable' : '🔴 En Pérdida'],
+    ['Drawdown Máximo', `${(kpis.maxDrawdownPct * 100).toFixed(2)}%`, 'Tolerancia recomendada < 20%'],
+    ['Total Operaciones Periodo', filteredOps.length, 'Registros ejecutados'],
+    ['Total Movimientos Periodo', filteredMovements.length, 'Depósitos, retiros y gastos'],
+    ['Disciplina Operativa', `${(kpis.disciplineRate * 100).toFixed(1)}%`, `${kpis.excessRiskOps} operaciones con exceso de riesgo`]
+  ];
+
+  kpiRows.forEach((r, idx) => {
+    const row = wsSummary.addRow(r);
+    if (idx === 0) {
+      row.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF334155' } };
+    }
+  });
+
+  // 2. HOJA 2: REGISTRO DE OPERACIONES
+  const wsOps = workbook.addWorksheet('📝 Operaciones', {
+    views: [{ showGridLines: true }]
+  });
+
+  wsOps.columns = [
+    { header: 'ID', key: 'id', width: 12 },
+    { header: 'Fecha', key: 'date', width: 14 },
+    { header: 'Hora', key: 'time', width: 10 },
+    { header: 'Categoría', key: 'category', width: 22 },
+    { header: 'Descripción / Partido', key: 'description', width: 32 },
+    { header: 'Tipo', key: 'type', width: 16 },
+    { header: 'Mercado / Racha', key: 'market', width: 22 },
+    { header: 'Estado', key: 'status', width: 14 },
+    { header: 'Cap. Antes', key: 'capitalBefore', width: 14 },
+    { header: 'Stake', key: 'stake', width: 12 },
+    { header: '% Stake', key: 'stakePct', width: 12 },
+    { header: 'Cuota', key: 'odds', width: 10 },
+    { header: 'P&L Gan/Pérd', key: 'pnl', width: 16 },
+    { header: 'Cap. Después', key: 'capitalAfter', width: 14 },
+    { header: 'ROI %', key: 'roi', width: 12 },
+    { header: 'Disciplina', key: 'discipline', width: 22 },
+    { header: 'Observaciones', key: 'notes', width: 30 }
+  ];
+
+  // Header styling
+  const headerRowOps = wsOps.getRow(1);
+  headerRowOps.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+  headerRowOps.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
+  headerRowOps.height = 24;
+
+  filteredOps.forEach(op => {
+    const row = wsOps.addRow({
+      id: op.id,
+      date: op.date,
+      time: op.time,
+      category: op.category || 'Fútbol Cuantitativo',
+      description: op.description,
+      type: op.operationType || 'Pre-partido',
+      market: op.market,
+      status: op.status,
+      capitalBefore: op.capitalBefore,
+      stake: op.stake,
+      stakePct: (op.stakePct * 100).toFixed(2) + '%',
+      odds: op.odds,
+      pnl: op.pnl,
+      capitalAfter: op.capitalAfter,
+      roi: (op.roi * 100).toFixed(2) + '%',
+      discipline: op.discipline,
+      notes: op.notes || ''
+    });
+
+    // Color PnL Cell
+    const pnlCell = row.getCell('pnl');
+    if (op.pnl > 0) {
+      pnlCell.font = { bold: true, color: { argb: 'FF16A34A' } };
+    } else if (op.pnl < 0) {
+      pnlCell.font = { bold: true, color: { argb: 'FFDC2626' } };
+    }
+  });
+
+  // 3. HOJA 3: FLUJO DE CAPITAL Y GASTOS
+  const wsMovs = workbook.addWorksheet('💳 Flujo de Capital', {
+    views: [{ showGridLines: true }]
+  });
+
+  wsMovs.columns = [
+    { header: 'ID', key: 'id', width: 12 },
+    { header: 'Fecha', key: 'date', width: 14 },
+    { header: 'Hora', key: 'time', width: 10 },
+    { header: 'Tipo de Movimiento', key: 'type', width: 20 },
+    { header: 'Categoría', key: 'category', width: 28 },
+    { header: 'Concepto / Descripción', key: 'description', width: 34 },
+    { header: 'Monto (' + curr + ')', key: 'amount', width: 16 },
+    { header: 'Saldo Después', key: 'balanceAfter', width: 16 },
+    { header: 'Observaciones', key: 'notes', width: 30 }
+  ];
+
+  const headerRowMovs = wsMovs.getRow(1);
+  headerRowMovs.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+  headerRowMovs.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F172A' } };
+  headerRowMovs.height = 24;
+
+  let currentBal = effectiveInitialCapital;
+  filteredMovements.forEach(m => {
+    const amt = Math.abs(m.amount);
+    if (m.type === 'INYECCION') currentBal += amt;
+    else currentBal -= amt;
+
+    const row = wsMovs.addRow({
+      id: m.id,
+      date: m.date,
+      time: m.time,
+      type: m.type === 'INYECCION' ? '📥 INYECCIÓN (+)' : m.type === 'EXTRACCION' ? '📤 EXTRACCIÓN (-)' : '🧾 GASTO (-)',
+      category: m.category,
+      description: m.description,
+      amount: m.type === 'INYECCION' ? amt : -amt,
+      balanceAfter: currentBal,
+      notes: m.notes || ''
+    });
+
+    const amtCell = row.getCell('amount');
+    if (m.type === 'INYECCION') {
+      amtCell.font = { bold: true, color: { argb: 'FF16A34A' } };
+    } else {
+      amtCell.font = { bold: true, color: { argb: 'FFDC2626' } };
+    }
+  });
+
+  // Generar buffer y disparar descarga
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const fileNameSuffix = (fromDate || toDate) ? `_${fromDate || 'INICIO'}_A_${toDate || 'HOY'}` : `_COMPLETO`;
+  a.download = `REGISTRO_DE_OPERACIONES_CONTROL_DE_BANCA${fileNameSuffix}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 

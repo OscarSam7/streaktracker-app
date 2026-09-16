@@ -35,6 +35,8 @@ import {
   saveCapitalMovements,
   calculateProcessedOperations, 
   computeBankrollKPIs,
+  filterBankrollByDate,
+  exportBankrollToExcel,
   formatCurrency,
   getCurrencyConfig,
   calcularMartingalaAcotada,
@@ -159,6 +161,9 @@ const state = {
   bankrollConfig: loadBankrollConfig(),
   bankrollRawOps: loadRawOperations(),
   capitalMovements: loadCapitalMovements(),
+  bankrollFilterFrom: null as string | null,
+  bankrollFilterTo: null as string | null,
+  bankrollFilterPreset: 'all' as string,
   activeLiveIndex: {} as Record<number, number>,
   oppFilter: 'all' as 'all' | 'premium' | 'strong' | 'live' | 'upcoming' | 'operating',
   activeTrades: loadActiveTrades() as Record<string, ActiveTrackedTrade>,
@@ -2875,9 +2880,6 @@ function updateBankrollModalTexts() {
   const xlsxBtn = document.getElementById('bankroll-download-xlsx-btn');
   if (xlsxBtn) xlsxBtn.innerText = lang.bankroll.exportExcelBtn;
 
-  const csvBtn = document.getElementById('bankroll-export-csv-btn');
-  if (csvBtn) csvBtn.innerText = lang.bankroll.exportCsvBtn;
-
   const tabDash = document.querySelector('[data-tab="tab-dashboard"]') as HTMLElement;
   const tabOps = document.querySelector('[data-tab="tab-operations"]') as HTMLElement;
   const tabCalc = document.querySelector('[data-tab="tab-calculator"]') as HTMLElement;
@@ -3134,9 +3136,6 @@ function updateStaticLanguageTexts() {
 
   const bkXlsxBtn = document.getElementById('bankroll-download-xlsx-btn');
   if (bkXlsxBtn) bkXlsxBtn.innerText = lang.bankroll.exportExcelBtn;
-
-  const bkCsvBtn = document.getElementById('bankroll-export-csv-btn');
-  if (bkCsvBtn) bkCsvBtn.innerText = lang.bankroll.exportCsvBtn;
 
   // Bankroll Tab Buttons
   const tabDash = document.querySelector('[data-tab="tab-dashboard"]') as HTMLElement;
@@ -5096,10 +5095,96 @@ function setupBankrollModule() {
   const lblMovAmount = document.getElementById('lbl-mov-amount') as HTMLElement;
 
   const bankrollDownloadXlsxBtn = document.getElementById('bankroll-download-xlsx-btn') as HTMLButtonElement;
-  const bankrollExportCsvBtn = document.getElementById('bankroll-export-csv-btn') as HTMLButtonElement;
   const saveBankrollCfgBtn = document.getElementById('save-bankroll-cfg-btn') as HTMLButtonElement;
 
+  // Date Filter UI Elements
+  const filterFromInput = document.getElementById('bankroll-filter-from') as HTMLInputElement;
+  const filterToInput = document.getElementById('bankroll-filter-to') as HTMLInputElement;
+  const filterApplyBtn = document.getElementById('bankroll-filter-apply-btn') as HTMLButtonElement;
+  const filterPresetBtns = document.querySelectorAll('.bankroll-preset-btn') as NodeListOf<HTMLButtonElement>;
+
+  // Excel Export Modal Elements
+  const excelExportModal = document.getElementById('bankroll-excel-export-modal') as HTMLDialogElement;
+  const closeExcelExportModal = document.getElementById('close-excel-export-modal') as HTMLButtonElement;
+  const cancelExcelExportBtn = document.getElementById('cancel-excel-export-btn') as HTMLButtonElement;
+  const confirmExcelExportBtn = document.getElementById('confirm-excel-export-btn') as HTMLButtonElement;
+  const excelExportModeRadios = document.querySelectorAll('input[name="excel-export-mode"]') as NodeListOf<HTMLInputElement>;
+  const excelExportRangeControls = document.getElementById('excel-export-range-controls') as HTMLDivElement;
+  const excelExportFromInput = document.getElementById('excel-export-from') as HTMLInputElement;
+  const excelExportToInput = document.getElementById('excel-export-to') as HTMLInputElement;
+
   if (!bankrollBtn || !bankrollModal) return;
+
+  // Date filter preset handlers
+  filterPresetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterPresetBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'rgba(255, 255, 255, 0.05)';
+        b.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        b.style.color = '#94a3b8';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'rgba(56, 189, 248, 0.2)';
+      btn.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+      btn.style.color = '#fff';
+
+      const preset = btn.dataset.preset;
+      state.bankrollFilterPreset = preset || 'all';
+
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+
+      if (preset === 'all') {
+        state.bankrollFilterFrom = null;
+        state.bankrollFilterTo = null;
+        if (filterFromInput) filterFromInput.value = '';
+        if (filterToInput) filterToInput.value = '';
+      } else if (preset === 'today') {
+        state.bankrollFilterFrom = todayStr;
+        state.bankrollFilterTo = todayStr;
+        if (filterFromInput) filterFromInput.value = todayStr;
+        if (filterToInput) filterToInput.value = todayStr;
+      } else if (preset === '7days') {
+        const d7 = new Date();
+        d7.setDate(d7.getDate() - 7);
+        const d7Str = d7.toISOString().split('T')[0];
+        state.bankrollFilterFrom = d7Str;
+        state.bankrollFilterTo = todayStr;
+        if (filterFromInput) filterFromInput.value = d7Str;
+        if (filterToInput) filterToInput.value = todayStr;
+      } else if (preset === 'month') {
+        const mStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+        state.bankrollFilterFrom = mStart;
+        state.bankrollFilterTo = todayStr;
+        if (filterFromInput) filterFromInput.value = mStart;
+        if (filterToInput) filterToInput.value = todayStr;
+      }
+
+      refreshBankrollUI();
+    });
+  });
+
+  // Date filter apply button
+  if (filterApplyBtn) {
+    filterApplyBtn.addEventListener('click', () => {
+      const fromVal = filterFromInput ? filterFromInput.value.trim() : '';
+      const toVal = filterToInput ? filterToInput.value.trim() : '';
+
+      state.bankrollFilterFrom = fromVal || null;
+      state.bankrollFilterTo = toVal || null;
+      state.bankrollFilterPreset = 'custom';
+
+      filterPresetBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'rgba(255, 255, 255, 0.05)';
+        b.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        b.style.color = '#94a3b8';
+      });
+
+      refreshBankrollUI();
+    });
+  }
 
   // Clear all operations handler
   if (clearAllOpsBtn) {
@@ -5340,7 +5425,6 @@ function setupBankrollModule() {
   }
 
   // Save Bankroll Config
-  // Initialize Currency Select
   const currencySelect = document.getElementById('cfg-currency-select') as HTMLSelectElement;
   if (currencySelect) {
     currencySelect.value = state.bankrollConfig.currencyCode || 'USD';
@@ -5367,83 +5451,88 @@ function setupBankrollModule() {
     });
   }
 
-  // Download Excel (.xlsx)
-  if (bankrollDownloadXlsxBtn) {
+  // Setup Excel Export Modal triggers & actions
+  if (bankrollDownloadXlsxBtn && excelExportModal) {
     bankrollDownloadXlsxBtn.addEventListener('click', () => {
       if (state.currentPlan === 'FREE') {
         alert('🔒 La descarga del archivo profesional de Excel (.xlsx) está disponible en los planes PRO y VIP.');
         pricingModal.showModal();
         return;
       }
-      const link = document.createElement('a');
-      link.href = '/REGISTRO_DE_OPERACIONES_CONTROL_DE_BANCA.xlsx';
-      link.download = 'REGISTRO_DE_OPERACIONES_CONTROL_DE_BANCA.xlsx';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+
+      // Pre-fill dates
+      const today = new Date().toISOString().split('T')[0];
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+      if (excelExportFromInput) excelExportFromInput.value = state.bankrollFilterFrom || monthStart;
+      if (excelExportToInput) excelExportToInput.value = state.bankrollFilterTo || today;
+
+      // Reset radio to 'all' or 'current' if filter is active
+      const radioAll = document.getElementById('excel-export-mode-all') as HTMLInputElement;
+      const radioCurrent = document.getElementById('excel-export-mode-current') as HTMLInputElement;
+      if (state.bankrollFilterFrom || state.bankrollFilterTo) {
+        if (radioCurrent) radioCurrent.checked = true;
+      } else {
+        if (radioAll) radioAll.checked = true;
+      }
+      if (excelExportRangeControls) {
+        excelExportRangeControls.style.display = 'none';
+      }
+
+      excelExportModal.showModal();
     });
   }
 
-  // Export CSV of Operations and Movements
-  if (bankrollExportCsvBtn) {
-    bankrollExportCsvBtn.addEventListener('click', () => {
-      const processedOps = calculateProcessedOperations(state.bankrollRawOps, state.bankrollConfig);
-      const rows = [
-        ['ID', 'Fecha', 'Hora', 'Categoría', 'Descripción', 'Tipo Operación', 'Mercado / Segmento', 'Estado', 'Capital Antes', 'Stake', '% Capital', 'Cuota', 'Ganancia / Pérdida', 'Capital Después', 'ROI %', 'Disciplina / Regla', 'Observaciones']
-      ];
-
-      processedOps.forEach(op => {
-        rows.push([
-          op.id,
-          op.date,
-          op.time,
-          `"${(op.category || '').replace(/"/g, '""')}"`,
-          `"${(op.description || '').replace(/"/g, '""')}"`,
-          `"${(op.operationType || '').replace(/"/g, '""')}"`,
-          `"${(op.market || '').replace(/"/g, '""')}"`,
-          `"${op.status}"`,
-          op.capitalBefore.toFixed(2),
-          op.stake.toFixed(2),
-          (op.stakePct * 100).toFixed(2) + '%',
-          op.odds.toFixed(2),
-          (op.pnl >= 0 ? '+' : '') + op.pnl.toFixed(2),
-          op.capitalAfter.toFixed(2),
-          (op.roi >= 0 ? '+' : '') + (op.roi * 100).toFixed(2) + '%',
-          `"${(op.discipline || '').replace(/"/g, '""')}"`,
-          `"${(op.notes || '').replace(/"/g, '""')}"`
-        ]);
+  if (excelExportModeRadios) {
+    excelExportModeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (excelExportRangeControls) {
+          excelExportRangeControls.style.display = radio.value === 'custom' && radio.checked ? 'flex' : 'none';
+        }
       });
+    });
+  }
 
-      // Append capital movements section
-      if (state.capitalMovements.length > 0) {
-        rows.push([]);
-        rows.push(['--- HISTORIAL DE MOVIMIENTOS DE CAPITAL & GASTOS ---']);
-        rows.push(['ID', 'Fecha', 'Hora', 'Tipo', 'Categoría', 'Concepto', 'Monto', 'Saldo Después', 'Observaciones']);
-        state.capitalMovements.forEach(m => {
-          rows.push([
-            m.id,
-            m.date,
-            m.time,
-            m.type,
-            `"${(m.category || '').replace(/"/g, '""')}"`,
-            `"${(m.description || '').replace(/"/g, '""')}"`,
-            (m.type === 'INYECCION' ? '+' : '-') + m.amount.toFixed(2),
-            m.balanceAfter ? m.balanceAfter.toFixed(2) : '',
-            `"${(m.notes || '').replace(/"/g, '""')}"`
-          ]);
-        });
+  if (closeExcelExportModal) {
+    closeExcelExportModal.addEventListener('click', () => excelExportModal.close());
+  }
+
+  if (cancelExcelExportBtn) {
+    cancelExcelExportBtn.addEventListener('click', () => excelExportModal.close());
+  }
+
+  if (confirmExcelExportBtn) {
+    confirmExcelExportBtn.addEventListener('click', async () => {
+      const mode = (document.querySelector('input[name="excel-export-mode"]:checked') as HTMLInputElement)?.value || 'all';
+      let exportFrom: string | null = null;
+      let exportTo: string | null = null;
+
+      if (mode === 'current') {
+        exportFrom = state.bankrollFilterFrom;
+        exportTo = state.bankrollFilterTo;
+      } else if (mode === 'custom') {
+        exportFrom = excelExportFromInput ? excelExportFromInput.value.trim() || null : null;
+        exportTo = excelExportToInput ? excelExportToInput.value.trim() || null : null;
       }
 
-      const csvData = 'sep=;\r\n' + rows.map(e => e.join(';')).join('\r\n');
-      const blob = new Blob(['\uFEFF' + csvData], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `REGISTRO_OPERACIONES_Y_CAPITAL_${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      confirmExcelExportBtn.disabled = true;
+      confirmExcelExportBtn.innerText = '⏳ Generando Excel...';
+
+      try {
+        await exportBankrollToExcel({
+          allRawOps: state.bankrollRawOps,
+          allMovements: state.capitalMovements,
+          config: state.bankrollConfig,
+          fromDate: exportFrom,
+          toDate: exportTo
+        });
+        excelExportModal.close();
+      } catch (err) {
+        console.error('Error al exportar Excel:', err);
+        alert('Ocurrió un error al generar el archivo Excel.');
+      } finally {
+        confirmExcelExportBtn.disabled = false;
+        confirmExcelExportBtn.innerText = '📥 Generar y Descargar .xlsx';
+      }
     });
   }
 
@@ -5452,8 +5541,59 @@ function setupBankrollModule() {
 }
 
 function refreshBankrollUI() {
-  const processedOps = calculateProcessedOperations(state.bankrollRawOps, state.bankrollConfig);
-  const kpis = computeBankrollKPIs(processedOps, state.bankrollConfig, state.capitalMovements);
+  const filterRes = filterBankrollByDate(
+    state.bankrollRawOps,
+    state.capitalMovements,
+    state.bankrollConfig,
+    state.bankrollFilterFrom,
+    state.bankrollFilterTo
+  );
+
+  const {
+    filteredOps,
+    filteredMovements,
+    effectiveInitialCapital,
+    periodInjections,
+    periodWithdrawals,
+    periodExpenses,
+    periodTradingPnl,
+    finalBalance,
+    kpis
+  } = filterRes;
+
+  const currCode = state.bankrollConfig.currencyCode || 'USD';
+
+  // Update Period Filter Status Tag
+  const filterTag = document.getElementById('bankroll-filter-status-tag');
+  if (filterTag) {
+    if (state.bankrollFilterFrom || state.bankrollFilterTo) {
+      filterTag.innerText = `(Periodo: ${state.bankrollFilterFrom || 'Inicio'} a ${state.bankrollFilterTo || 'Hoy'})`;
+      filterTag.style.color = '#38bdf8';
+      filterTag.style.background = 'rgba(56, 189, 248, 0.15)';
+    } else {
+      filterTag.innerText = `(Historial Completo)`;
+      filterTag.style.color = '#94a3b8';
+      filterTag.style.background = 'rgba(255, 255, 255, 0.06)';
+    }
+  }
+
+  // Reconciliation Box updates
+  const recInit = document.getElementById('rec-init-cap');
+  const recInj = document.getElementById('rec-total-inj');
+  const recWith = document.getElementById('rec-total-with');
+  const recExp = document.getElementById('rec-total-exp');
+  const recPnl = document.getElementById('rec-trading-pnl');
+  const recFinal = document.getElementById('rec-final-balance');
+
+  if (recInit) recInit.innerText = formatCurrency(effectiveInitialCapital, currCode);
+  if (recInj) recInj.innerText = `+${formatCurrency(periodInjections, currCode)}`;
+  if (recWith) recWith.innerText = `-${formatCurrency(periodWithdrawals, currCode)}`;
+  if (recExp) recExp.innerText = `-${formatCurrency(periodExpenses, currCode)}`;
+  if (recPnl) {
+    recPnl.innerText = formatCurrency(periodTradingPnl, currCode, true);
+    recPnl.style.color = periodTradingPnl >= 0 ? '#4ade80' : '#f87171';
+  }
+  if (recFinal) recFinal.innerText = formatCurrency(finalBalance, currCode);
 
   // Update KPI Cards
   const kpiCur = document.getElementById('kpi-current-cap');
@@ -5472,38 +5612,18 @@ function refreshBankrollUI() {
   const opsCounter = document.getElementById('ops-total-counter');
   const movsCounter = document.getElementById('movs-total-counter');
 
-  const currCode = state.bankrollConfig.currencyCode || 'USD';
-
-  // Reconciliation Box updates
-  const recInit = document.getElementById('rec-init-cap');
-  const recInj = document.getElementById('rec-total-inj');
-  const recWith = document.getElementById('rec-total-with');
-  const recExp = document.getElementById('rec-total-exp');
-  const recPnl = document.getElementById('rec-trading-pnl');
-  const recFinal = document.getElementById('rec-final-balance');
-
-  if (recInit) recInit.innerText = formatCurrency(kpis.initialCapital, currCode);
-  if (recInj) recInj.innerText = `+${formatCurrency(kpis.totalInjections, currCode)}`;
-  if (recWith) recWith.innerText = `-${formatCurrency(kpis.totalWithdrawals, currCode)}`;
-  if (recExp) recExp.innerText = `-${formatCurrency(kpis.totalExpenses, currCode)}`;
-  if (recPnl) {
-    recPnl.innerText = formatCurrency(kpis.tradingPnl, currCode, true);
-    recPnl.style.color = kpis.tradingPnl >= 0 ? '#4ade80' : '#f87171';
-  }
-  if (recFinal) recFinal.innerText = formatCurrency(kpis.currentCapital, currCode);
-
-  if (kpiCur) kpiCur.innerText = formatCurrency(kpis.currentCapital, currCode);
+  if (kpiCur) kpiCur.innerText = formatCurrency(finalBalance, currCode);
   if (kpiYield) kpiYield.innerText = `${kpis.yieldPct >= 0 ? '+' : ''}${(kpis.yieldPct * 100).toFixed(2)}% Yield Trading`;
   
   if (kpiPnl) {
-    kpiPnl.innerText = formatCurrency(kpis.totalPnl, currCode, true);
-    kpiPnl.className = `kpi-value ${kpis.totalPnl >= 0 ? 'positive' : 'negative'}`;
+    kpiPnl.innerText = formatCurrency(periodTradingPnl, currCode, true);
+    kpiPnl.className = `kpi-value ${periodTradingPnl >= 0 ? 'positive' : 'negative'}`;
   }
   if (kpiPnlBreak) kpiPnlBreak.innerText = `Gan: ${formatCurrency(kpis.totalProfit, currCode)} | Pérd: -${formatCurrency(Math.abs(kpis.totalLoss), currCode)}`;
 
-  if (kpiInj) kpiInj.innerText = `+${formatCurrency(kpis.totalInjections, currCode)}`;
-  if (kpiWith) kpiWith.innerText = `-${formatCurrency(kpis.totalWithdrawals, currCode)}`;
-  if (kpiExp) kpiExp.innerText = `-${formatCurrency(kpis.totalExpenses, currCode)}`;
+  if (kpiInj) kpiInj.innerText = `+${formatCurrency(periodInjections, currCode)}`;
+  if (kpiWith) kpiWith.innerText = `-${formatCurrency(periodWithdrawals, currCode)}`;
+  if (kpiExp) kpiExp.innerText = `-${formatCurrency(periodExpenses, currCode)}`;
 
   if (kpiRoi) {
     kpiRoi.innerText = `${kpis.roi >= 0 ? '+' : ''}${(kpis.roi * 100).toFixed(2)}%`;
@@ -5517,25 +5637,35 @@ function refreshBankrollUI() {
   if (kpiExpSub) kpiExpSub.innerText = `Comprometido: ${formatCurrency(kpis.committedCapital, currCode)}`;
 
   if (kpiDd) kpiDd.innerText = `${(kpis.maxDrawdownPct * 100).toFixed(2)}%`;
-  if (opsCounter) opsCounter.innerText = processedOps.length.toString();
-  if (movsCounter) movsCounter.innerText = state.capitalMovements.length.toString();
+  
+  const isDateFiltered = Boolean(state.bankrollFilterFrom || state.bankrollFilterTo);
+  if (opsCounter) {
+    opsCounter.innerText = isDateFiltered 
+      ? `${filteredOps.length} (${filteredOps.length === state.bankrollRawOps.length ? 'total' : 'filtradas'})`
+      : state.bankrollRawOps.length.toString();
+  }
+  if (movsCounter) {
+    movsCounter.innerText = isDateFiltered
+      ? `${filteredMovements.length} (${filteredMovements.length === state.capitalMovements.length ? 'total' : 'filtrados'})`
+      : state.capitalMovements.length.toString();
+  }
 
   // Populate Operations Table Body
   const tbody = document.getElementById('bankroll-table-body');
   if (tbody) {
     tbody.innerHTML = '';
-    if (processedOps.length === 0) {
+    if (filteredOps.length === 0) {
       tbody.innerHTML = `
         <tr>
           <td colspan="15" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
             <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📋</div>
-            <p style="margin: 0; font-weight: 600; color: #fff;">Sin operaciones registradas</p>
-            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">Haz clic en <strong>"➕ Añadir Registro"</strong> o pulsa <strong>"💼 Operar"</strong> desde el Centro de Oportunidades.</p>
+            <p style="margin: 0; font-weight: 600; color: #fff;">Sin operaciones registradas en el periodo seleccionado</p>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">Modifica los filtros de fecha o pulsa <strong>"🌐 Todas las Fechas"</strong> para ver todo el historial.</p>
           </td>
         </tr>
       `;
     } else {
-      processedOps.forEach((op, idx) => {
+      filteredOps.forEach((op) => {
         const tr = document.createElement('tr');
         const discColor = op.discipline.includes('🔴') ? '#f87171' : op.discipline.includes('🟡') ? '#facc15' : '#4ade80';
         const isLocked = Boolean(op.is_locked);
@@ -5548,7 +5678,7 @@ function refreshBankrollUI() {
             </span>
           </div>
         ` : `
-          <select class="op-status-select" data-idx="${idx}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(56,189,248,0.3); color: #fff; border-radius: 0.3rem; padding: 0.15rem 0.3rem; font-size: 0.75rem; cursor: pointer;">
+          <select class="op-status-select" data-op-id="${op.id}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(56,189,248,0.3); color: #fff; border-radius: 0.3rem; padding: 0.15rem 0.3rem; font-size: 0.75rem; cursor: pointer;">
             <option value="Pendiente" ${op.status === 'Pendiente' ? 'selected' : ''}>⏳ Pendiente</option>
             <option value="Ganada" ${op.status === 'Ganada' ? 'selected' : ''}>🟢 Ganada</option>
             <option value="Perdida" ${op.status === 'Perdida' ? 'selected' : ''}>🔴 Perdida</option>
@@ -5567,7 +5697,7 @@ function refreshBankrollUI() {
           </div>
         ` : `
           <div style="display: flex; align-items: center; justify-content: center;">
-            <button class="btn op-delete-btn" data-idx="${idx}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); cursor: pointer;" title="Eliminar registro pendiente">✕</button>
+            <button class="btn op-delete-btn" data-op-id="${op.id}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); cursor: pointer;" title="Eliminar registro pendiente">✕</button>
           </div>
         `;
 
@@ -5598,8 +5728,8 @@ function refreshBankrollUI() {
       tbody.querySelectorAll('.op-status-select').forEach(sel => {
         sel.addEventListener('change', (e) => {
           const target = e.target as HTMLSelectElement;
-          const opIdx = parseInt(target.dataset.idx || '0', 10);
-          const rawOp = state.bankrollRawOps[opIdx];
+          const opId = target.dataset.opId;
+          const rawOp = state.bankrollRawOps.find(o => o.id === opId);
           if (!rawOp || rawOp.is_locked) {
             alert('🔒 Este registro está auditado y bloqueado. No se puede modificar.');
             refreshBankrollUI();
@@ -5625,9 +5755,10 @@ function refreshBankrollUI() {
       tbody.querySelectorAll('.op-delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const target = e.currentTarget as HTMLButtonElement;
-          const opIdx = parseInt(target.dataset.idx || '0', 10);
+          const opId = target.dataset.opId;
+          const opIdx = state.bankrollRawOps.findIndex(o => o.id === opId);
+          if (opIdx < 0) return;
           const rawOp = state.bankrollRawOps[opIdx];
-          if (!rawOp) return;
           if (rawOp.is_locked) {
             alert('🔒 Este registro está auditado y bloqueado. No se puede eliminar.');
             return;
@@ -5646,19 +5777,19 @@ function refreshBankrollUI() {
   const movsTbody = document.getElementById('bankroll-movements-tbody');
   if (movsTbody) {
     movsTbody.innerHTML = '';
-    if (state.capitalMovements.length === 0) {
+    if (filteredMovements.length === 0) {
       movsTbody.innerHTML = `
         <tr>
           <td colspan="10" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
             <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💳</div>
-            <p style="margin: 0; font-weight: 600; color: #fff;">Sin movimientos de capital registrados</p>
-            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">Pulsa en <strong>"➕ Registrar Movimiento"</strong> para asentar inyecciones, extracciones o gastos operativos.</p>
+            <p style="margin: 0; font-weight: 600; color: #fff;">Sin movimientos de capital en el periodo seleccionado</p>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">Pulsa en <strong>"➕ Registrar Movimiento"</strong> o selecciona <strong>"🌐 Todas las Fechas"</strong>.</p>
           </td>
         </tr>
       `;
     } else {
-      let runningBal = kpis.initialCapital;
-      state.capitalMovements.forEach((mov, idx) => {
+      let runningBal = effectiveInitialCapital;
+      filteredMovements.forEach((mov) => {
         const tr = document.createElement('tr');
         const amt = Math.abs(mov.amount);
 
@@ -5689,7 +5820,7 @@ function refreshBankrollUI() {
           <td style="font-weight: 700; color: #fff;">${formatCurrency(runningBal, currCode)}</td>
           <td style="font-size: 0.75rem; color: var(--text-muted);">${mov.notes || '-'}</td>
           <td style="text-align: center;">
-            <button class="btn mov-delete-btn" data-idx="${idx}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); cursor: pointer;" title="Eliminar este movimiento">✕</button>
+            <button class="btn mov-delete-btn" data-mov-id="${mov.id}" style="padding: 0.15rem 0.45rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); cursor: pointer;" title="Eliminar este movimiento">✕</button>
           </td>
         `;
 
@@ -5700,9 +5831,10 @@ function refreshBankrollUI() {
       movsTbody.querySelectorAll('.mov-delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const target = e.currentTarget as HTMLButtonElement;
-          const movIdx = parseInt(target.dataset.idx || '0', 10);
+          const movId = target.dataset.movId;
+          const movIdx = state.capitalMovements.findIndex(m => m.id === movId);
+          if (movIdx < 0) return;
           const mov = state.capitalMovements[movIdx];
-          if (!mov) return;
           if (confirm(`¿Seguro que deseas eliminar el movimiento ${mov.id} (${mov.description})?`)) {
             state.capitalMovements.splice(movIdx, 1);
             saveCapitalMovements(state.capitalMovements);
