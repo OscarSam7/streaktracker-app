@@ -690,22 +690,27 @@ function renderDashboard(liveMatches: any[] = state.liveMatches) {
                <div style="font-size: 0.75rem; color: var(--text-accent); margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.2rem;">
                    ${lang.streaks.upcomingPrefix} ${displayDate.charAt(0).toUpperCase() + displayDate.slice(1)}
                </div>
-               ${validUpcoming.map(um => {
-                   const timeRaw = new Date(um.date);
-                   const timeString = timeRaw.toLocaleTimeString(localeCode, { hour: '2-digit', minute: '2-digit' });
-                   return `
-                       <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.3rem;">
-                          <div style="display: flex; align-items: center; gap: 0.3rem; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                             <span>${um.homeTeam}</span>
-                             <span style="font-size: 0.6rem; color: var(--text-muted);">vs</span>
-                             <span>${um.awayTeam}</span>
-                          </div>
-                          <span style="font-size: 0.75rem; background: rgba(0,0,0,0.5); padding: 0.1rem 0.3rem; border-radius: 0.2rem; margin-left: 0.3rem;">
-                             ${timeString}
-                          </span>
-                       </div>
-                   `;
-               }).join('')}
+                ${validUpcoming.map(um => {
+                    const timeRaw = new Date(um.date);
+                    const timeString = timeRaw.toLocaleTimeString(localeCode, { hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.35rem; background: rgba(0,0,0,0.25); padding: 0.25rem 0.45rem; border-radius: 4px; gap: 0.4rem;">
+                           <div style="display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 0;">
+                              <div style="display: flex; align-items: center; gap: 0.3rem; min-width: 0;">
+                                 ${um.homeLogo ? `<img src="${um.homeLogo}" class="team-logo-micro" alt="${um.homeTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+                                 <span style="font-size: 0.74rem; font-weight: 700; color: #f8fafc; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${um.homeTeam}</span>
+                              </div>
+                              <div style="display: flex; align-items: center; gap: 0.3rem; min-width: 0;">
+                                 ${um.awayLogo ? `<img src="${um.awayLogo}" class="team-logo-micro" alt="${um.awayTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+                                 <span style="font-size: 0.74rem; font-weight: 700; color: #cbd5e1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${um.awayTeam}</span>
+                              </div>
+                           </div>
+                           <span style="font-size: 0.72rem; font-weight: 800; background: rgba(0,0,0,0.5); padding: 0.15rem 0.35rem; border-radius: 4px; color: #38bdf8; border: 1px solid rgba(56,189,248,0.2); flex-shrink: 0; white-space: nowrap;">
+                              ${timeString}
+                           </span>
+                        </div>
+                    `;
+                }).join('')}
            </div>
        `;
     }
@@ -1088,6 +1093,16 @@ interface OpportunityItem {
   isLive: boolean;
   liveMatchId?: number | null;
   hasUpcoming: boolean;
+  homeTeam?: string;
+  awayTeam?: string;
+  homeLogo?: string;
+  awayLogo?: string;
+  goalsHome?: number;
+  goalsAway?: number;
+  halftimeHome?: number;
+  halftimeAway?: number;
+  matchStatus?: string;
+  elapsed?: number;
   marketKey: string;
   marketLabel: string;
   actionMarketLabel: string;
@@ -1214,17 +1229,19 @@ async function renderLeagueRecentRoundsHistory(
                 }
 
                 return `
-                  <div class="history-modal-match-box" style="border-color: rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.04);">
-                    <div style="flex: 1; overflow: hidden;">
-                      <div style="font-weight: 700; color: #f8fafc; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${m.homeTeam}
+                  <div class="history-modal-match-box" style="border-color: rgba(56, 189, 248, 0.25); background: rgba(56, 189, 248, 0.04); display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.6rem; gap: 0.5rem;">
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0;">
+                        ${m.homeLogo ? `<img src="${m.homeLogo}" class="team-logo-micro" alt="${m.homeTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+                        <span style="font-weight: 700; color: #f8fafc; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.homeTeam}</span>
                       </div>
-                      <div style="font-weight: 700; color: #cbd5e1; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 0.15rem;">
-                        ${m.awayTeam}
+                      <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0;">
+                        ${m.awayLogo ? `<img src="${m.awayLogo}" class="team-logo-micro" alt="${m.awayTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+                        <span style="font-weight: 700; color: #cbd5e1; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.awayTeam}</span>
                       </div>
-                      <div style="font-size: 0.65rem; color: #38bdf8; margin-top: 0.3rem;">📅 ${matchDateStr}</div>
+                      <div style="font-size: 0.62rem; color: #38bdf8; margin-top: 0.15rem;">📅 ${matchDateStr}</div>
                     </div>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem; flex-shrink: 0;">
                       <span class="history-next-time-badge">
                         ${matchDayTime}
                       </span>
@@ -1254,15 +1271,20 @@ async function renderLeagueRecentRoundsHistory(
                 }
 
                 return `
-                  <div class="opp-history-match-item" style="border-left: 2px solid #38bdf8;">
-                    <div class="opp-history-teams" title="${m.homeTeam} vs ${m.awayTeam}">
-                      <span>${m.homeTeam}</span>
-                      <span style="color: #64748b; font-size: 0.58rem; margin: 0 0.15rem;">vs</span>
-                      <span>${m.awayTeam}</span>
+                  <div class="opp-history-match-item" style="border-left: 2px solid #38bdf8; display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0.45rem; gap: 0.4rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 0;" title="${m.homeTeam} vs ${m.awayTeam}">
+                      <div style="display: flex; align-items: center; gap: 0.3rem; min-width: 0;">
+                        ${m.homeLogo ? `<img src="${m.homeLogo}" class="team-logo-micro" alt="${m.homeTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.62rem;">⚽</span>'}
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.homeTeam}</span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 0.3rem; min-width: 0;">
+                        ${m.awayLogo ? `<img src="${m.awayLogo}" class="team-logo-micro" alt="${m.awayTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.62rem;">⚽</span>'}
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #cbd5e1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.awayTeam}</span>
+                      </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
                       ${matchDateStr ? `<span class="opp-history-match-date">📅 ${matchDateStr}</span>` : ''}
-                      <span style="font-size: 0.64rem; font-weight: 800; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.08rem 0.35rem; border-radius: 4px;">${timeStr}</span>
+                      <span style="font-size: 0.64rem; font-weight: 800; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.08rem 0.35rem; border-radius: 4px; white-space: nowrap;">${timeStr}</span>
                     </div>
                   </div>
                 `;
@@ -1301,7 +1323,7 @@ async function renderLeagueRecentRoundsHistory(
             <div class="history-modal-grid">
               ${roundMatches.map(m => {
                 const htInfo = (m.halftimeHome !== undefined && m.halftimeAway !== undefined) 
-                  ? `<span style="font-size: 0.65rem; color: #94a3b8; font-weight: normal;">(HT ${m.halftimeHome}-${m.halftimeAway})</span>` 
+                  ? `<span style="font-size: 0.65rem; color: #facc15; font-weight: 800; background: rgba(0,0,0,0.5); padding: 0.05rem 0.3rem; border-radius: 3px; border: 1px solid rgba(250,204,21,0.25); white-space: nowrap; flex-shrink: 0;">(HT ${m.halftimeHome}-${m.halftimeAway})</span>` 
                   : '';
 
                 let matchDateStr = '';
@@ -1311,18 +1333,20 @@ async function renderLeagueRecentRoundsHistory(
                 }
 
                 return `
-                  <div class="history-modal-match-box">
-                    <div style="flex: 1; overflow: hidden;">
-                      <div style="font-weight: 700; color: #f8fafc; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${m.homeTeam}
+                  <div class="history-modal-match-box" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.6rem; gap: 0.5rem;">
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0;">
+                        ${m.homeLogo ? `<img src="${m.homeLogo}" class="team-logo-micro" alt="${m.homeTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+                        <span style="font-weight: 700; color: #f8fafc; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.homeTeam}</span>
                       </div>
-                      <div style="font-weight: 700; color: #cbd5e1; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 0.15rem;">
-                        ${m.awayTeam}
+                      <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0;">
+                        ${m.awayLogo ? `<img src="${m.awayLogo}" class="team-logo-micro" alt="${m.awayTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+                        <span style="font-weight: 700; color: #cbd5e1; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.awayTeam}</span>
                       </div>
-                      ${matchDateStr ? `<div style="font-size: 0.65rem; color: #38bdf8; margin-top: 0.3rem;">📅 ${matchDateStr}</div>` : ''}
+                      ${matchDateStr ? `<div style="font-size: 0.62rem; color: #38bdf8; margin-top: 0.15rem;">📅 ${matchDateStr}</div>` : ''}
                     </div>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem;">
-                      <span style="font-size: 1.05rem; font-weight: 900; background: rgba(0,0,0,0.7); color: #fff; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(56,189,248,0.25);">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 0.2rem; flex-shrink: 0;">
+                      <span style="font-size: 1.05rem; font-weight: 900; background: rgba(0,0,0,0.7); color: #fff; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid rgba(56,189,248,0.25); white-space: nowrap;">
                         ${m.goalsHome} - ${m.goalsAway}
                       </span>
                       ${htInfo}
@@ -1353,15 +1377,20 @@ async function renderLeagueRecentRoundsHistory(
                 }
 
                 return `
-                  <div class="opp-history-match-item">
-                    <div class="opp-history-teams" title="${m.homeTeam} vs ${m.awayTeam}">
-                      <span>${m.homeTeam}</span>
-                      <span style="color: #64748b; font-size: 0.58rem; margin: 0 0.15rem;">vs</span>
-                      <span>${m.awayTeam}</span>
+                  <div class="opp-history-match-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0.45rem; gap: 0.4rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 0;" title="${m.homeTeam} vs ${m.awayTeam}">
+                      <div style="display: flex; align-items: center; gap: 0.3rem; min-width: 0;">
+                        ${m.homeLogo ? `<img src="${m.homeLogo}" class="team-logo-micro" alt="${m.homeTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.62rem;">⚽</span>'}
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.homeTeam}</span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 0.3rem; min-width: 0;">
+                        ${m.awayLogo ? `<img src="${m.awayLogo}" class="team-logo-micro" alt="${m.awayTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.62rem;">⚽</span>'}
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #cbd5e1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${m.awayTeam}</span>
+                      </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
                       ${matchDateStr ? `<span class="opp-history-match-date">📅 ${matchDateStr}</span>` : ''}
-                      <span class="opp-history-score">${m.goalsHome} - ${m.goalsAway}</span>
+                      <span class="opp-history-score" style="white-space: nowrap;">${m.goalsHome} - ${m.goalsAway}</span>
                       ${htInfo}
                     </div>
                   </div>
@@ -1511,10 +1540,30 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
     let matchTimeStr = 'Sin horario confirmado';
     let sortTimestamp = Date.now() + 86400000;
     let liveMatchId: number | null = null;
+    let oppHomeTeam = '';
+    let oppAwayTeam = '';
+    let oppHomeLogo = '';
+    let oppAwayLogo = '';
+    let oppGoalsHome: number | undefined;
+    let oppGoalsAway: number | undefined;
+    let oppHalftimeHome: number | undefined;
+    let oppHalftimeAway: number | undefined;
+    let oppMatchStatus: string | undefined;
+    let oppElapsed: number | undefined;
 
     if (isLive) {
       const lm = leagueLiveMatches[0];
       liveMatchId = lm.id;
+      oppHomeTeam = lm.homeTeam;
+      oppAwayTeam = lm.awayTeam;
+      oppHomeLogo = lm.homeLogo || '';
+      oppAwayLogo = lm.awayLogo || '';
+      oppGoalsHome = lm.goalsHome;
+      oppGoalsAway = lm.goalsAway;
+      oppHalftimeHome = lm.halftimeHome;
+      oppHalftimeAway = lm.halftimeAway;
+      oppMatchStatus = lm.status;
+      oppElapsed = lm.elapsed;
       const liveTimeFormatted = formatLiveElapsedWithSeconds(lm);
       const isPastOrAtHT = lm.status === 'HT' || lm.status === '2H' || lm.status === 'FT' || lm.status === 'AET' || lm.status === 'PEN';
       const htScoreSuffix = isPastOrAtHT ? ` (HT ${lm.halftimeHome ?? 0}-${lm.halftimeAway ?? 0})` : '';
@@ -1523,6 +1572,11 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
       sortTimestamp = Date.now(); // Máxima prioridad de inmediatez
     } else if (hasUpcoming) {
       const um = validUpcoming[0];
+      oppHomeTeam = um.homeTeam;
+      oppAwayTeam = um.awayTeam;
+      oppHomeLogo = um.homeLogo || '';
+      oppAwayLogo = um.awayLogo || '';
+      oppMatchStatus = um.status;
       const matchDate = new Date(um.date);
       fixtureName = `${um.homeTeam} vs ${um.awayTeam}`;
       const dateLocale = state.currentLang === 'en' ? 'en-US' : (state.currentLang === 'pt' ? 'pt-BR' : 'es-ES');
@@ -1559,6 +1613,16 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
           isLive,
           liveMatchId,
           hasUpcoming,
+          homeTeam: oppHomeTeam,
+          awayTeam: oppAwayTeam,
+          homeLogo: oppHomeLogo,
+          awayLogo: oppAwayLogo,
+          goalsHome: oppGoalsHome,
+          goalsAway: oppGoalsAway,
+          halftimeHome: oppHalftimeHome,
+          halftimeAway: oppHalftimeAway,
+          matchStatus: oppMatchStatus,
+          elapsed: oppElapsed,
           marketKey: m.key,
           marketLabel: m.label,
           actionMarketLabel: actionLabel,
@@ -1791,10 +1855,26 @@ function renderOpportunitiesCenter(liveMatches: any[] = state.liveMatches) {
         </span>
       </div>
 
-      <!-- Partido / Equipos en disputa -->
-      <div style="margin-top: 0.35rem;">
-        <div style="font-size: 0.82rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${opp.fixtureName}">
-          ⚽ ${opp.fixtureName}
+      <!-- Enfrentamiento con Insignias de Club y Resultado HT siempre visible -->
+      <div style="margin-top: 0.35rem; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.4rem 0.55rem; border: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem;">
+          <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0;">
+            ${opp.homeLogo ? `<img src="${opp.homeLogo}" class="team-logo-micro" alt="${opp.homeTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+            <span style="font-size: 0.78rem; font-weight: 700; color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${opp.homeTeam || ''}">${opp.homeTeam || 'Equipo Local'}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem; min-width: 0;">
+            ${opp.awayLogo ? `<img src="${opp.awayLogo}" class="team-logo-micro" alt="${opp.awayTeam}" onerror="this.style.display='none'">` : '<span style="font-size: 0.65rem;">⚽</span>'}
+            <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${opp.awayTeam || ''}">${opp.awayTeam || 'Equipo Visita'}</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; text-align: right; gap: 0.15rem;">
+          ${opp.isLive 
+            ? `<span style="font-size: 0.92rem; font-weight: 900; color: #fff; background: rgba(239, 68, 68, 0.25); border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.1rem 0.45rem; border-radius: 4px; box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); white-space: nowrap;">${opp.goalsHome ?? 0} - ${opp.goalsAway ?? 0}</span>` 
+            : `<span style="font-size: 0.7rem; font-weight: 800; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.1rem 0.4rem; border-radius: 4px; white-space: nowrap;">VS</span>`
+          }
+          ${(opp.isLive && (opp.halftimeHome !== undefined && opp.halftimeAway !== undefined)) 
+            ? `<span class="opp-history-ht" style="white-space: nowrap; flex-shrink: 0;">HT ${opp.halftimeHome}-${opp.halftimeAway}</span>` 
+            : ''}
         </div>
       </div>
 

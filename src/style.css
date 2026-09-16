@@ -3281,6 +3281,50 @@ html, body {
 }
 
 /* =========================================================
+   TEAM CRESTS / LOGOS & HT SCORE BADGES
+   ========================================================= */
+.team-logo-micro {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 2px;
+  flex-shrink: 0;
+  vertical-align: middle;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.team-logo-mini {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.team-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.ht-score-badge,
+.opp-history-ht {
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  color: #facc15 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  padding: 0.08rem 0.35rem !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(250, 204, 21, 0.35) !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  letter-spacing: 0.03em !important;
+  display: inline-block !important;
+}
+
+/* =========================================================
    STREAKS VISUAL REPORT CARDS & MODAL
    ========================================================= */
 .streaks-report-card {
