@@ -78,8 +78,56 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutM
   }
 }
 
+const APISPORTS_DIRECT_KEY = (import.meta as any).env?.VITE_APISPORTS_KEY || 'c3e40bbc2c34eb562bd85e21c0dc68af';
+const APISPORTS_DIRECT_BASE = 'https://v3.football.api-sports.io';
+
+async function requestApiData(endpointAndQuery: string): Promise<any> {
+  // 1. Try Backend Proxy
+  try {
+    const proxyUrl = `${BACKEND_API_BASE}${endpointAndQuery}`;
+    const response = await fetchWithTimeout(proxyUrl, {}, 6000);
+    const contentType = response.headers.get('content-type') || '';
+    if (response.ok && contentType.includes('application/json')) {
+      const json = await response.json();
+      if (json && !json.error && !json.errors?.rateLimit && (json.response !== undefined || json.data !== undefined)) {
+        return json;
+      }
+    }
+  } catch (e) {
+    // Proxy not reachable or timed out, fallback to direct API-Sports
+  }
+
+  // 2. Direct fallback to API-Sports
+  try {
+    const cleanPath = endpointAndQuery.replace(/[?&]nocache=true/g, '').replace(/[?&]force=true/g, '');
+    const directUrl = `${APISPORTS_DIRECT_BASE}${cleanPath}`;
+    const directResponse = await fetchWithTimeout(directUrl, {
+      headers: {
+        'x-apisports-key': APISPORTS_DIRECT_KEY
+      }
+    }, 8000);
+    if (directResponse.ok) {
+      const json = await directResponse.json();
+      return {
+        ...json,
+        _meta: {
+          dataSource: 'API_SPORTS_LIVE',
+          dataFreshness: 'FRESH',
+          lastUpdated: new Date().toISOString(),
+          ageSeconds: 0,
+          apiStatus: 'ONLINE'
+        }
+      };
+    }
+  } catch (err) {
+    // Both failed
+  }
+
+  throw new Error(`Failed to fetch ${endpointAndQuery} from both proxy and direct API`);
+}
+
 // -------------------------------------------------------------------------
-// 1. FETCH LIVE MATCHES (High frequency: 45s TTL)
+// 1. FETCH LIVE MATCHES (High frequency: 15s TTL)
 // -------------------------------------------------------------------------
 export async function fetchLiveMatches(leagueIds: number[]): Promise<MatchData[]> {
   if (USE_MOCK) return getMockLiveMatches(leagueIds);
@@ -90,9 +138,7 @@ export async function fetchLiveMatches(leagueIds: number[]): Promise<MatchData[]
   }
 
   try {
-    const response = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?live=all`);
-    if (!response.ok) throw new Error(`Proxy status ${response.status}`);
-    const result = await response.json();
+    const result = await requestApiData('/fixtures?live=all');
 
     if (result._meta) {
       latestDataTelemetry = {
@@ -142,7 +188,6 @@ function getActiveSeasonYear(leagueId: number): number {
     return year;
   }
 
-
   // European / Winter leagues (La Liga 140, Premier 39, Serie A 135, Bundesliga 477, Ligue 1 61, etc.):
   // If month is January to June, season started in previous year (e.g. May 2026 -> season 2025). If July-Dec, season is current year.
   return month <= 6 ? year - 1 : year;
@@ -187,20 +232,15 @@ export async function fetchRecentMatches(leagueId: number, forceRefresh: boolean
   try {
     const season = getActiveSeasonYear(leagueId);
     const forceParam = forceRefresh ? '&nocache=true' : '';
-    let response = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?league=${leagueId}&season=${season}&status=FT-AET-PEN${forceParam}`);
-    if (!response.ok) throw new Error(`Proxy status ${response.status}`);
-    let result = await response.json();
+    let result = await requestApiData(`/fixtures?league=${leagueId}&season=${season}&status=FT-AET-PEN${forceParam}`);
 
     let matches = result.response || [];
 
     // Fallback: If no matches returned for calculated season (e.g. transition month), try current year
     if (matches.length === 0 && season !== new Date().getFullYear()) {
-      const fallbackResp = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?league=${leagueId}&season=${new Date().getFullYear()}&status=FT-AET-PEN${forceParam}`);
-      if (fallbackResp.ok) {
-        const fallbackResult = await fallbackResp.json();
-        if (fallbackResult.response && fallbackResult.response.length > 0) {
-          matches = fallbackResult.response;
-        }
+      const fallbackResult = await requestApiData(`/fixtures?league=${leagueId}&season=${new Date().getFullYear()}&status=FT-AET-PEN${forceParam}`);
+      if (fallbackResult.response && fallbackResult.response.length > 0) {
+        matches = fallbackResult.response;
       }
     }
 
@@ -223,7 +263,7 @@ export async function fetchRecentMatches(leagueId: number, forceRefresh: boolean
 }
 
 // -------------------------------------------------------------------------
-// 3. FETCH UPCOMING MATCHES (Moderate frequency: 2 hours TTL)
+// 3. FETCH UPCOMING MATCHES (Moderate frequency: 1 hour TTL)
 // -------------------------------------------------------------------------
 export async function fetchUpcomingMatches(leagueId: number, count: number = 10): Promise<any[]> {
   if (USE_MOCK) return getMockUpcomingMatches(leagueId);
@@ -241,9 +281,7 @@ export async function fetchUpcomingMatches(leagueId: number, count: number = 10)
   }
 
   try {
-    const response = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?league=${leagueId}&next=${count}`);
-    if (!response.ok) throw new Error(`Proxy status ${response.status}`);
-    const result = await response.json();
+    const result = await requestApiData(`/fixtures?league=${leagueId}&next=${count}`);
 
     const matches = result.response || [];
     const parsedUpcoming = matches.map((fixtureItem: any) => ({
