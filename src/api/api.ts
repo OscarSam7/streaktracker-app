@@ -24,8 +24,8 @@ const USE_MOCK = false;
 // INTELLIGENT MULTI-TIER CLIENT CACHE & TIMEOUT CONTROLLER
 // =========================================================================
 const LIVE_CACHE_TTL_MS = 15 * 1000;
-const RECENT_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-const UPCOMING_CACHE_TTL_MS = 2 * 60 * 60 * 1000;
+const RECENT_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutos para capturar partidos finalizados rápidamente
+const UPCOMING_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hora
 
 interface CacheEntry<T> {
   data: T;
@@ -186,7 +186,8 @@ export async function fetchRecentMatches(leagueId: number, forceRefresh: boolean
 
   try {
     const season = getActiveSeasonYear(leagueId);
-    let response = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?league=${leagueId}&season=${season}&status=FT-AET-PEN`);
+    const forceParam = forceRefresh ? '&nocache=true' : '';
+    let response = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?league=${leagueId}&season=${season}&status=FT-AET-PEN${forceParam}`);
     if (!response.ok) throw new Error(`Proxy status ${response.status}`);
     let result = await response.json();
 
@@ -194,7 +195,7 @@ export async function fetchRecentMatches(leagueId: number, forceRefresh: boolean
 
     // Fallback: If no matches returned for calculated season (e.g. transition month), try current year
     if (matches.length === 0 && season !== new Date().getFullYear()) {
-      const fallbackResp = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?league=${leagueId}&season=${new Date().getFullYear()}&status=FT-AET-PEN`);
+      const fallbackResp = await fetchWithTimeout(`${BACKEND_API_BASE}/fixtures?league=${leagueId}&season=${new Date().getFullYear()}&status=FT-AET-PEN${forceParam}`);
       if (fallbackResp.ok) {
         const fallbackResult = await fallbackResp.json();
         if (fallbackResult.response && fallbackResult.response.length > 0) {

@@ -108,8 +108,8 @@ function writeDbFile(filename, data) {
 // Server-Side Centralized Cache for API-Sports
 const serverCache = {};
 const TTL_LIVE_MS = 15 * 1000;
-const TTL_RECENT_MS = 6 * 60 * 60 * 1000;
-const TTL_UPCOMING_MS = 2 * 60 * 60 * 1000;
+const TTL_RECENT_MS = 10 * 60 * 1000; // 10 minutes (captures finished matches quickly)
+const TTL_UPCOMING_MS = 60 * 60 * 1000; // 1 hour
 
 let apiCallCountToday = 0;
 let lastResetDate = new Date().toDateString();
@@ -673,7 +673,11 @@ const server = http.createServer(async (req, res) => {
 
   // 10. Fixtures Proxy
   if (pathname === '/api/fixtures') {
-    const query = parsedUrl.query;
+    const query = { ...parsedUrl.query };
+    const isNoCache = query.nocache === 'true' || query.force === 'true';
+    delete query.nocache;
+    delete query.force;
+
     const cacheKey = JSON.stringify(query);
     const now = Date.now();
 
@@ -682,7 +686,7 @@ const server = http.createServer(async (req, res) => {
     else if (query.status === 'FT-AET-PEN') ttl = TTL_RECENT_MS;
 
     const cached = serverCache[cacheKey];
-    if (cached && (now - cached.timestamp < ttl)) {
+    if (!isNoCache && cached && (now - cached.timestamp < ttl)) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         ...cached.data,
