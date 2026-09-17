@@ -707,15 +707,33 @@ const server = http.createServer(async (req, res) => {
       const result = await forwardToApiSports(upstreamPath);
 
       if (result.status === 200 && result.body && !result.body.errors?.rateLimit) {
+        let cleanedBody = result.body;
+        if (query.live === 'all' && Array.isArray(cleanedBody.response)) {
+          const inPlayStatuses = ['1H', '2H', 'HT', 'ET', 'BT', 'P', 'LIVE', 'IN_PLAY'];
+          cleanedBody = {
+            ...cleanedBody,
+            response: cleanedBody.response.filter(f => {
+              const status = f.fixture?.status?.short;
+              if (inPlayStatuses.includes(status)) {
+                const matchTime = new Date(f.fixture?.date).getTime();
+                if (!isNaN(matchTime) && (now - matchTime > 135 * 60 * 1000)) {
+                  return false; // Exclude stalled zombie match (>135 min since kickoff)
+                }
+              }
+              return true;
+            })
+          };
+        }
+
         serverCache[cacheKey] = {
-          data: result.body,
+          data: cleanedBody,
           timestamp: now,
           dataFreshness: 'FRESH'
         };
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
-          ...result.body,
+          ...cleanedBody,
           _meta: {
             dataSource: 'API_SPORTS_LIVE',
             dataFreshness: 'FRESH',

@@ -126,8 +126,28 @@ async function requestApiData(endpointAndQuery: string): Promise<any> {
   throw new Error(`Failed to fetch ${endpointAndQuery} from both proxy and direct API`);
 }
 
+/**
+ * Watchdog Anti-Congelamiento:
+ * Detecta si un partido sigue reportado como 'en juego' (1H, 2H, HT, etc.)
+ * pero ya han transcurrido más de 135 minutos desde la hora programada de inicio.
+ * Evita que fallos upstream de la API congelen las tarjetas de partidos en vivo.
+ */
+export function isMatchStalledZombie(match: MatchData): boolean {
+  if (!match.date) return false;
+  const inPlayStatuses = ['1H', '2H', 'HT', 'ET', 'BT', 'P', 'LIVE', 'IN_PLAY'];
+  if (!inPlayStatuses.includes(match.status)) return false;
+
+  const kickoffTime = new Date(match.date).getTime();
+  if (isNaN(kickoffTime)) return false;
+
+  const elapsedMs = Date.now() - kickoffTime;
+  const MAX_MATCH_DURATION_MS = 135 * 60 * 1000; // 135 minutos
+
+  return elapsedMs > MAX_MATCH_DURATION_MS;
+}
+
 // -------------------------------------------------------------------------
-// 1. FETCH LIVE MATCHES (High frequency: 15s TTL)
+// 1. FETCH LIVE MATCHES (High frequency: 15s TTL + Watchdog Filter)
 // -------------------------------------------------------------------------
 export async function fetchLiveMatches(leagueIds: number[]): Promise<MatchData[]> {
   if (USE_MOCK) return getMockLiveMatches(leagueIds);
@@ -158,7 +178,10 @@ export async function fetchLiveMatches(leagueIds: number[]): Promise<MatchData[]
       };
     }
 
-    const allLiveMatches: MatchData[] = (result.response || []).map(mapResponseToMatchData);
+    const rawLiveMatches: MatchData[] = (result.response || []).map(mapResponseToMatchData);
+    // Aplicar Watchdog Filter: descartar partidos colgados/zombies en la API
+    const allLiveMatches = rawLiveMatches.filter(m => !isMatchStalledZombie(m));
+
     memoryCache.liveMatches = {
       data: allLiveMatches,
       timestamp: now
