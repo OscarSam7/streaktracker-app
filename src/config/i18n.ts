@@ -32,6 +32,33 @@ export interface Translations {
     transparency: string;
     portalWeb: string;
     adminPanel: string;
+    downloadApp: string;
+    downloadAppHub: string;
+  };
+  downloadModal: {
+    title: string;
+    subtitle: string;
+    installNowBtn: string;
+    installingBtn: string;
+    installedBadge: string;
+    tabAndroid: string;
+    tabIos: string;
+    tabDesktop: string;
+    stepAndroid1: string;
+    stepAndroid2: string;
+    stepAndroid3: string;
+    stepIos1: string;
+    stepIos2: string;
+    stepIos3: string;
+    stepIos4: string;
+    stepDesktop1: string;
+    stepDesktop2: string;
+    stepDesktop3: string;
+    benefitsTitle: string;
+    benefit1: string;
+    benefit2: string;
+    benefit3: string;
+    closeBtn: string;
   };
   trialBanner: {
     title: string;
@@ -557,7 +584,34 @@ export const I18N: Record<Language, Translations> = {
       "dailyReport": "📊 Informe de Jornada",
       "transparency": "🔍 Transparencia & Resultados",
       "portalWeb": "🌐 Portal Web",
-      "adminPanel": "⚙️ Panel Admin"
+      "adminPanel": "⚙️ Panel Admin",
+      "downloadApp": "📲 Instalar App",
+      "downloadAppHub": "📲 Descargar App"
+    },
+    "downloadModal": {
+      "title": "📲 Descargar e Instalar EnRachas",
+      "subtitle": "Instala la aplicación en tu teléfono o computadora para acceso instantáneo, alertas en tiempo real y modo pantalla completa sin navegador.",
+      "installNowBtn": "📥 Instalar App Ahora (1 Clic)",
+      "installingBtn": "⏳ Abriendo instalador...",
+      "installedBadge": "✓ ¡App Ya Instalada en este Dispositivo!",
+      "tabAndroid": "🤖 Android (Chrome / Brave)",
+      "tabIos": "🍏 iPhone / iPad (Safari)",
+      "tabDesktop": "💻 PC / Mac (Escritorio)",
+      "stepAndroid1": "Toca el botón 'Instalar App Ahora' de arriba o pulsa el menú de tres puntos (⋮) en Chrome.",
+      "stepAndroid2": "Selecciona 'Instalar aplicación' o 'Añadir a la pantalla de inicio'.",
+      "stepAndroid3": "¡Listo! La app se abrirá en modo nativo con icono oficial en tu móvil.",
+      "stepIos1": "Abre esta web en el navegador oficial Safari de tu iPhone o iPad.",
+      "stepIos2": "Toca el botón Compartir (el icono cuadrado con la flecha hacia arriba ⎋ en la barra inferior).",
+      "stepIos3": "Desplaza hacia abajo y selecciona 'Añadir a pantalla de inicio'.",
+      "stepIos4": "Pulsa 'Añadir' en la esquina superior derecha. ¡Ya tienes la App en tu pantalla!",
+      "stepDesktop1": "En Google Chrome, Microsoft Edge o Brave, haz clic en el icono de instalación (⊕ o 📥) en la barra de direcciones.",
+      "stepDesktop2": "O abre el menú del navegador (⋮ / ...) y elige 'Instalar EnRachas'.",
+      "stepDesktop3": "Se creará un acceso directo en tu escritorio para abrir la terminal en ventana propia.",
+      "benefitsTitle": "⚡ Ventajas de la App Instalada",
+      "benefit1": "Modo Pantalla Completa ultrarrápido sin barras de navegación.",
+      "benefit2": "Alertas y notificaciones sonoras prioritarias 24/7.",
+      "benefit3": "Acceso instantáneo con un solo toque desde tu pantalla principal.",
+      "closeBtn": "✕ Cerrar"
     },
     "trialBanner": {
       "title": "Período de Prueba Gratuita Activo",
@@ -1145,7 +1199,34 @@ export const I18N: Record<Language, Translations> = {
       "dailyReport": "📊 Daily Matchday Report",
       "transparency": "🔍 Transparency & Results",
       "portalWeb": "🌐 Web Portal",
-      "adminPanel": "⚙️ Admin Panel"
+      "adminPanel": "⚙️ Admin Panel",
+      "downloadApp": "📲 Install App",
+      "downloadAppHub": "📲 Download App"
+    },
+    "downloadModal": {
+      "title": "📲 Download & Install EnRachas",
+      "subtitle": "Install the app on your phone or desktop for instant access, real-time alerts, and distraction-free full screen mode.",
+      "installNowBtn": "📥 Install App Now (1-Click)",
+      "installingBtn": "⏳ Launching installer...",
+      "installedBadge": "✓ App Already Installed on this Device!",
+      "tabAndroid": "🤖 Android (Chrome / Brave)",
+      "tabIos": "🍏 iPhone / iPad (Safari)",
+      "tabDesktop": "💻 PC / Mac (Desktop)",
+      "stepAndroid1": "Tap the 'Install App Now' button above or open the 3-dot menu (⋮) in Chrome.",
+      "stepAndroid2": "Select 'Install app' or 'Add to Home screen'.",
+      "stepAndroid3": "Done! The app opens natively with an official icon on your home screen.",
+      "stepIos1": "Open this website in the official Safari browser on your iPhone or iPad.",
+      "stepIos2": "Tap the Share button (the square icon with an upward arrow ⎋ at the bottom).",
+      "stepIos3": "Scroll down and choose 'Add to Home Screen'.",
+      "stepIos4": "Tap 'Add' at the top right. You now have the native App icon ready!",
+      "stepDesktop1": "In Google Chrome, Edge or Brave, click the install icon (⊕ or 📥) in the address bar.",
+      "stepDesktop2": "Or open the browser menu (⋮ / ...) and choose 'Install EnRachas'.",
+      "stepDesktop3": "A desktop shortcut is created for a standalone high-performance window.",
+      "benefitsTitle": "⚡ Advantages of the Installed App",
+      "benefit1": "Blazing-fast full-screen experience with zero browser clutter.",
+      "benefit2": "Priority 24/7 real-time telemetry and audio alerts.",
+      "benefit3": "Instant 1-tap launch directly from your home screen or taskbar.",
+      "closeBtn": "✕ Close"
     },
     "trialBanner": {
       "title": "Free Trial Active",
@@ -1731,7 +1812,34 @@ export const I18N: Record<Language, Translations> = {
       "dailyReport": "📊 Relatório da Rodada",
       "transparency": "🔍 Transparência & Resultados",
       "portalWeb": "🌐 Portal Web",
-      "adminPanel": "⚙️ Painel Admin"
+      "adminPanel": "⚙️ Painel Admin",
+      "downloadApp": "📲 Instalar App",
+      "downloadAppHub": "📲 Baixar App"
+    },
+    "downloadModal": {
+      "title": "📲 Baixar e Instalar EnRachas",
+      "subtitle": "Instale o aplicativo no seu celular ou computador para acesso instantâneo, alertas em tempo real e modo tela cheia.",
+      "installNowBtn": "📥 Instalar App Agora (1 Clique)",
+      "installingBtn": "⏳ Abrindo instalador...",
+      "installedBadge": "✓ App Já Instalado neste Dispositivo!",
+      "tabAndroid": "🤖 Android (Chrome / Brave)",
+      "tabIos": "🍏 iPhone / iPad (Safari)",
+      "tabDesktop": "💻 PC / Mac (Desktop)",
+      "stepAndroid1": "Toque no botão 'Instalar App Agora' acima ou no menu de 3 pontos (⋮) do Chrome.",
+      "stepAndroid2": "Selecione 'Instalar aplicativo' ou 'Adicionar à tela inicial'.",
+      "stepAndroid3": "Pronto! O aplicativo abrirá em modo nativo com ícone oficial no seu celular.",
+      "stepIos1": "Abra este site no navegador Safari do seu iPhone ou iPad.",
+      "stepIos2": "Toque no botão Compartilhar (o ícone quadrado com a seta para cima ⎋ na barra inferior).",
+      "stepIos3": "Role para baixo e selecione 'Adicionar à Tela de Início'.",
+      "stepIos4": "Toque em 'Adicionar' no canto superior direito. O App está pronto na sua tela!",
+      "stepDesktop1": "No Google Chrome, Edge ou Brave, clique no ícone de instalação (⊕ ou 📥) na barra de endereços.",
+      "stepDesktop2": "Ou abra o menu do navegador (⋮ / ...) e escolha 'Instalar EnRachas'.",
+      "stepDesktop3": "Um atalho na área de trabalho será criado para abrir o terminal em janela própria.",
+      "benefitsTitle": "⚡ Vantagens do App Instalado",
+      "benefit1": "Modo Tela Cheia ultrarrápido sem barras de navegador.",
+      "benefit2": "Alertas prioritários e avisos sonoros 24/7.",
+      "benefit3": "Acesso instantâneo com um toque a partir da sua tela inicial.",
+      "closeBtn": "✕ Fechar"
     },
     "trialBanner": {
       "title": "Período de Teste Gratuito Ativo",
@@ -2319,7 +2427,34 @@ export const I18N: Record<Language, Translations> = {
       "dailyReport": "📊 Jornada Marandu",
       "transparency": "🔍 Transparencia & Resultados",
       "portalWeb": "🌐 Portal Web",
-      "adminPanel": "⚙️ Panel Admin"
+      "adminPanel": "⚙️ Panel Admin",
+      "downloadApp": "📲 Emboguejy App",
+      "downloadAppHub": "📲 Emboguejy App"
+    },
+    "downloadModal": {
+      "title": "📲 Emboguejy ha Emohenda EnRachas App",
+      "subtitle": "Emohenda ko tembipuru nde pumbyrýpe térã kombutadórape eike pya'e hag̃ua, eguereko marandukuéra en vivo ha ehecha pantalla tuichápe.",
+      "installNowBtn": "📥 Emohenda Ko'ág̃a (1 Clic)",
+      "installingBtn": "⏳ Oipe'a hína...",
+      "installedBadge": "✓ ¡App Oñemohendáma ko Tembipurúpe!",
+      "tabAndroid": "🤖 Android (Chrome / Brave)",
+      "tabIos": "🍏 iPhone / iPad (Safari)",
+      "tabDesktop": "💻 PC / Mac (Escritorio)",
+      "stepAndroid1": "Epoko botón 'Emohenda Ko'ág̃a' yvateguápe térã eike Chrome menú mbohapy kyta (⋮)-pe.",
+      "stepAndroid2": "Eiporavo 'Instalar aplicación' térã 'Añadir a pantalla de inicio'.",
+      "stepAndroid3": "¡Oĩma! Pe app oipe'áta voi icono oficial ndive nde pumbyrýpe.",
+      "stepIos1": "Eike ko web-pe Safari navegador rupive nde iPhone térã iPad-pe.",
+      "stepIos2": "Epoko botón Compartir (kuatia'i hu'y yvatévo ⎋ iguýpe).",
+      "stepIos3": "Eguejy michĩmi ha eiporavo 'Añadir a pantalla de inicio'.",
+      "stepIos4": "Epoko 'Añadir' yvate akatúape. ¡Oĩmbáma pe App nde pantalla-pe!",
+      "stepDesktop1": "Chrome, Edge térã Brave-pe, ejapo clic icono ⊕ térã 📥 dirección barra-pe.",
+      "stepDesktop2": "Térã eike navegador menú (⋮ / ...) ha eiporavo 'Instalar EnRachas'.",
+      "stepDesktop3": "Oñemohendáta peteĩ acceso directo nde escritorio-pe eike pya'e hag̃ua.",
+      "benefitsTitle": "⚡ Mba'érepa Iporãve App Ñemohenda",
+      "benefit1": "Oiko pya'eterei pantalla tuichaitépe navegador mba'eve'ỹre.",
+      "benefit2": "Marandukuéra ha tyapu oñemotenondéva 24/7.",
+      "benefit3": "Eike peteĩ poko rupive nde pantalla principal guive.",
+      "closeBtn": "✕ Mboty"
     },
     "trialBanner": {
       "title": "Prueba Gratuita Oĩva Hína",

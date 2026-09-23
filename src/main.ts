@@ -249,6 +249,7 @@ async function run() {
   updateTrialBannerUI();
   updateUserHeaderUI();
   setupAdminModule();
+  setupDownloadAppModule();
 
   // Multi-Device Persistence: Realizar migración segura y sincronizar estado con el servidor
   DataRepository.performSafeMigration(state.userProfile.id).catch(() => {});
@@ -3115,6 +3116,7 @@ function updateStaticLanguageTexts() {
   updateTransparencyModalTexts();
   updateBankrollModalTexts();
   updateAdminModalTexts();
+  updateDownloadModalTexts();
 
   const lang = t();
 
@@ -3133,6 +3135,16 @@ function updateStaticLanguageTexts() {
   // Header Buttons
   const logoutBtn = document.getElementById('logout-header-btn');
   if (logoutBtn) logoutBtn.innerText = lang.header.logout;
+
+  const lblDownloadHeader = document.getElementById('lbl-download-app-header');
+  if (lblDownloadHeader && lang.header?.downloadApp) {
+    lblDownloadHeader.innerText = lang.header.downloadApp.replace(/^[^\w\s]+/, '').trim();
+  }
+
+  const lblDownloadHub = document.getElementById('lbl-download-app-hub');
+  if (lblDownloadHub && lang.header?.downloadAppHub) {
+    lblDownloadHub.innerText = lang.header.downloadAppHub.replace(/^[^\w\s]+/, '').trim();
+  }
 
   const guideBtn = document.getElementById('guide-btn');
   if (guideBtn) guideBtn.innerText = lang.header.whichMarket;
@@ -7199,3 +7211,154 @@ function setupAdminModule() {
     });
   }
 }
+
+// -------------------------------------------------------------------------
+// DOWNLOAD & INSTALL PWA APP MODULE
+// -------------------------------------------------------------------------
+
+let deferredPwaPrompt: any = null;
+
+function updateDownloadModalTexts() {
+  const lang = t();
+  const modal = document.getElementById('download-app-modal');
+  if (!modal || !lang.downloadModal) return;
+
+  const titleEl = document.getElementById('download-modal-title');
+  if (titleEl) titleEl.innerText = lang.downloadModal.title;
+
+  const subEl = document.getElementById('download-modal-subtitle');
+  if (subEl) subEl.innerText = lang.downloadModal.subtitle;
+
+  const installNowBtn = document.getElementById('lbl-install-now-btn');
+  if (installNowBtn) installNowBtn.innerText = lang.downloadModal.installNowBtn;
+
+  const installedNotice = document.getElementById('pwa-installed-notice');
+  if (installedNotice) installedNotice.innerText = lang.downloadModal.installedBadge;
+
+  const tabAndroid = document.getElementById('tab-install-android');
+  if (tabAndroid) tabAndroid.innerText = lang.downloadModal.tabAndroid;
+
+  const tabIos = document.getElementById('tab-install-ios');
+  if (tabIos) tabIos.innerText = lang.downloadModal.tabIos;
+
+  const tabDesktop = document.getElementById('tab-install-desktop');
+  if (tabDesktop) tabDesktop.innerText = lang.downloadModal.tabDesktop;
+
+  const stepA1 = document.getElementById('step-android-1');
+  if (stepA1) stepA1.innerHTML = lang.downloadModal.stepAndroid1;
+  const stepA2 = document.getElementById('step-android-2');
+  if (stepA2) stepA2.innerHTML = lang.downloadModal.stepAndroid2;
+  const stepA3 = document.getElementById('step-android-3');
+  if (stepA3) stepA3.innerHTML = lang.downloadModal.stepAndroid3;
+
+  const stepI1 = document.getElementById('step-ios-1');
+  if (stepI1) stepI1.innerHTML = lang.downloadModal.stepIos1;
+  const stepI2 = document.getElementById('step-ios-2');
+  if (stepI2) stepI2.innerHTML = lang.downloadModal.stepIos2;
+  const stepI3 = document.getElementById('step-ios-3');
+  if (stepI3) stepI3.innerHTML = lang.downloadModal.stepIos3;
+  const stepI4 = document.getElementById('step-ios-4');
+  if (stepI4) stepI4.innerHTML = lang.downloadModal.stepIos4;
+
+  const stepD1 = document.getElementById('step-desktop-1');
+  if (stepD1) stepD1.innerHTML = lang.downloadModal.stepDesktop1;
+  const stepD2 = document.getElementById('step-desktop-2');
+  if (stepD2) stepD2.innerHTML = lang.downloadModal.stepDesktop2;
+  const stepD3 = document.getElementById('step-desktop-3');
+  if (stepD3) stepD3.innerHTML = lang.downloadModal.stepDesktop3;
+
+  const bTitle = document.getElementById('download-modal-benefits-title');
+  if (bTitle) bTitle.innerText = lang.downloadModal.benefitsTitle;
+
+  const b1 = document.getElementById('download-benefit-1');
+  if (b1) b1.innerText = lang.downloadModal.benefit1;
+  const b2 = document.getElementById('download-benefit-2');
+  if (b2) b2.innerText = lang.downloadModal.benefit2;
+  const b3 = document.getElementById('download-benefit-3');
+  if (b3) b3.innerText = lang.downloadModal.benefit3;
+}
+
+function setupDownloadAppModule() {
+  const downloadBtn = document.getElementById('download-app-btn');
+  const downloadHubBtn = document.getElementById('download-app-chip-btn');
+  const modal = document.getElementById('download-app-modal') as HTMLDialogElement;
+  const closeBtn = document.getElementById('close-download-app-modal');
+  const pwaActionBtn = document.getElementById('pwa-install-action-btn');
+  const installedNotice = document.getElementById('pwa-installed-notice');
+
+  // Capture beforeinstallprompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPwaPrompt = e;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredPwaPrompt = null;
+    if (installedNotice) installedNotice.style.display = 'block';
+    if (pwaActionBtn) pwaActionBtn.style.display = 'none';
+  });
+
+  const openModal = () => {
+    updateDownloadModalTexts();
+    if (modal) modal.showModal();
+  };
+
+  if (downloadBtn) downloadBtn.addEventListener('click', openModal);
+  if (downloadHubBtn) downloadHubBtn.addEventListener('click', openModal);
+  if (closeBtn && modal) closeBtn.addEventListener('click', () => modal.close());
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.close();
+    });
+  }
+
+  // Tabs switching
+  const tabs = modal?.querySelectorAll('[data-install-tab]') as NodeListOf<HTMLButtonElement>;
+  const paneAndroid = document.getElementById('install-pane-android');
+  const paneIos = document.getElementById('install-pane-ios');
+  const paneDesktop = document.getElementById('install-pane-desktop');
+
+  tabs?.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const targetTab = tab.dataset.installTab;
+
+      if (paneAndroid) paneAndroid.style.display = targetTab === 'android' ? 'block' : 'none';
+      if (paneIos) paneIos.style.display = targetTab === 'ios' ? 'block' : 'none';
+      if (paneDesktop) paneDesktop.style.display = targetTab === 'desktop' ? 'block' : 'none';
+    });
+  });
+
+  // 1-Click Install Action
+  if (pwaActionBtn) {
+    pwaActionBtn.addEventListener('click', async () => {
+      if (deferredPwaPrompt) {
+        pwaActionBtn.innerText = t().downloadModal?.installingBtn || '⏳ Abriendo instalador...';
+        deferredPwaPrompt.prompt();
+        const choiceResult = await deferredPwaPrompt.userChoice;
+        if (choiceResult.outcome === 'accepted') {
+          if (installedNotice) installedNotice.style.display = 'block';
+          pwaActionBtn.style.display = 'none';
+        } else {
+          pwaActionBtn.innerHTML = `📥 <span>${t().downloadModal?.installNowBtn || 'Instalar App Ahora (1 Clic)'}</span>`;
+        }
+        deferredPwaPrompt = null;
+      } else {
+        // Auto detect platform and focus relevant tab
+        const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+        if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+          const tabIos = document.getElementById('tab-install-ios');
+          if (tabIos) tabIos.click();
+        } else if (/android/i.test(userAgent)) {
+          const tabAnd = document.getElementById('tab-install-android');
+          if (tabAnd) tabAnd.click();
+        } else {
+          const tabDesk = document.getElementById('tab-install-desktop');
+          if (tabDesk) tabDesk.click();
+        }
+      }
+    });
+  }
+}
+

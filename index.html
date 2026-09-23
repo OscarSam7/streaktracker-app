@@ -65,6 +65,11 @@
             <span id="header-user-plan-pill" class="sports-plan-chip">VIP</span>
           </div>
 
+          <button id="download-app-btn" class="sports-btn-download" title="Descargar / Instalar App EnRachas">
+            <span class="download-icon">📲</span>
+            <span class="download-text" id="lbl-download-app-header">Instalar App</span>
+          </button>
+
           <button id="refresh-btn" class="sports-btn-icon" title="Actualizar datos de las ligas ahora">🔄</button>
           <button id="notif-settings-btn" class="sports-btn-icon sports-notif-btn" title="Centro de Notificaciones y Clasificación de Alertas">
             <span class="notif-bell-icon">🔔</span>
@@ -143,6 +148,9 @@
         </a>
         <button id="export-csv-btn" class="sports-tool-chip chip-report" title="Ver Informe Visual Consolidado de Rachas en Pantalla">
           <span class="tool-icon">📋</span> Informe de Rachas
+        </button>
+        <button id="download-app-chip-btn" class="sports-tool-chip chip-install" title="Descargar e Instalar la App en Android, iOS o PC">
+          <span class="tool-icon">📲</span> <span id="lbl-download-app-hub">Descargar App</span>
         </button>
         <button id="admin-panel-btn" class="btn" style="display: none;" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
       </div>
@@ -2216,6 +2224,139 @@
 
         <div id="history-modal-body" style="max-height: 68vh; overflow-y: auto; padding-right: 0.3rem;">
           <!-- Contenido inyectado dinámicamente -->
+        </div>
+      </dialog>
+
+      <!-- Modal Descargar / Instalar App (PWA & Multi-Plataforma) -->
+      <dialog id="download-app-modal" class="custom-dialog" style="width: 95vw; max-width: 680px; padding: 1.75rem; border-radius: 1rem; border: 1px solid rgba(56, 189, 248, 0.4); color: var(--text-main); background: #0f172a; box-shadow: 0 0 50px rgba(15, 23, 42, 0.95); overflow-y: auto;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 0 20px rgba(56, 189, 248, 0.45); flex-shrink: 0;">
+              📲
+            </div>
+            <div>
+              <h2 id="download-modal-title" style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+                Descargar e Instalar EnRachas App
+              </h2>
+              <p id="download-modal-subtitle" style="font-size: 0.76rem; color: #94a3b8; margin-top: 0.2rem; margin-bottom: 0;">
+                Instala la aplicación en tu teléfono o computadora para acceso instantáneo, alertas y modo pantalla completa.
+              </p>
+            </div>
+          </div>
+          <button id="close-download-app-modal" class="btn" style="padding: 0.35rem 0.75rem;">✕</button>
+        </div>
+
+        <!-- 1-Click Action Card (Hero Banner) -->
+        <div style="background: linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(30, 41, 59, 0.9) 100%); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 0.85rem; padding: 1.1rem; margin-bottom: 1.25rem; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.35);">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+            <img src="/app-icon-192.png" alt="EnRachas App" style="width: 48px; height: 48px; border-radius: 10px; box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); border: 1px solid rgba(56, 189, 248, 0.4);" />
+            <div style="text-align: left;">
+              <strong style="font-size: 1rem; color: #fff; display: block;">EnRachas — Progressive Web App</strong>
+              <span style="font-size: 0.74rem; color: #38bdf8;">✓ Compatible con Android, iOS (iPhone/iPad), Windows y Mac</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <button id="pwa-install-action-btn" class="btn" style="background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%); color: #fff; font-weight: 800; font-size: 0.9rem; padding: 0.6rem 1.4rem; border-radius: 8px; border: none; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+              📥 <span id="lbl-install-now-btn">Instalar App Ahora (1 Clic)</span>
+            </button>
+          </div>
+          <div id="pwa-installed-notice" style="display: none; color: #4ade80; font-size: 0.8rem; font-weight: 700; margin-top: 0.6rem;">
+            ✓ ¡Aplicación instalada exitosamente en este dispositivo!
+          </div>
+        </div>
+
+        <!-- Platform Instructions Tabs -->
+        <div style="display: flex; gap: 0.4rem; margin-bottom: 1rem; background: rgba(0,0,0,0.35); padding: 0.35rem; border-radius: 0.6rem; border: 1px solid rgba(255,255,255,0.08); overflow-x: auto;">
+          <button class="filter-pill active" id="tab-install-android" data-install-tab="android" style="flex: 1; text-align: center; font-size: 0.78rem;">
+            🤖 Android
+          </button>
+          <button class="filter-pill" id="tab-install-ios" data-install-tab="ios" style="flex: 1; text-align: center; font-size: 0.78rem;">
+            🍏 iPhone / iPad
+          </button>
+          <button class="filter-pill" id="tab-install-desktop" data-install-tab="desktop" style="flex: 1; text-align: center; font-size: 0.78rem;">
+            💻 PC / Mac
+          </button>
+        </div>
+
+        <!-- Tab Body: Android -->
+        <div id="install-pane-android" class="install-pane-content" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.25rem;">
+          <h4 style="color: #38bdf8; font-size: 0.88rem; margin: 0 0 0.65rem 0; display: flex; align-items: center; gap: 0.4rem;">
+            🤖 Pasos para Android (Google Chrome / Brave / Edge)
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.8rem; color: #cbd5e1;">
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">1</span>
+              <p id="step-android-1" style="margin: 0;">Toca el botón <strong>'Instalar App Ahora'</strong> de arriba o pulsa el menú de tres puntos (<strong>⋮</strong>) en Chrome.</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">2</span>
+              <p id="step-android-2" style="margin: 0;">Selecciona <strong>'Instalar aplicación'</strong> o <strong>'Añadir a la pantalla de inicio'</strong>.</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">3</span>
+              <p id="step-android-3" style="margin: 0;">¡Listo! La app se abrirá en modo nativo con icono oficial en tu cajón de aplicaciones.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Body: iOS (Hidden by default) -->
+        <div id="install-pane-ios" class="install-pane-content" style="display: none; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.25rem;">
+          <h4 style="color: #38bdf8; font-size: 0.88rem; margin: 0 0 0.65rem 0; display: flex; align-items: center; gap: 0.4rem;">
+            🍏 Pasos para iPhone / iPad (Safari)
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.8rem; color: #cbd5e1;">
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">1</span>
+              <p id="step-ios-1" style="margin: 0;">Abre esta web en el navegador oficial <strong>Safari</strong> de tu iPhone o iPad.</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">2</span>
+              <p id="step-ios-2" style="margin: 0;">Toca el botón <strong>Compartir</strong> (el icono cuadrado con la flecha hacia arriba <strong>⎋</strong> en la barra inferior).</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">3</span>
+              <p id="step-ios-3" style="margin: 0;">Desplaza hacia abajo y selecciona <strong>'Añadir a pantalla de inicio'</strong>.</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">4</span>
+              <p id="step-ios-4" style="margin: 0;">Pulsa <strong>'Añadir'</strong> en la esquina superior derecha. ¡Ya tienes la App en tu pantalla!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Body: Desktop (Hidden by default) -->
+        <div id="install-pane-desktop" class="install-pane-content" style="display: none; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.25rem;">
+          <h4 style="color: #38bdf8; font-size: 0.88rem; margin: 0 0 0.65rem 0; display: flex; align-items: center; gap: 0.4rem;">
+            💻 Pasos para PC / Mac (Chrome / Edge / Brave)
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.8rem; color: #cbd5e1;">
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">1</span>
+              <p id="step-desktop-1" style="margin: 0;">En Google Chrome, Microsoft Edge o Brave, haz clic en el icono de instalación (<strong>⊕</strong> o <strong>📥</strong>) en la barra de direcciones.</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">2</span>
+              <p id="step-desktop-2" style="margin: 0;">O abre el menú del navegador (<strong>⋮</strong> / <strong>...</strong>) y elige <strong>'Instalar EnRachas'</strong>.</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem;">3</span>
+              <p id="step-desktop-3" style="margin: 0;">Se creará un acceso directo en tu escritorio para abrir la terminal en ventana propia de alto rendimiento.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benefits Grid -->
+        <div style="background: rgba(0,0,0,0.3); border-radius: 0.6rem; padding: 0.85rem; border: 1px dashed rgba(255,255,255,0.1);">
+          <strong id="download-modal-benefits-title" style="font-size: 0.78rem; color: #38bdf8; text-transform: uppercase; display: block; margin-bottom: 0.4rem;">
+            ⚡ Ventajas de la App Instalada
+          </strong>
+          <ul style="margin: 0; padding-left: 1.1rem; font-size: 0.75rem; color: #94a3b8; line-height: 1.5;">
+            <li id="download-benefit-1">Modo Pantalla Completa ultrarrápido sin barras de navegación.</li>
+            <li id="download-benefit-2">Alertas y notificaciones sonoras prioritarias 24/7.</li>
+            <li id="download-benefit-3">Acceso instantáneo con un solo toque desde tu pantalla principal.</li>
+          </ul>
         </div>
       </dialog>
 
