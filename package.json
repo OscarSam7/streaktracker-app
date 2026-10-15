@@ -1,7 +1,7 @@
 {
-  "name": "antigravity",
+  "name": "enrachas-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,11 +9,12 @@
     "preview": "vite preview",
     "start": "node proxyServer.cjs"
   },
-  "devDependencies": {
+  "dependencies": {
+    "exceljs": "^4.4.0",
     "typescript": "~5.9.3",
     "vite": "^7.3.1"
   },
-  "dependencies": {
-    "exceljs": "^4.4.0"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

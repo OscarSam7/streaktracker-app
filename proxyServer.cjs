@@ -12,7 +12,7 @@ const APISPORTS_HOST = 'v3.football.api-sports.io';
 // Environment Settings
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const PAYMENT_ENVIRONMENT = process.env.PAYMENT_ENVIRONMENT || 'SANDBOX';
-const ALLOWED_ORIGIN = process.env.APP_ORIGIN || (NODE_ENV === 'production' ? 'https://streaktracker.io' : '*');
+const ALLOWED_ORIGIN = process.env.APP_ORIGIN || '*';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder_mock';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test_placeholder_mock';
@@ -294,11 +294,11 @@ const server = http.createServer(async (req, res) => {
 
   // Strict CORS Evaluation
   let resolvedOrigin = originHeader || '*';
-  if (NODE_ENV === 'production' && ALLOWED_ORIGIN !== '*') {
-    if (originHeader && originHeader === ALLOWED_ORIGIN) {
-      resolvedOrigin = ALLOWED_ORIGIN;
+  if (ALLOWED_ORIGIN !== '*') {
+    if (originHeader && (originHeader === ALLOWED_ORIGIN || originHeader.includes('.onrender.com') || originHeader.includes('localhost'))) {
+      resolvedOrigin = originHeader;
     } else {
-      resolvedOrigin = ALLOWED_ORIGIN; // Fallback strictly to authorized production domain
+      resolvedOrigin = ALLOWED_ORIGIN;
     }
   }
 

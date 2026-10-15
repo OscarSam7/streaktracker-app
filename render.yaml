@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: enrachas-tracker
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APISPORTS_KEY
+        value: c3e40bbc2c34eb562bd85e21c0dc68af
