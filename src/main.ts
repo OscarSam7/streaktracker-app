@@ -3141,11 +3141,6 @@ function updateStaticLanguageTexts() {
     lblDownloadHeader.innerText = lang.header.downloadApp.replace(/^[^\w\s]+/, '').trim();
   }
 
-  const lblDownloadHub = document.getElementById('lbl-download-app-hub');
-  if (lblDownloadHub && lang.header?.downloadAppHub) {
-    lblDownloadHub.innerText = lang.header.downloadAppHub.replace(/^[^\w\s]+/, '').trim();
-  }
-
   const guideBtn = document.getElementById('guide-btn');
   if (guideBtn) guideBtn.innerText = lang.header.whichMarket;
 
@@ -7278,13 +7273,38 @@ function updateDownloadModalTexts() {
   if (b3) b3.innerText = lang.downloadModal.benefit3;
 }
 
+function isPwaInstalled(): boolean {
+  try {
+    if (window.matchMedia('(display-mode: standalone)').matches) return true;
+    if (window.matchMedia('(display-mode: minimal-ui)').matches) return true;
+    if (window.matchMedia('(display-mode: window-controls-overlay)').matches) return true;
+    if ((window.navigator as any).standalone === true) return true;
+    if (document.referrer && document.referrer.startsWith('android-app://')) return true;
+    if (localStorage.getItem('pwa_app_installed') === 'true') return true;
+  } catch (e) {}
+  return false;
+}
+
 function setupDownloadAppModule() {
   const downloadBtn = document.getElementById('download-app-btn');
-  const downloadHubBtn = document.getElementById('download-app-chip-btn');
   const modal = document.getElementById('download-app-modal') as HTMLDialogElement;
   const closeBtn = document.getElementById('close-download-app-modal');
   const pwaActionBtn = document.getElementById('pwa-install-action-btn');
   const installedNotice = document.getElementById('pwa-installed-notice');
+
+  // Si ya está instalada en el dispositivo o corriendo como App nativa, ocultar el botón de la cabecera
+  if (isPwaInstalled() && downloadBtn) {
+    downloadBtn.style.display = 'none';
+  }
+
+  // Detectar cambio dinámico a modo standalone
+  try {
+    window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
+      if (evt.matches && downloadBtn) {
+        downloadBtn.style.display = 'none';
+      }
+    });
+  } catch (e) {}
 
   // Capture beforeinstallprompt
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -7294,6 +7314,8 @@ function setupDownloadAppModule() {
 
   window.addEventListener('appinstalled', () => {
     deferredPwaPrompt = null;
+    try { localStorage.setItem('pwa_app_installed', 'true'); } catch (e) {}
+    if (downloadBtn) downloadBtn.style.display = 'none';
     if (installedNotice) installedNotice.style.display = 'block';
     if (pwaActionBtn) pwaActionBtn.style.display = 'none';
   });
@@ -7304,7 +7326,6 @@ function setupDownloadAppModule() {
   };
 
   if (downloadBtn) downloadBtn.addEventListener('click', openModal);
-  if (downloadHubBtn) downloadHubBtn.addEventListener('click', openModal);
   if (closeBtn && modal) closeBtn.addEventListener('click', () => modal.close());
   if (modal) {
     modal.addEventListener('click', (e) => {
@@ -7338,6 +7359,8 @@ function setupDownloadAppModule() {
         deferredPwaPrompt.prompt();
         const choiceResult = await deferredPwaPrompt.userChoice;
         if (choiceResult.outcome === 'accepted') {
+          try { localStorage.setItem('pwa_app_installed', 'true'); } catch (e) {}
+          if (downloadBtn) downloadBtn.style.display = 'none';
           if (installedNotice) installedNotice.style.display = 'block';
           pwaActionBtn.style.display = 'none';
         } else {
