@@ -250,6 +250,7 @@ async function run() {
   updateUserHeaderUI();
   setupAdminModule();
   setupDownloadAppModule();
+  setupVipMenuModal();
 
   // Multi-Device Persistence: Realizar migración segura y sincronizar estado con el servidor
   DataRepository.performSafeMigration(state.userProfile.id).catch(() => {});
@@ -3118,6 +3119,14 @@ function updateStaticLanguageTexts() {
   updateAdminModalTexts();
   updateDownloadModalTexts();
 
+  document.querySelectorAll<HTMLButtonElement>('.vip-lang-btn').forEach(btn => {
+    if (btn.dataset.vipLang === state.currentLang) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
   const lang = t();
 
   // App Title
@@ -3584,6 +3593,15 @@ function setupSportsBottomNav() {
       setActiveBnav(bnavPlans);
       const planBtn = document.getElementById('pricing-btn');
       if (planBtn) planBtn.click();
+    });
+  }
+
+  const bnavMenu = document.getElementById('bnav-menu');
+  if (bnavMenu) {
+    bnavMenu.addEventListener('click', () => {
+      setActiveBnav(bnavMenu);
+      const vipBtn = document.getElementById('vip-menu-btn');
+      if (vipBtn) vipBtn.click();
     });
   }
 }
@@ -7384,4 +7402,279 @@ function setupDownloadAppModule() {
     });
   }
 }
+
+// ---------------------------------------------------------
+// VIP MENU MODAL (SELECTOR CLARO VIP & FAST ACCESS SUITE)
+// ---------------------------------------------------------
+
+function setupVipMenuModal() {
+  const vipMenuBtn = document.getElementById('vip-menu-btn');
+  const vipMenuModal = document.getElementById('vip-menu-modal') as HTMLDialogElement;
+  const closeVipMenuModal = document.getElementById('close-vip-menu-modal');
+  const searchInput = document.getElementById('vip-menu-search-input') as HTMLInputElement;
+  const searchClearBtn = document.getElementById('vip-menu-search-clear') as HTMLButtonElement;
+  const sectorPills = document.querySelectorAll('.vip-sector-pill') as NodeListOf<HTMLButtonElement>;
+  const vipCards = document.querySelectorAll('.vip-card') as NodeListOf<HTMLDivElement>;
+  const emptyState = document.getElementById('vip-menu-empty') as HTMLDivElement;
+  const langBtns = document.querySelectorAll('.vip-lang-btn') as NodeListOf<HTMLButtonElement>;
+
+  if (!vipMenuModal) return;
+
+  let currentSector = 'all';
+
+  // Sincronizar botones de idiomas activos en tarjeta VIP
+  const syncVipLanguageButtons = () => {
+    langBtns.forEach(btn => {
+      const lang = btn.dataset.vipLang;
+      if (lang === state.currentLang) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  };
+
+  // Filtrado reactivo por sector y búsqueda
+  const filterVipCards = () => {
+    const query = (searchInput?.value || '').trim().toLowerCase();
+    let visibleCount = 0;
+
+    vipCards.forEach(card => {
+      const cardSector = card.dataset.sector || '';
+      const cardKeywords = (card.dataset.keywords || '').toLowerCase();
+      const cardText = (card.textContent || '').toLowerCase();
+
+      const matchesSector = currentSector === 'all' || cardSector === currentSector;
+      const matchesSearch = !query || cardKeywords.includes(query) || cardText.includes(query);
+
+      if (matchesSector && matchesSearch) {
+        card.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    if (emptyState) {
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    if (searchClearBtn) {
+      searchClearBtn.style.display = query ? 'flex' : 'none';
+    }
+  };
+
+  const openVipMenu = () => {
+    syncVipLanguageButtons();
+    currentSector = 'all';
+    sectorPills.forEach(p => {
+      if (p.dataset.sector === 'all') p.classList.add('active');
+      else p.classList.remove('active');
+    });
+    if (searchInput) searchInput.value = '';
+    filterVipCards();
+
+    if (!vipMenuModal.open) {
+      vipMenuModal.showModal();
+    }
+    if (window.location.hash !== '#menu' && !window.location.pathname.endsWith('/menu')) {
+      try {
+        history.pushState(null, '', '#menu');
+      } catch (e) {}
+    }
+  };
+
+  const closeVipMenu = () => {
+    if (vipMenuModal.open) {
+      vipMenuModal.close();
+    }
+    if (window.location.hash === '#menu') {
+      try {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      } catch (e) {}
+    } else if (window.location.pathname.endsWith('/menu')) {
+      try {
+        history.replaceState(null, '', '/');
+      } catch (e) {}
+    }
+  };
+
+  // Botón disparador en Header
+  if (vipMenuBtn) {
+    vipMenuBtn.addEventListener('click', openVipMenu);
+  }
+
+  // Botón cerrar
+  if (closeVipMenuModal) {
+    closeVipMenuModal.addEventListener('click', closeVipMenu);
+  }
+
+  // Click fuera del modal (backdrop)
+  vipMenuModal.addEventListener('click', (e) => {
+    if (e.target === vipMenuModal) {
+      closeVipMenu();
+    }
+  });
+
+  // Evento cancelar (tecla Escape)
+  vipMenuModal.addEventListener('cancel', () => {
+    if (window.location.hash === '#menu') {
+      try {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      } catch (e) {}
+    }
+  });
+
+  // Filtro por pestañas de sectores
+  sectorPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      sectorPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentSector = pill.dataset.sector || 'all';
+      filterVipCards();
+    });
+  });
+
+  // Buscador en tiempo real
+  if (searchInput) {
+    searchInput.addEventListener('input', filterVipCards);
+  }
+
+  if (searchClearBtn) {
+    searchClearBtn.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      filterVipCards();
+    });
+  }
+
+  // 1. Selector de Idiomas dentro de tarjeta VIP
+  langBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const selectedLang = btn.dataset.vipLang as Language;
+      if (selectedLang && selectedLang !== state.currentLang) {
+        state.currentLang = selectedLang;
+        if (langSelect) langSelect.value = selectedLang;
+        try {
+          localStorage.setItem(STORAGE_KEY_LANG, selectedLang);
+        } catch (e) {}
+        updateStaticLanguageTexts();
+        renderDashboard();
+        renderOpportunitiesCenter();
+        refreshBankrollUI();
+        updateLeagueModalToggles();
+        syncVipLanguageButtons();
+      }
+    });
+  });
+
+  // 2. Planes & Membresías VIP
+  const actPlans = document.getElementById('vip-action-plans');
+  if (actPlans) {
+    actPlans.addEventListener('click', () => {
+      closeVipMenu();
+      updatePricingModalTexts();
+      pricingModal.showModal();
+    });
+  }
+
+  // 3. Registro Nueva Operación
+  const actNewOp = document.getElementById('vip-action-new-op');
+  if (actNewOp) {
+    actNewOp.addEventListener('click', () => {
+      closeVipMenu();
+      const bankrollNewOpBtn = document.getElementById('bankroll-new-op-btn');
+      if (bankrollNewOpBtn) {
+        bankrollNewOpBtn.click();
+      } else {
+        const newOpModal = document.getElementById('new-op-modal') as HTMLDialogElement;
+        if (newOpModal) newOpModal.showModal();
+      }
+    });
+  }
+
+  // 4. Registrar Movimiento de Capital
+  const actNewMov = document.getElementById('vip-action-new-mov');
+  if (actNewMov) {
+    actNewMov.addEventListener('click', () => {
+      closeVipMenu();
+      const bankrollNewMovementBtn = document.getElementById('bankroll-new-movement-btn');
+      if (bankrollNewMovementBtn) {
+        bankrollNewMovementBtn.click();
+      } else {
+        const newMovementModal = document.getElementById('new-movement-modal') as HTMLDialogElement;
+        if (newMovementModal) newMovementModal.showModal();
+      }
+    });
+  }
+
+  // 5. Registro de operaciones - Control de Banca
+  const actBankroll = document.getElementById('vip-action-bankroll');
+  if (actBankroll) {
+    actBankroll.addEventListener('click', () => {
+      closeVipMenu();
+      const bankrollBtn = document.getElementById('bankroll-btn');
+      if (bankrollBtn) bankrollBtn.click();
+      const tabOpsBtn = document.querySelector('#bankroll-modal [data-tab="tab-operations"]') as HTMLButtonElement;
+      if (tabOpsBtn) tabOpsBtn.click();
+    });
+  }
+
+  // 6. Parámetros de Banca
+  const actBankrollConfig = document.getElementById('vip-action-bankroll-config');
+  if (actBankrollConfig) {
+    actBankrollConfig.addEventListener('click', () => {
+      closeVipMenu();
+      const bankrollBtn = document.getElementById('bankroll-btn');
+      if (bankrollBtn) bankrollBtn.click();
+      const tabCfgBtn = document.querySelector('#bankroll-modal [data-tab="tab-config"]') as HTMLButtonElement;
+      if (tabCfgBtn) tabCfgBtn.click();
+    });
+  }
+
+  // 7. Simulación Histórica (Backtest)
+  const actBacktest = document.getElementById('vip-action-backtest');
+  if (actBacktest) {
+    actBacktest.addEventListener('click', () => {
+      closeVipMenu();
+      const backtestBtn = document.getElementById('backtest-btn');
+      if (backtestBtn) backtestBtn.click();
+    });
+  }
+
+  // 8. Panel de Administración
+  const actAdmin = document.getElementById('vip-action-admin');
+  if (actAdmin) {
+    actAdmin.addEventListener('click', () => {
+      closeVipMenu();
+      const adminBtn = document.getElementById('admin-panel-btn');
+      if (adminBtn) adminBtn.click();
+    });
+  }
+
+  // Escuchadores de URL para soporte de /menu y #menu
+  const checkUrlRoute = () => {
+    if (window.location.hash === '#menu' || window.location.pathname.endsWith('/menu')) {
+      openVipMenu();
+    }
+  };
+
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#menu') {
+      openVipMenu();
+    } else if (vipMenuModal.open) {
+      vipMenuModal.close();
+    }
+  });
+
+  window.addEventListener('popstate', () => {
+    checkUrlRoute();
+  });
+
+  // Comprobar URL al cargar la aplicación
+  checkUrlRoute();
+}
+
 

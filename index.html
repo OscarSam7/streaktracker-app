@@ -65,6 +65,11 @@
             <span id="header-user-plan-pill" class="sports-plan-chip">VIP</span>
           </div>
 
+          <button id="vip-menu-btn" class="sports-btn-vip-menu" title="Menú Selector VIP y Navegación">
+            <span class="vip-menu-icon">🧭</span>
+            <span class="vip-menu-text">Menú VIP</span>
+          </button>
+
           <button id="download-app-btn" class="sports-btn-download" title="Descargar / Instalar App EnRachas">
             <span class="download-icon">📲</span>
             <span class="download-text" id="lbl-download-app-header">Instalar App</span>
@@ -2357,6 +2362,201 @@
         </div>
       </dialog>
 
+      <!-- MODAL SELECTOR CLARO VIP / MENU -->
+      <dialog id="vip-menu-modal" class="custom-dialog vip-menu-dialog" aria-labelledby="vip-menu-title">
+        <div class="vip-menu-container">
+          <!-- Modal Header -->
+          <div class="vip-menu-header">
+            <div class="vip-menu-header-left">
+              <div class="vip-menu-title-wrap">
+                <span class="vip-badge-pill">👑 VIP SUITE</span>
+                <h2 id="vip-menu-title" class="vip-menu-title">🧭 Menú & Selector VIP</h2>
+              </div>
+              <p class="vip-menu-sub">Selector modal táctil optimizado para Android y escritorio. Acceso directo a todas las funciones sin desplegables del sistema.</p>
+            </div>
+            <button id="close-vip-menu-modal" class="vip-menu-close-btn" aria-label="Cerrar modal">&times;</button>
+          </div>
+
+          <!-- Buscador y Filtros por Sector -->
+          <div class="vip-menu-controls">
+            <div class="vip-search-bar">
+              <span class="vip-search-icon">🔍</span>
+              <input type="text" id="vip-menu-search-input" class="vip-search-input" placeholder="Buscar función o módulo... (ej. idiomas, banca, backtest, admin, kelly)" autocomplete="off" />
+              <button id="vip-menu-search-clear" class="vip-search-clear" style="display: none;" title="Limpiar búsqueda">&times;</button>
+            </div>
+
+            <!-- Filtros por sector -->
+            <div class="vip-sector-tabs" role="tablist" aria-label="Filtro de módulos por sector">
+              <button type="button" class="vip-sector-pill active" data-sector="all">🌟 Todos <span class="vip-pill-count">(8)</span></button>
+              <button type="button" class="vip-sector-pill" data-sector="banca">💼 Banca & Capital <span class="vip-pill-count">(4)</span></button>
+              <button type="button" class="vip-sector-pill" data-sector="simulacion">📈 Simulación & Análisis <span class="vip-pill-count">(1)</span></button>
+              <button type="button" class="vip-sector-pill" data-sector="cuenta">⚙️ Cuenta & Sistema <span class="vip-pill-count">(3)</span></button>
+            </div>
+          </div>
+
+          <!-- Grid de Tarjetas VIP (8 tarjetas elegantes) -->
+          <div class="vip-menu-grid" id="vip-menu-grid">
+
+            <!-- 1. Idiomas -->
+            <div class="vip-card" data-sector="cuenta" data-keywords="idiomas idioma lenguaje language espanol english portugues guarani jopara sistema config">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-cyan">🌐</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-cuenta">⚙️ Cuenta & Sistema</span>
+                  <h3 class="vip-card-title">Idiomas del Sistema</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Cambia el idioma al instante con un solo toque directo, sin desplegables nativos de Android.</p>
+              <div class="vip-lang-grid" id="vip-lang-selector-grid">
+                <button type="button" class="vip-lang-btn" data-vip-lang="es">
+                  <span class="vip-lang-flag">🇪🇸</span>
+                  <span class="vip-lang-name">Español</span>
+                </button>
+                <button type="button" class="vip-lang-btn" data-vip-lang="en">
+                  <span class="vip-lang-flag">🇬🇧</span>
+                  <span class="vip-lang-name">English</span>
+                </button>
+                <button type="button" class="vip-lang-btn" data-vip-lang="pt">
+                  <span class="vip-lang-flag">🇧🇷</span>
+                  <span class="vip-lang-name">Português</span>
+                </button>
+                <button type="button" class="vip-lang-btn" data-vip-lang="gn">
+                  <span class="vip-lang-flag">🇵🇾</span>
+                  <span class="vip-lang-name">Guaraní</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Planes -->
+            <div class="vip-card" data-sector="cuenta" data-keywords="planes membresia upgrade suscripcion renovar pro vip precios tarifas">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-gold">👑</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-cuenta">⚙️ Cuenta & Sistema</span>
+                  <h3 class="vip-card-title">Planes & Membresías VIP</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Explora o renueva tus niveles INICIO, PRO y VIP con señales instantáneas, bot de Telegram y backtest ilimitado.</p>
+              <div class="vip-card-footer">
+                <button type="button" class="vip-btn-action vip-btn-gold" id="vip-action-plans">
+                  <span>👑 Ver & Gestionar Planes</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Registro Nueva operación -->
+            <div class="vip-card" data-sector="banca" data-keywords="registro nueva operacion apuesta pick stake cuota bankroll registrar">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-emerald">⚡</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-banca">💼 Banca & Capital</span>
+                  <h3 class="vip-card-title">Registro Nueva Operación</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Añade un nuevo pronóstico o pick manual a tu banca con cálculo automático de stake y cuota de valor.</p>
+              <div class="vip-card-footer">
+                <button type="button" class="vip-btn-action vip-btn-emerald" id="vip-action-new-op">
+                  <span>➕ Registrar Operación</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 4. Registrar Movimiento de Capital -->
+            <div class="vip-card" data-sector="banca" data-keywords="registrar movimiento capital deposito retiro ingreso ajuste balance banco fondo">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-emerald">💵</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-banca">💼 Banca & Capital</span>
+                  <h3 class="vip-card-title">Registrar Movimiento de Capital</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Registra depósitos, retiros y conciliaciones contables para mantener el balance neto exacto de tu banca.</p>
+              <div class="vip-card-footer">
+                <button type="button" class="vip-btn-action vip-btn-emerald" id="vip-action-new-mov">
+                  <span>💰 Registrar Movimiento</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 5. Registro de operaciones - Control de Banca -->
+            <div class="vip-card" data-sector="banca" data-keywords="registro operaciones control banca ledger historial roi yield drawdown metricas">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-cyan">📊</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-banca">💼 Banca & Capital</span>
+                  <h3 class="vip-card-title">Control de Banca (Ledger)</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Visualiza tu historial de apuestas, Yield, ROI acumulado, gráfico de evolución y exportación profesional Excel.</p>
+              <div class="vip-card-footer">
+                <button type="button" class="vip-btn-action vip-btn-cyan" id="vip-action-bankroll">
+                  <span>💼 Abrir Control de Banca</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 6. Parámetros de Banca -->
+            <div class="vip-card" data-sector="banca" data-keywords="parametros banca configuracion kelly stake fijo capital inicial divisa moneda usd eur pyg brl">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-cyan">⚙️</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-banca">💼 Banca & Capital</span>
+                  <h3 class="vip-card-title">Parámetros de Banca</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Ajusta tu capital base, divisa (USD, EUR, PYG, BRL), criterio fraccional Kelly y stake plano para tu estrategia.</p>
+              <div class="vip-card-footer">
+                <button type="button" class="vip-btn-action vip-btn-cyan" id="vip-action-bankroll-config">
+                  <span>🛠️ Ajustar Parámetros</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 7. Simulacion Historica -->
+            <div class="vip-card" data-sector="simulacion" data-keywords="simulacion historica backtesting backtest cuantitativo cuotas temporadas ligas">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-purple">📈</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-simulacion">📈 Simulación & Análisis</span>
+                  <h3 class="vip-card-title">Simulación Histórica (Backtest)</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Ejecuta simulaciones cuantitativas con algoritmos avanzados sobre más de 50 ligas y 5 temporadas completas.</p>
+              <div class="vip-card-footer">
+                <button type="button" class="vip-btn-action vip-btn-purple" id="vip-action-backtest">
+                  <span>🚀 Iniciar Backtesting</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 8. Panel de administración -->
+            <div class="vip-card" data-sector="cuenta" data-keywords="panel administracion admin auditoria usuarios logs seguridad calibracion integridad">
+              <div class="vip-card-header">
+                <div class="vip-card-icon-box icon-gold">🛡️</div>
+                <div class="vip-card-header-meta">
+                  <span class="vip-card-badge badge-cuenta">⚙️ Cuenta & Sistema</span>
+                  <h3 class="vip-card-title">Panel de Administración</h3>
+                </div>
+              </div>
+              <p class="vip-card-desc">Control administrativo, bitácora de auditoría, gestión de usuarios, calibración de umbrales del motor e integridad.</p>
+              <div class="vip-card-footer">
+                <button type="button" class="vip-btn-action vip-btn-gold" id="vip-action-admin">
+                  <span>🔐 Acceder al Panel Admin</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Empty state when search returns nothing -->
+          <div id="vip-menu-empty" class="vip-menu-empty" style="display: none;">
+            <div class="vip-empty-icon">🔍</div>
+            <h4 class="vip-empty-title">No se encontraron accesos</h4>
+            <p class="vip-empty-desc">Intenta buscar por otro término o haz clic en "🌟 Todos" para restaurar la vista.</p>
+          </div>
+        </div>
+      </dialog>
+
       <!-- CENTRO DE OPORTUNIDADES -->
       <section id="opportunities-center-section" class="sports-opps-section">
         <div class="opps-section-header-box">
@@ -2459,6 +2659,10 @@
       <button class="bottom-nav-btn" id="bnav-plans">
         <span class="bnav-icon">💎</span>
         <span class="bnav-text">Planes</span>
+      </button>
+      <button class="bottom-nav-btn" id="bnav-menu">
+        <span class="bnav-icon">🧭</span>
+        <span class="bnav-text">Menú</span>
       </button>
     </nav>
   </div>
