@@ -252,6 +252,7 @@ async function run() {
   setupDownloadAppModule();
   setupVipMenuModal();
   setupVipSelectPicker();
+  setupVipCalendarPicker();
 
   // Multi-Device Persistence: Realizar migración segura y sincronizar estado con el servidor
   DataRepository.performSafeMigration(state.userProfile.id).catch(() => {});
@@ -7945,5 +7946,397 @@ function setupVipSelectPicker() {
 
   document.querySelectorAll<HTMLSelectElement>(selectQuery).forEach(upgradeSelect);
 }
+
+// ---------------------------------------------------------
+// UNIVERSAL VIP CALENDAR PICKER (REEMPLAZO FECHAS ANDROID)
+// ---------------------------------------------------------
+
+function setupVipCalendarPicker() {
+  const calModal = document.getElementById('vip-custom-calendar-modal') as HTMLDialogElement;
+  const calTitle = document.getElementById('vip-cal-title') as HTMLElement;
+  const calSubText = document.getElementById('vip-cal-sub-text') as HTMLElement;
+  const calCloseBtn = document.getElementById('close-vip-cal-modal') as HTMLButtonElement;
+  const calCancelBtn = document.getElementById('vip-cal-cancel-btn') as HTMLButtonElement;
+  const calApplyBtn = document.getElementById('vip-cal-apply-btn') as HTMLButtonElement;
+  const calGrid = document.getElementById('vip-cal-grid') as HTMLElement;
+  const calMonthName = document.getElementById('vip-cal-month-name') as HTMLElement;
+  const calYearVal = document.getElementById('vip-cal-year-val') as HTMLElement;
+  const prevMonthBtn = document.getElementById('vip-cal-prev-month') as HTMLButtonElement;
+  const nextMonthBtn = document.getElementById('vip-cal-next-month') as HTMLButtonElement;
+  const prevYearBtn = document.getElementById('vip-cal-prev-year') as HTMLButtonElement;
+  const nextYearBtn = document.getElementById('vip-cal-next-year') as HTMLButtonElement;
+  const previewDayName = document.getElementById('vip-cal-preview-dayname') as HTMLElement;
+  const previewValue = document.getElementById('vip-cal-preview-value') as HTMLElement;
+  const presetClearBtn = document.getElementById('vip-cal-preset-clear') as HTMLButtonElement;
+
+  if (!calModal || !calGrid) return;
+
+  let activeDateInput: HTMLInputElement | null = null;
+  let activeTriggerEl: HTMLElement | null = null;
+
+  // View state (year, month: 0-11)
+  let currentViewYear = new Date().getFullYear();
+  let currentViewMonth = new Date().getMonth();
+  // Selected date: 'YYYY-MM-DD' or ''
+  let selectedDateStr = '';
+
+  const monthNamesEs = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+  const shortMonthNamesEs = [
+    'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+    'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
+  ];
+  const dayNamesEs = [
+    'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+  ];
+
+  const formatDisplayDate = (isoStr: string): string => {
+    if (!isoStr) return 'Seleccionar fecha';
+    const parts = isoStr.split('-');
+    if (parts.length !== 3) return isoStr;
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const d = parseInt(parts[2], 10);
+    const monthShort = shortMonthNamesEs[m] || '';
+    return `${d} ${monthShort} ${y}`;
+  };
+
+  const updateBannerPreview = (isoStr: string) => {
+    if (!isoStr) {
+      if (previewDayName) previewDayName.textContent = 'FECHA';
+      if (previewValue) previewValue.textContent = 'SIN SELECCIONAR';
+      return;
+    }
+    const parts = isoStr.split('-');
+    if (parts.length === 3) {
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) - 1;
+      const d = parseInt(parts[2], 10);
+      const dt = new Date(y, m, d);
+      const dayName = dayNamesEs[dt.getDay()] || '';
+      const mShort = (shortMonthNamesEs[m] || '').toUpperCase();
+      if (previewDayName) previewDayName.textContent = dayName.toUpperCase();
+      if (previewValue) previewValue.textContent = `${d} ${mShort} ${y}`;
+    }
+  };
+
+  const closeCalendar = () => {
+    if (calModal.open) {
+      calModal.close();
+    }
+    activeDateInput = null;
+    activeTriggerEl = null;
+  };
+
+  if (calCloseBtn) calCloseBtn.addEventListener('click', closeCalendar);
+  if (calCancelBtn) calCancelBtn.addEventListener('click', closeCalendar);
+
+  calModal.addEventListener('click', (e) => {
+    if (e.target === calModal) closeCalendar();
+  });
+
+  const applySelectedDate = () => {
+    if (!activeDateInput) return;
+    activeDateInput.value = selectedDateStr;
+    activeDateInput.dispatchEvent(new Event('input', { bubbles: true }));
+    activeDateInput.dispatchEvent(new Event('change', { bubbles: true }));
+    if (activeTriggerEl) {
+      updateTriggerText(activeTriggerEl, selectedDateStr);
+    }
+    closeCalendar();
+  };
+
+  if (calApplyBtn) calApplyBtn.addEventListener('click', applySelectedDate);
+
+  const renderGrid = () => {
+    calGrid.innerHTML = '';
+    if (calMonthName) calMonthName.textContent = monthNamesEs[currentViewMonth];
+    if (calYearVal) calYearVal.textContent = currentViewYear.toString();
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    // First day of current view month (0=Sun..6=Sat)
+    const firstDayIndex = new Date(currentViewYear, currentViewMonth, 1).getDay();
+    const daysInCurrentMonth = new Date(currentViewYear, currentViewMonth + 1, 0).getDate();
+    const daysInPrevMonth = new Date(currentViewYear, currentViewMonth, 0).getDate();
+
+    // Previous month padding days
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const dayNum = daysInPrevMonth - i;
+      const prevMonth = currentViewMonth === 0 ? 11 : currentViewMonth - 1;
+      const prevYear = currentViewMonth === 0 ? currentViewYear - 1 : currentViewYear;
+      const isoStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+
+      const cell = document.createElement('div');
+      cell.className = 'vip-cal-day other-month';
+      cell.textContent = dayNum.toString();
+      cell.dataset.date = isoStr;
+      cell.addEventListener('click', () => {
+        currentViewYear = prevYear;
+        currentViewMonth = prevMonth;
+        selectedDateStr = isoStr;
+        updateBannerPreview(selectedDateStr);
+        renderGrid();
+      });
+      calGrid.appendChild(cell);
+    }
+
+    // Current month days
+    for (let dayNum = 1; dayNum <= daysInCurrentMonth; dayNum++) {
+      const isoStr = `${currentViewYear}-${String(currentViewMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+      const cell = document.createElement('div');
+      cell.className = 'vip-cal-day';
+      cell.textContent = dayNum.toString();
+      cell.dataset.date = isoStr;
+
+      if (isoStr === todayStr) {
+        cell.classList.add('is-today');
+      }
+      if (isoStr === selectedDateStr) {
+        cell.classList.add('selected');
+      }
+
+      cell.addEventListener('click', () => {
+        selectedDateStr = isoStr;
+        updateBannerPreview(selectedDateStr);
+        // Highlight active cell
+        calGrid.querySelectorAll('.vip-cal-day').forEach(el => el.classList.remove('selected'));
+        cell.classList.add('selected');
+      });
+
+      // Double-click to instantly apply
+      cell.addEventListener('dblclick', () => {
+        selectedDateStr = isoStr;
+        applySelectedDate();
+      });
+
+      calGrid.appendChild(cell);
+    }
+
+    // Next month padding days to complete grid rows
+    const totalCellsSoFar = firstDayIndex + daysInCurrentMonth;
+    const remainder = totalCellsSoFar % 7;
+    const nextPaddingCount = remainder === 0 ? 0 : 7 - remainder;
+
+    for (let dayNum = 1; dayNum <= nextPaddingCount; dayNum++) {
+      const nextMonth = currentViewMonth === 11 ? 0 : currentViewMonth + 1;
+      const nextYear = currentViewMonth === 11 ? currentViewYear + 1 : currentViewYear;
+      const isoStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+
+      const cell = document.createElement('div');
+      cell.className = 'vip-cal-day other-month';
+      cell.textContent = dayNum.toString();
+      cell.dataset.date = isoStr;
+      cell.addEventListener('click', () => {
+        currentViewYear = nextYear;
+        currentViewMonth = nextMonth;
+        selectedDateStr = isoStr;
+        updateBannerPreview(selectedDateStr);
+        renderGrid();
+      });
+      calGrid.appendChild(cell);
+    }
+  };
+
+  // Nav buttons
+  if (prevMonthBtn) {
+    prevMonthBtn.addEventListener('click', () => {
+      currentViewMonth--;
+      if (currentViewMonth < 0) {
+        currentViewMonth = 11;
+        currentViewYear--;
+      }
+      renderGrid();
+    });
+  }
+
+  if (nextMonthBtn) {
+    nextMonthBtn.addEventListener('click', () => {
+      currentViewMonth++;
+      if (currentViewMonth > 11) {
+        currentViewMonth = 0;
+        currentViewYear++;
+      }
+      renderGrid();
+    });
+  }
+
+  if (prevYearBtn) {
+    prevYearBtn.addEventListener('click', () => {
+      currentViewYear--;
+      renderGrid();
+    });
+  }
+
+  if (nextYearBtn) {
+    nextYearBtn.addEventListener('click', () => {
+      currentViewYear++;
+      renderGrid();
+    });
+  }
+
+  // Presets
+  const presetsContainer = document.getElementById('vip-cal-presets');
+  if (presetsContainer) {
+    presetsContainer.querySelectorAll<HTMLButtonElement>('.vip-cal-preset-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = btn.dataset.calPreset;
+        const now = new Date();
+        if (preset === 'today') {
+          selectedDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+          currentViewYear = now.getFullYear();
+          currentViewMonth = now.getMonth();
+        } else if (preset === 'yesterday') {
+          const yst = new Date();
+          yst.setDate(yst.getDate() - 1);
+          selectedDateStr = `${yst.getFullYear()}-${String(yst.getMonth() + 1).padStart(2, '0')}-${String(yst.getDate()).padStart(2, '0')}`;
+          currentViewYear = yst.getFullYear();
+          currentViewMonth = yst.getMonth();
+        } else if (preset === 'last7') {
+          const d7 = new Date();
+          d7.setDate(d7.getDate() - 7);
+          selectedDateStr = `${d7.getFullYear()}-${String(d7.getMonth() + 1).padStart(2, '0')}-${String(d7.getDate()).padStart(2, '0')}`;
+          currentViewYear = d7.getFullYear();
+          currentViewMonth = d7.getMonth();
+        } else if (preset === 'month-start') {
+          selectedDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+          currentViewYear = now.getFullYear();
+          currentViewMonth = now.getMonth();
+        } else if (preset === 'clear') {
+          selectedDateStr = '';
+          applySelectedDate();
+          return;
+        }
+
+        updateBannerPreview(selectedDateStr);
+        renderGrid();
+      });
+    });
+  }
+
+  const updateTriggerText = (trigger: HTMLElement, val: string) => {
+    const textSpan = trigger.querySelector('.vip-date-text');
+    if (textSpan) {
+      textSpan.textContent = formatDisplayDate(val);
+    }
+  };
+
+  const openCalendarForInput = (inputEl: HTMLInputElement, triggerEl: HTMLElement) => {
+    activeDateInput = inputEl;
+    activeTriggerEl = triggerEl;
+
+    // Detect friendly title
+    const parentGroup = inputEl.closest('.form-group') || inputEl.parentElement;
+    const labelEl = parentGroup ? parentGroup.querySelector('label') : null;
+    let titleText = labelEl ? labelEl.textContent?.trim() : inputEl.getAttribute('aria-label');
+
+    if (inputEl.id === 'bankroll-filter-from') titleText = '📅 Control de Banca — Desde';
+    else if (inputEl.id === 'bankroll-filter-to') titleText = '📅 Control de Banca — Hasta';
+    else if (inputEl.id === 'op-form-date') titleText = '📅 Registro de Operación — Fecha';
+    else if (inputEl.id === 'mov-form-date') titleText = '📅 Movimiento de Capital — Fecha';
+    else if (inputEl.id === 'dr-date-start') titleText = '📅 Informe Diario — Desde';
+    else if (inputEl.id === 'dr-date-end') titleText = '📅 Informe Diario — Hasta';
+    else if (inputEl.id === 'excel-export-from') titleText = '📅 Exportar Excel — Desde';
+    else if (inputEl.id === 'excel-export-to') titleText = '📅 Exportar Excel — Hasta';
+
+    if (calTitle) calTitle.textContent = titleText || '📅 Seleccionar Fecha';
+    if (calSubText) {
+      calSubText.textContent = inputEl.required ? 'Campo obligatorio' : 'Selecciona una fecha en el calendario';
+    }
+
+    // Show or hide the "Limpiar" preset (only for non-required filter inputs)
+    if (presetClearBtn) {
+      presetClearBtn.style.display = inputEl.required ? 'none' : 'inline-block';
+    }
+
+    // Initial date parsing
+    const rawVal = inputEl.value.trim();
+    if (rawVal && /^\d{4}-\d{2}-\d{2}$/.test(rawVal)) {
+      selectedDateStr = rawVal;
+      const parts = rawVal.split('-');
+      currentViewYear = parseInt(parts[0], 10);
+      currentViewMonth = parseInt(parts[1], 10) - 1;
+    } else {
+      const now = new Date();
+      selectedDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      currentViewYear = now.getFullYear();
+      currentViewMonth = now.getMonth();
+    }
+
+    updateBannerPreview(selectedDateStr);
+    renderGrid();
+    calModal.showModal();
+  };
+
+  const upgradeDateInput = (inputEl: HTMLInputElement) => {
+    if (inputEl.dataset.vipDateUpgraded === 'true') return;
+
+    inputEl.dataset.vipDateUpgraded = 'true';
+    inputEl.style.display = 'none';
+
+    // Create trigger button
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'vip-holo-date-trigger';
+    trigger.dataset.dateTarget = inputEl.id;
+
+    trigger.innerHTML = `
+      <span class="vip-date-trigger-label">
+        <span class="vip-date-icon">📅</span>
+        <span class="vip-date-text">${formatDisplayDate(inputEl.value)}</span>
+      </span>
+      <span class="vip-trigger-chevron">▾</span>
+    `;
+
+    inputEl.parentNode?.insertBefore(trigger, inputEl.nextSibling);
+
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openCalendarForInput(inputEl, trigger);
+    });
+
+    // Intercept property setter so programmatic inputEl.value = '...' updates trigger
+    const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    if (originalDescriptor && originalDescriptor.set && originalDescriptor.get) {
+      Object.defineProperty(inputEl, 'value', {
+        get() {
+          return originalDescriptor.get!.call(this);
+        },
+        set(val: string) {
+          originalDescriptor.set!.call(this, val);
+          updateTriggerText(trigger, val);
+        },
+        configurable: true
+      });
+    }
+
+    // Also sync on change / input events
+    inputEl.addEventListener('change', () => {
+      updateTriggerText(trigger, inputEl.value);
+    });
+    inputEl.addEventListener('input', () => {
+      updateTriggerText(trigger, inputEl.value);
+    });
+  };
+
+  const dateInputsQuery = `
+    #dr-date-start,
+    #dr-date-end,
+    #bankroll-filter-from,
+    #bankroll-filter-to,
+    #excel-export-from,
+    #excel-export-to,
+    #op-form-date,
+    #mov-form-date
+  `;
+
+  document.querySelectorAll<HTMLInputElement>(dateInputsQuery).forEach(upgradeDateInput);
+  document.querySelectorAll<HTMLInputElement>('input[type="date"]').forEach(upgradeDateInput);
+}
+
 
 

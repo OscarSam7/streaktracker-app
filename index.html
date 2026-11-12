@@ -2599,6 +2599,82 @@
         </div>
       </dialog>
 
+      <!-- MODAL CALENDARIO HOLOGRÁFICO / TECNOLÓGICO VIP (UNIVERSAL DATE PICKER) -->
+      <dialog id="vip-custom-calendar-modal" class="custom-dialog vip-calendar-dialog vip-holo-dialog" aria-labelledby="vip-cal-title">
+        <div class="vip-holo-corner corner-tl"></div>
+        <div class="vip-holo-corner corner-tr"></div>
+        <div class="vip-holo-corner corner-bl"></div>
+        <div class="vip-holo-corner corner-br"></div>
+        <div class="vip-cal-container">
+          <!-- Header -->
+          <div class="vip-cal-header">
+            <div class="vip-cal-header-text">
+              <h3 class="vip-cal-title" id="vip-cal-title">📅 Seleccionar Fecha</h3>
+              <p class="vip-cal-sub" id="vip-cal-sub">
+                <span class="vip-live-dot"></span>
+                <span id="vip-cal-sub-text">Filtro / Registro de Operaciones</span>
+              </p>
+            </div>
+            <button type="button" id="close-vip-cal-modal" class="vip-picker-close-btn" aria-label="Cerrar calendario">&times;</button>
+          </div>
+
+          <!-- HUD Date Preview Banner -->
+          <div class="vip-cal-preview-banner">
+            <div class="vip-cal-preview-inner">
+              <span class="vip-cal-preview-dayname" id="vip-cal-preview-dayname">JUEVES</span>
+              <span class="vip-cal-preview-value" id="vip-cal-preview-value">12 NOV 2026</span>
+            </div>
+          </div>
+
+          <!-- Quick Presets Bar (Pills) -->
+          <div class="vip-cal-presets" id="vip-cal-presets">
+            <button type="button" class="vip-cal-preset-pill" data-cal-preset="today">⚡ Hoy</button>
+            <button type="button" class="vip-cal-preset-pill" data-cal-preset="yesterday">⏮️ Ayer</button>
+            <button type="button" class="vip-cal-preset-pill" data-cal-preset="last7">📅 Hace 7 Días</button>
+            <button type="button" class="vip-cal-preset-pill" data-cal-preset="month-start">🏁 1º de Mes</button>
+            <button type="button" class="vip-cal-preset-pill vip-cal-preset-clear" data-cal-preset="clear" id="vip-cal-preset-clear" style="display: none;">✕ Limpiar</button>
+          </div>
+
+          <!-- Month & Year Navigation Bar -->
+          <div class="vip-cal-nav-bar">
+            <div class="vip-cal-nav-btns-left">
+              <button type="button" id="vip-cal-prev-year" class="vip-cal-nav-btn" title="Año anterior" aria-label="Año anterior">«</button>
+              <button type="button" id="vip-cal-prev-month" class="vip-cal-nav-btn" title="Mes anterior" aria-label="Mes anterior">‹</button>
+            </div>
+            <div class="vip-cal-month-year-wrap">
+              <span id="vip-cal-month-name" class="vip-cal-month-name">Noviembre</span>
+              <span id="vip-cal-year-val" class="vip-cal-year-val">2026</span>
+            </div>
+            <div class="vip-cal-nav-btns-right">
+              <button type="button" id="vip-cal-next-month" class="vip-cal-nav-btn" title="Mes siguiente" aria-label="Mes siguiente">›</button>
+              <button type="button" id="vip-cal-next-year" class="vip-cal-nav-btn" title="Año siguiente" aria-label="Año siguiente">»</button>
+            </div>
+          </div>
+
+          <!-- Calendar Matrix -->
+          <div class="vip-cal-matrix">
+            <!-- Weekday headers -->
+            <div class="vip-cal-weekdays">
+              <span>DO</span>
+              <span>LU</span>
+              <span>MA</span>
+              <span>MI</span>
+              <span>JU</span>
+              <span>VI</span>
+              <span>SA</span>
+            </div>
+            <!-- Days Grid (Rendered dynamically) -->
+            <div class="vip-cal-grid" id="vip-cal-grid"></div>
+          </div>
+
+          <!-- Action Buttons Footer -->
+          <div class="vip-cal-footer">
+            <button type="button" id="vip-cal-cancel-btn" class="vip-cal-btn-cancel">Cancelar</button>
+            <button type="button" id="vip-cal-apply-btn" class="vip-cal-btn-apply">✓ Aceptar Fecha</button>
+          </div>
+        </div>
+      </dialog>
+
       <!-- CENTRO DE OPORTUNIDADES -->
       <section id="opportunities-center-section" class="sports-opps-section">
         <div class="opps-section-header-box">
