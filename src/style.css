@@ -3938,43 +3938,90 @@ dialog.vip-menu-dialog::backdrop {
 }
 
 /* =========================================================
-   UNIVERSAL VIP SELECT PICKER MODAL (REEMPLAZO SELECT ANDROID)
+   HOLOGRAPHIC / CYBERNETIC VIP SELECT PICKER MODAL
    ========================================================= */
 dialog.vip-picker-dialog {
-  background: linear-gradient(155deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
-  color: #0f172a !important;
-  border: 2px solid rgba(56, 189, 248, 0.6) !important;
+  position: relative;
+  background: linear-gradient(145deg, rgba(8, 14, 28, 0.98) 0%, rgba(13, 22, 42, 0.99) 100%) !important;
+  color: #f8fafc !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.7) !important;
   border-radius: 1.25rem !important;
-  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.4), 0 0 40px rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 
+    0 0 35px rgba(56, 189, 248, 0.4),
+    0 0 70px rgba(139, 92, 246, 0.25),
+    inset 0 0 25px rgba(56, 189, 248, 0.12) !important;
   width: 92vw !important;
   max-width: 520px !important;
   max-height: 85vh !important;
   padding: 0 !important;
   overflow: hidden !important;
-  animation: vipModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: vipHoloModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vipHoloModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 dialog.vip-picker-dialog::backdrop {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.2) 0%, rgba(4, 8, 18, 0.88) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
+/* Holographic Grid Container */
 .vip-picker-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   max-height: 85vh;
   padding: 1.5rem;
   gap: 1rem;
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
+/* Futuristic HUD Corner Accents */
+.vip-holo-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  z-index: 2;
+}
+.corner-tl { top: 6px; left: 6px; border-top: 2px solid #38bdf8; border-left: 2px solid #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+.corner-tr { top: 6px; right: 6px; border-top: 2px solid #38bdf8; border-right: 2px solid #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+.corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid #38bdf8; border-left: 2px solid #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+.corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid #38bdf8; border-right: 2px solid #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+
+/* Header */
 .vip-picker-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
   padding-bottom: 0.85rem;
+  position: relative;
+}
+
+.vip-picker-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  box-shadow: 0 0 10px #38bdf8;
 }
 
 .vip-picker-header-text {
@@ -3985,39 +4032,61 @@ dialog.vip-picker-dialog::backdrop {
 .vip-picker-badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.35rem;
   font-size: 0.68rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #ffffff;
-  padding: 0.18rem 0.55rem;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(139, 92, 246, 0.25));
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  color: #38bdf8;
+  padding: 0.2rem 0.6rem;
   border-radius: 9999px;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
   width: fit-content;
-  box-shadow: 0 2px 5px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
 }
 
 .vip-picker-title {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   line-height: 1.3;
+  text-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+  letter-spacing: -0.01em;
 }
 
 .vip-picker-sub {
-  margin: 0.25rem 0 0 0;
+  margin: 0.3rem 0 0 0;
   font-size: 0.8rem;
-  color: #64748b;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.vip-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+  animation: vipLivePulse 1.8s infinite ease-in-out;
+}
+
+@keyframes vipLivePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
 }
 
 .vip-picker-close-btn {
-  background: #e2e8f0;
-  border: none;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.4);
   font-size: 1.5rem;
   line-height: 1;
-  color: #475569;
+  color: #38bdf8;
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -4025,16 +4094,20 @@ dialog.vip-picker-dialog::backdrop {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
   flex-shrink: 0;
 }
 
 .vip-picker-close-btn:hover {
-  background: #cbd5e1;
-  color: #0f172a;
-  transform: scale(1.08);
+  background: rgba(56, 189, 248, 0.3);
+  color: #ffffff;
+  border-color: #38bdf8;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
 }
 
+/* Holographic Search Bar */
 .vip-picker-search-box {
   position: relative;
   display: flex;
@@ -4046,90 +4119,109 @@ dialog.vip-picker-dialog::backdrop {
   position: absolute;
   left: 0.85rem;
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: #38bdf8;
   pointer-events: none;
 }
 
 .vip-picker-search-input {
   width: 100%;
-  padding: 0.6rem 1rem 0.6rem 2.4rem;
+  padding: 0.65rem 1rem 0.65rem 2.4rem;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #0f172a;
-  background: #ffffff;
-  border: 1.5px solid #cbd5e1;
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.45);
   border-radius: 0.65rem;
   outline: none;
   transition: all 0.2s;
+  box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1);
+}
+
+.vip-picker-search-input::placeholder {
+  color: #64748b;
 }
 
 .vip-picker-search-input:focus {
-  border-color: #0284c7;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+  border-color: #38bdf8;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4), inset 0 0 12px rgba(56, 189, 248, 0.15);
 }
 
+/* Option List */
 .vip-picker-options-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
   overflow-y: auto;
   max-height: 55vh;
   padding-right: 0.25rem;
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: rgba(56, 189, 248, 0.3) transparent;
 }
 
 .vip-picker-options-list::-webkit-scrollbar {
   width: 5px;
 }
 .vip-picker-options-list::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: rgba(56, 189, 248, 0.4);
   border-radius: 4px;
 }
 
+/* Holographic Cyber Option Card */
 .vip-picker-option-card {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1rem;
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
+  padding: 0.85rem 1.1rem;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(24, 38, 66, 0.65) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-left: 3px solid rgba(56, 189, 248, 0.4);
   border-radius: 0.75rem;
   cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  color: #0f172a;
-  font-size: 0.9rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #e2e8f0;
+  font-size: 0.92rem;
   font-weight: 700;
-  min-height: 50px;
+  min-height: 52px;
   user-select: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
 }
 
-.vip-picker-option-card:hover {
-  background: #f0f9ff;
-  border-color: #0284c7;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+.vip-picker-option-card:hover,
+.vip-picker-option-card:focus {
+  background: linear-gradient(135deg, rgba(20, 36, 68, 0.9) 0%, rgba(30, 50, 90, 0.8) 100%);
+  border-color: #38bdf8;
+  border-left: 3px solid #38bdf8;
+  transform: translateX(4px);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 12px rgba(56, 189, 248, 0.15);
+  outline: none;
 }
 
 .vip-picker-option-card.active {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.35) 0%, rgba(14, 165, 233, 0.2) 100%) !important;
+  border: 1.5px solid #38bdf8 !important;
+  border-left: 4px solid #38bdf8 !important;
   color: #ffffff !important;
-  border-color: #0284c7 !important;
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.5), inset 0 0 15px rgba(56, 189, 248, 0.2) !important;
+  transform: translateX(4px);
 }
 
 .vip-picker-option-text {
   flex-grow: 1;
   text-align: left;
   line-height: 1.35;
+  letter-spacing: 0.01em;
 }
 
+/* Holographic Quantum Node Radio */
 .vip-picker-radio {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 2px solid #cbd5e1;
+  border: 2px solid rgba(56, 189, 248, 0.4);
+  background: rgba(15, 23, 42, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4137,16 +4229,17 @@ dialog.vip-picker-dialog::backdrop {
   font-weight: 900;
   flex-shrink: 0;
   color: transparent;
-  background: #ffffff;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   margin-left: 0.75rem;
+  box-shadow: inset 0 0 6px rgba(56, 189, 248, 0.2);
 }
 
 .vip-picker-radio.active {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #0284c7;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  border-color: #38bdf8;
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  color: #ffffff;
+  box-shadow: 0 0 12px #38bdf8, inset 0 0 6px rgba(255, 255, 255, 0.6);
+  transform: scale(1.08);
 }
 
 .vip-picker-empty {
@@ -4156,33 +4249,38 @@ dialog.vip-picker-dialog::backdrop {
   color: #64748b;
 }
 
-/* Custom Select Trigger Button in place of Native <select> */
-.vip-custom-select-trigger {
-  display: flex;
+/* Holographic Trigger Button replacing Native Selects */
+.vip-custom-select-trigger,
+.vip-holo-trigger {
+  display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  border-radius: 0.45rem;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(20, 32, 54, 0.95) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 0.5rem;
   padding: 0.55rem 0.85rem;
-  color: #ffffff;
+  color: #f8fafc;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
   width: 100%;
   min-height: 38px;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.15), inset 0 0 8px rgba(56, 189, 248, 0.06);
 }
 
 .vip-custom-select-trigger:hover,
-.vip-custom-select-trigger:focus {
+.vip-custom-select-trigger:focus,
+.vip-holo-trigger:hover,
+.vip-holo-trigger:focus {
   border-color: #38bdf8;
-  background: rgba(30, 41, 59, 0.95);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  background: linear-gradient(135deg, rgba(20, 35, 65, 0.95) 0%, rgba(30, 48, 85, 0.95) 100%);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.15);
   outline: none;
+  transform: translateY(-1px);
 }
 
 .vip-trigger-label {
@@ -4194,32 +4292,45 @@ dialog.vip-picker-dialog::backdrop {
 }
 
 .vip-trigger-chevron {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #38bdf8;
   transition: transform 0.2s ease;
   flex-shrink: 0;
+  text-shadow: 0 0 6px #38bdf8;
 }
 
-.vip-custom-select-trigger:hover .vip-trigger-chevron {
-  transform: translateY(1px);
+.vip-custom-select-trigger:hover .vip-trigger-chevron,
+.vip-holo-trigger:hover .vip-trigger-chevron {
+  transform: translateY(1.5px);
 }
 
+.lang-selector-box .vip-holo-trigger,
 .lang-selector-box .vip-custom-select-trigger {
   padding: 0.35rem 0.65rem;
   font-size: 0.8rem;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(56, 189, 248, 0.3);
   width: auto;
 }
 
+.plan-selector-box .vip-holo-trigger,
 .plan-selector-box .vip-custom-select-trigger {
   padding: 0.35rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 800;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(56, 189, 248, 0.15));
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(56, 189, 248, 0.15));
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
   width: auto;
 }
+
+/* Force hiding of native selects */
+select.lang-select,
+select.plan-select,
+select[data-vip-upgraded="true"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 
 
 

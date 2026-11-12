@@ -8,6 +8,9 @@
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0b1320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -42,21 +45,29 @@
 
         <div class="sports-user-controls">
           <div class="lang-selector-box">
-            <select id="lang-select" class="lang-select">
+            <select id="lang-select" class="lang-select" style="display: none !important;">
               <option value="es" selected>🇪🇸 ES</option>
               <option value="en">🇬🇧 EN</option>
               <option value="pt">🇧🇷 PT</option>
               <option value="gn">🇵🇾 GN (Jopara)</option>
             </select>
+            <button type="button" id="trigger-lang-select" class="vip-custom-select-trigger vip-holo-trigger" data-select-target="lang-select" title="Seleccionar Idioma">
+              <span class="vip-trigger-label" id="lbl-current-lang">🇪🇸 ES</span>
+              <span class="vip-trigger-chevron">▾</span>
+            </button>
           </div>
           <div class="plan-selector-box">
             <label for="plan-select" id="plan-label" class="plan-selector-label" style="display: none;">Plan:</label>
-            <select id="plan-select" class="plan-select" style="font-weight: 800;">
+            <select id="plan-select" class="plan-select" style="display: none !important;">
               <option value="FREE">⚪ Plan INICIO ($0/mes)</option>
               <!-- <option value="TRIAL">🧪 TRIAL (Prueba 3 Días)</option> -->
               <!-- <option value="PRO">🔵 PRO (Cuantitativo)</option> -->
               <option value="VIP" selected>👑 Plan VIP ($2 / 7 días)</option>
             </select>
+            <button type="button" id="trigger-plan-select" class="vip-custom-select-trigger vip-holo-trigger" data-select-target="plan-select" title="Seleccionar Plan">
+              <span class="vip-trigger-label" id="lbl-current-plan">👑 Plan VIP ($2 / 7 días)</span>
+              <span class="vip-trigger-chevron">▾</span>
+            </button>
           </div>
           
           <div id="user-badge-header" class="sports-user-badge">
@@ -2557,25 +2568,32 @@
         </div>
       </dialog>
 
-      <!-- MODAL SELECTOR CLARO VIP UNIVERSAL (CUSTOM SELECT PICKER) -->
-      <dialog id="vip-custom-picker-modal" class="custom-dialog vip-picker-dialog" aria-labelledby="vip-picker-title">
+      <!-- MODAL SELECTOR HOLOGRÁFICO / TECNOLÓGICO VIP (UNIVERSAL PICKER) -->
+      <dialog id="vip-custom-picker-modal" class="custom-dialog vip-picker-dialog vip-holo-dialog" aria-labelledby="vip-picker-title">
+        <div class="vip-holo-corner corner-tl"></div>
+        <div class="vip-holo-corner corner-tr"></div>
+        <div class="vip-holo-corner corner-bl"></div>
+        <div class="vip-holo-corner corner-br"></div>
         <div class="vip-picker-container">
           <div class="vip-picker-header">
             <div class="vip-picker-header-text">
-              <span class="vip-picker-badge" id="vip-picker-badge">👑 SELECTOR VIP</span>
+              <span class="vip-picker-badge" id="vip-picker-badge">⚡ SELECTOR HOLOGRÁFICO • QUANTUM HUD</span>
               <h3 class="vip-picker-title" id="vip-picker-title">Seleccionar Opción</h3>
-              <p class="vip-picker-sub" id="vip-picker-sub">Toca la opción deseada para aplicarla al instante.</p>
+              <p class="vip-picker-sub" id="vip-picker-sub">
+                <span class="vip-live-dot"></span>
+                <span id="vip-picker-sub-text">Toca la opción deseada para aplicarla al instante.</span>
+              </p>
             </div>
             <button type="button" id="close-vip-picker-modal" class="vip-picker-close-btn" aria-label="Cerrar selector">&times;</button>
           </div>
 
-          <!-- Buscador rápido para listas extensas -->
+          <!-- Buscador holográfico rápido -->
           <div class="vip-picker-search-box" id="vip-picker-search-box" style="display: none;">
             <span class="vip-picker-search-icon">🔍</span>
             <input type="text" id="vip-picker-search-input" class="vip-picker-search-input" placeholder="Buscar opción..." autocomplete="off" />
           </div>
 
-          <!-- Lista de opciones como tarjetas VIP -->
+          <!-- Lista de opciones como tarjetas holográficas VIP -->
           <div class="vip-picker-options-list" id="vip-picker-options-list">
             <!-- Renderizado dinámico -->
           </div>

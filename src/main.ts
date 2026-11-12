@@ -3128,6 +3128,12 @@ function updateStaticLanguageTexts() {
     }
   });
 
+  const lblLang = document.getElementById('lbl-current-lang');
+  if (lblLang) {
+    const langMap: Record<string, string> = { es: '🇪🇸 ES', en: '🇬🇧 EN', pt: '🇧🇷 PT', gn: '🇵🇾 GN (Jopara)' };
+    lblLang.textContent = langMap[state.currentLang] || state.currentLang.toUpperCase();
+  }
+
   const lang = t();
 
   // App Title
@@ -4755,6 +4761,13 @@ function updateUserHeaderUI() {
       pillEl.style.color = '#0b1320';
       pillEl.innerText = 'FREE';
     }
+  }
+
+  const lblPlan = document.getElementById('lbl-current-plan');
+  if (lblPlan) {
+    if (state.currentPlan === 'VIP') lblPlan.textContent = '👑 Plan VIP ($2 / 7 días)';
+    else if (state.currentPlan === 'FREE') lblPlan.textContent = '⚪ Plan INICIO ($0/mes)';
+    else lblPlan.textContent = `👑 Plan ${state.currentPlan}`;
   }
 
   // Visibilidad del botón de Panel Admin: Estrictamente visible SÓLO cuando isAdmin sea true
@@ -7718,6 +7731,14 @@ function setupVipSelectPicker() {
     if (labelSpan && selectedOpt) {
       labelSpan.textContent = selectedOpt.text.trim();
     }
+    if (selectEl.id === 'lang-select') {
+      const lblLang = document.getElementById('lbl-current-lang');
+      if (lblLang && selectedOpt) lblLang.textContent = selectedOpt.text.trim();
+    }
+    if (selectEl.id === 'plan-select') {
+      const lblPlan = document.getElementById('lbl-current-plan');
+      if (lblPlan && selectedOpt) lblPlan.textContent = selectedOpt.text.trim();
+    }
   };
 
   const renderPickerOptions = (query = '') => {
@@ -7850,45 +7871,53 @@ function setupVipSelectPicker() {
     selectEl.style.display = 'none';
     selectEl.dataset.vipUpgraded = 'true';
 
-    // Crear botón trigger estilizado VIP
-    const trigger = document.createElement('div');
-    trigger.className = 'vip-custom-select-trigger';
-    trigger.setAttribute('role', 'combobox');
-    trigger.setAttribute('tabindex', '0');
-    trigger.setAttribute('aria-haspopup', 'dialog');
+    // Comprobar si ya existe un botón trigger predefinido en HTML
+    let trigger = selectEl.parentElement?.querySelector<HTMLElement>(`[data-select-target="${selectEl.id}"]`);
 
-    const selectedOpt = selectEl.selectedOptions[0] || selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
-    const initialText = selectedOpt ? selectedOpt.text.trim() : 'Seleccionar';
+    if (!trigger) {
+      trigger = document.createElement('button');
+      (trigger as HTMLButtonElement).type = 'button';
+      trigger.className = 'vip-custom-select-trigger vip-holo-trigger';
+      trigger.setAttribute('role', 'combobox');
+      trigger.setAttribute('tabindex', '0');
+      trigger.setAttribute('aria-haspopup', 'dialog');
+      trigger.dataset.selectTarget = selectEl.id;
 
-    trigger.innerHTML = `
-      <span class="vip-trigger-label">${initialText}</span>
-      <span class="vip-trigger-chevron">▾</span>
-    `;
+      const selectedOpt = selectEl.selectedOptions[0] || selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
+      const initialText = selectedOpt ? selectedOpt.text.trim() : 'Seleccionar';
+
+      trigger.innerHTML = `
+        <span class="vip-trigger-label">${initialText}</span>
+        <span class="vip-trigger-chevron">▾</span>
+      `;
+
+      selectEl.parentNode?.insertBefore(trigger, selectEl.nextSibling);
+    }
 
     trigger.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      openPickerForSelect(selectEl, trigger);
+      openPickerForSelect(selectEl, trigger!);
     });
 
     trigger.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openPickerForSelect(selectEl, trigger);
+        openPickerForSelect(selectEl, trigger!);
       }
     });
 
-    // Insertar trigger inmediatamente después del select
-    selectEl.parentNode?.insertBefore(trigger, selectEl.nextSibling);
+    // Sincronizar etiqueta inicial
+    updateTriggerLabel(trigger, selectEl);
 
     // Mantener sincronizado el texto del trigger cuando cambie el select
     selectEl.addEventListener('change', () => {
-      updateTriggerLabel(trigger, selectEl);
+      if (trigger) updateTriggerLabel(trigger, selectEl);
     });
 
     // Observar cambios dinámicos en las opciones del select (ej. categorías dependientes)
     const observer = new MutationObserver(() => {
-      updateTriggerLabel(trigger, selectEl);
+      if (trigger) updateTriggerLabel(trigger, selectEl);
     });
     observer.observe(selectEl, { childList: true });
   };
