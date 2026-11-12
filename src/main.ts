@@ -251,6 +251,7 @@ async function run() {
   setupAdminModule();
   setupDownloadAppModule();
   setupVipMenuModal();
+  setupVipSelectPicker();
 
   // Multi-Device Persistence: Realizar migración segura y sincronizar estado con el servidor
   DataRepository.performSafeMigration(state.userProfile.id).catch(() => {});
@@ -7675,6 +7676,245 @@ function setupVipMenuModal() {
 
   // Comprobar URL al cargar la aplicación
   checkUrlRoute();
+}
+
+// ---------------------------------------------------------
+// UNIVERSAL VIP SELECT PICKER (REEMPLAZO SELECT ANDROID)
+// ---------------------------------------------------------
+
+function setupVipSelectPicker() {
+  const pickerModal = document.getElementById('vip-custom-picker-modal') as HTMLDialogElement;
+  const pickerTitle = document.getElementById('vip-picker-title') as HTMLElement;
+  const pickerSub = document.getElementById('vip-picker-sub') as HTMLElement;
+  const pickerOptionsList = document.getElementById('vip-picker-options-list') as HTMLElement;
+  const pickerCloseBtn = document.getElementById('close-vip-picker-modal') as HTMLButtonElement;
+  const pickerSearchBox = document.getElementById('vip-picker-search-box') as HTMLElement;
+  const pickerSearchInput = document.getElementById('vip-picker-search-input') as HTMLInputElement;
+
+  if (!pickerModal || !pickerOptionsList) return;
+
+  let activeSelectEl: HTMLSelectElement | null = null;
+  let activeTriggerEl: HTMLElement | null = null;
+
+  const closePicker = () => {
+    if (pickerModal.open) {
+      pickerModal.close();
+    }
+    activeSelectEl = null;
+    activeTriggerEl = null;
+  };
+
+  if (pickerCloseBtn) {
+    pickerCloseBtn.addEventListener('click', closePicker);
+  }
+
+  pickerModal.addEventListener('click', (e) => {
+    if (e.target === pickerModal) closePicker();
+  });
+
+  const updateTriggerLabel = (triggerEl: HTMLElement, selectEl: HTMLSelectElement) => {
+    const labelSpan = triggerEl.querySelector('.vip-trigger-label');
+    const selectedOpt = selectEl.selectedOptions[0] || selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
+    if (labelSpan && selectedOpt) {
+      labelSpan.textContent = selectedOpt.text.trim();
+    }
+  };
+
+  const renderPickerOptions = (query = '') => {
+    if (!activeSelectEl) return;
+    const cleanQuery = query.trim().toLowerCase();
+    pickerOptionsList.innerHTML = '';
+
+    const options = Array.from(activeSelectEl.options);
+    let matchCount = 0;
+
+    options.forEach(opt => {
+      const text = opt.text.trim();
+      const value = opt.value;
+      const isSelected = opt.value === activeSelectEl!.value;
+
+      if (cleanQuery && !text.toLowerCase().includes(cleanQuery)) {
+        return;
+      }
+      matchCount++;
+
+      const card = document.createElement('div');
+      card.className = `vip-picker-option-card ${isSelected ? 'active' : ''}`;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+
+      card.innerHTML = `
+        <span class="vip-picker-option-text">${text}</span>
+        <span class="vip-picker-radio ${isSelected ? 'active' : ''}">${isSelected ? '✓' : ''}</span>
+      `;
+
+      card.addEventListener('click', () => {
+        if (!activeSelectEl) return;
+        activeSelectEl.value = value;
+        activeSelectEl.dispatchEvent(new Event('change', { bubbles: true }));
+        activeSelectEl.dispatchEvent(new Event('input', { bubbles: true }));
+        if (activeTriggerEl) {
+          updateTriggerLabel(activeTriggerEl, activeSelectEl);
+        }
+        closePicker();
+      });
+
+      pickerOptionsList.appendChild(card);
+    });
+
+    if (matchCount === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'vip-picker-empty';
+      empty.textContent = 'No se encontraron opciones para esta búsqueda.';
+      pickerOptionsList.appendChild(empty);
+    }
+  };
+
+  if (pickerSearchInput) {
+    pickerSearchInput.addEventListener('input', () => {
+      renderPickerOptions(pickerSearchInput.value);
+    });
+  }
+
+  const openPickerForSelect = (selectEl: HTMLSelectElement, triggerEl: HTMLElement) => {
+    activeSelectEl = selectEl;
+    activeTriggerEl = triggerEl;
+
+    // Detectar título contextual amigable
+    const parentGroup = selectEl.closest('.form-group') || selectEl.parentElement;
+    const labelEl = parentGroup ? parentGroup.querySelector('label') : null;
+    let titleText = labelEl ? labelEl.textContent?.trim() : selectEl.getAttribute('aria-label');
+
+    // Nombres directos para los módulos clave
+    if (selectEl.id === 'calc-profile-select') {
+      titleText = '🧮 Perfil de Gestión de Riesgo y Stake';
+    } else if (selectEl.id === 'calc-mart-max-steps') {
+      titleText = '🛡️ Pasos Máximos Martingala';
+    } else if (selectEl.id === 'cfg-currency-select') {
+      titleText = '🌎 Moneda / Divisa Principal';
+    } else if (selectEl.id === 'op-form-category') {
+      titleText = '⚽ Categoría de Operación';
+    } else if (selectEl.id === 'op-form-type') {
+      titleText = '⚡ Tipo de Operación';
+    } else if (selectEl.id === 'op-form-status') {
+      titleText = '📊 Estado de la Operación';
+    } else if (selectEl.id === 'mov-form-type') {
+      titleText = '💰 Tipo de Movimiento de Capital';
+    } else if (selectEl.id === 'mov-form-category') {
+      titleText = '📁 Categoría de Movimiento';
+    } else if (selectEl.id === 'bt-filter-league') {
+      titleText = '🌐 Liga para Simulación (Backtest)';
+    } else if (selectEl.id === 'backtest-market-select') {
+      titleText = '🎯 Mercado Cuantitativo';
+    } else if (selectEl.id === 'bt-filter-season') {
+      titleText = '📅 Temporada Histórica';
+    } else if (selectEl.id === 'bt-filter-odds') {
+      titleText = '🎲 Rango de Cuotas';
+    } else if (selectEl.id === 'bt-filter-tier') {
+      titleText = '⚡ Nivel de Señal';
+    } else if (selectEl.id === 'backtest-stake-select') {
+      titleText = '📈 Porcentaje de Stake';
+    } else if (selectEl.id === 'adm-cfg-tier') {
+      titleText = '🛡️ Nivel Mínimo de Señal (Admin)';
+    } else if (selectEl.id === 'lang-select') {
+      titleText = '🌐 Idioma del Sistema';
+    } else if (selectEl.id === 'plan-select') {
+      titleText = '👑 Plan de Suscripción';
+    }
+
+    if (pickerTitle) {
+      pickerTitle.textContent = titleText || 'Seleccionar Opción';
+    }
+    if (pickerSub) {
+      pickerSub.textContent = `Selecciona una opción (${selectEl.options.length} disponibles):`;
+    }
+
+    // Mostrar buscador si hay más de 5 opciones
+    if (pickerSearchBox && pickerSearchInput) {
+      if (selectEl.options.length > 5) {
+        pickerSearchBox.style.display = 'flex';
+        pickerSearchInput.value = '';
+      } else {
+        pickerSearchBox.style.display = 'none';
+      }
+    }
+
+    renderPickerOptions();
+    pickerModal.showModal();
+  };
+
+  const upgradeSelect = (selectEl: HTMLSelectElement) => {
+    if (selectEl.dataset.vipUpgraded === 'true') return;
+
+    // Ocultar select nativo para que Android no dispare su modal del sistema
+    selectEl.style.display = 'none';
+    selectEl.dataset.vipUpgraded = 'true';
+
+    // Crear botón trigger estilizado VIP
+    const trigger = document.createElement('div');
+    trigger.className = 'vip-custom-select-trigger';
+    trigger.setAttribute('role', 'combobox');
+    trigger.setAttribute('tabindex', '0');
+    trigger.setAttribute('aria-haspopup', 'dialog');
+
+    const selectedOpt = selectEl.selectedOptions[0] || selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
+    const initialText = selectedOpt ? selectedOpt.text.trim() : 'Seleccionar';
+
+    trigger.innerHTML = `
+      <span class="vip-trigger-label">${initialText}</span>
+      <span class="vip-trigger-chevron">▾</span>
+    `;
+
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openPickerForSelect(selectEl, trigger);
+    });
+
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openPickerForSelect(selectEl, trigger);
+      }
+    });
+
+    // Insertar trigger inmediatamente después del select
+    selectEl.parentNode?.insertBefore(trigger, selectEl.nextSibling);
+
+    // Mantener sincronizado el texto del trigger cuando cambie el select
+    selectEl.addEventListener('change', () => {
+      updateTriggerLabel(trigger, selectEl);
+    });
+
+    // Observar cambios dinámicos en las opciones del select (ej. categorías dependientes)
+    const observer = new MutationObserver(() => {
+      updateTriggerLabel(trigger, selectEl);
+    });
+    observer.observe(selectEl, { childList: true });
+  };
+
+  // Modernizar todos los selects de los módulos solicitados
+  const selectQuery = `
+    #lang-select,
+    #plan-select,
+    #calc-profile-select,
+    #calc-mart-max-steps,
+    #cfg-currency-select,
+    #op-form-category,
+    #op-form-type,
+    #op-form-status,
+    #mov-form-type,
+    #mov-form-category,
+    #bt-filter-league,
+    #backtest-market-select,
+    #bt-filter-season,
+    #bt-filter-odds,
+    #bt-filter-tier,
+    #backtest-stake-select,
+    #adm-cfg-tier
+  `;
+
+  document.querySelectorAll<HTMLSelectElement>(selectQuery).forEach(upgradeSelect);
 }
 
 

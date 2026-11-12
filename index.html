@@ -2557,6 +2557,31 @@
         </div>
       </dialog>
 
+      <!-- MODAL SELECTOR CLARO VIP UNIVERSAL (CUSTOM SELECT PICKER) -->
+      <dialog id="vip-custom-picker-modal" class="custom-dialog vip-picker-dialog" aria-labelledby="vip-picker-title">
+        <div class="vip-picker-container">
+          <div class="vip-picker-header">
+            <div class="vip-picker-header-text">
+              <span class="vip-picker-badge" id="vip-picker-badge">👑 SELECTOR VIP</span>
+              <h3 class="vip-picker-title" id="vip-picker-title">Seleccionar Opción</h3>
+              <p class="vip-picker-sub" id="vip-picker-sub">Toca la opción deseada para aplicarla al instante.</p>
+            </div>
+            <button type="button" id="close-vip-picker-modal" class="vip-picker-close-btn" aria-label="Cerrar selector">&times;</button>
+          </div>
+
+          <!-- Buscador rápido para listas extensas -->
+          <div class="vip-picker-search-box" id="vip-picker-search-box" style="display: none;">
+            <span class="vip-picker-search-icon">🔍</span>
+            <input type="text" id="vip-picker-search-input" class="vip-picker-search-input" placeholder="Buscar opción..." autocomplete="off" />
+          </div>
+
+          <!-- Lista de opciones como tarjetas VIP -->
+          <div class="vip-picker-options-list" id="vip-picker-options-list">
+            <!-- Renderizado dinámico -->
+          </div>
+        </div>
+      </dialog>
+
       <!-- CENTRO DE OPORTUNIDADES -->
       <section id="opportunities-center-section" class="sports-opps-section">
         <div class="opps-section-header-box">
