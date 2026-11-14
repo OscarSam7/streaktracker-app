@@ -253,6 +253,7 @@ async function run() {
   setupVipMenuModal();
   setupVipSelectPicker();
   setupVipCalendarPicker();
+  setupToolsInfiniteCarousel();
 
   // Multi-Device Persistence: Realizar migración segura y sincronizar estado con el servidor
   DataRepository.performSafeMigration(state.userProfile.id).catch(() => {});
@@ -8337,6 +8338,207 @@ function setupVipCalendarPicker() {
   document.querySelectorAll<HTMLInputElement>(dateInputsQuery).forEach(upgradeDateInput);
   document.querySelectorAll<HTMLInputElement>('input[type="date"]').forEach(upgradeDateInput);
 }
+
+// ---------------------------------------------------------
+// SPORTS TOOLS INFINITE CAROUSEL (MODO HÍBRIDO CONTINUO)
+// ---------------------------------------------------------
+
+function setupToolsInfiniteCarousel() {
+  const viewport = document.getElementById('tools-carousel-viewport') as HTMLElement;
+  const track = document.getElementById('tools-carousel-track') as HTMLElement;
+  const prevBtn = document.getElementById('tools-carousel-prev') as HTMLButtonElement;
+  const nextBtn = document.getElementById('tools-carousel-next') as HTMLButtonElement;
+
+  if (!viewport || !track) return;
+
+  // 1. Obtener la lista de chips originales
+  const originalChips = Array.from(track.children) as HTMLElement[];
+  if (originalChips.length === 0) return;
+
+  // 2. Clonar elementos para generar bucle infinito continuo
+  for (let cycle = 1; cycle <= 2; cycle++) {
+    originalChips.forEach((chip) => {
+      const clone = chip.cloneNode(true) as HTMLElement;
+      if (chip.id) {
+        clone.dataset.targetId = chip.id;
+        clone.removeAttribute('id'); // Evitar duplicación de IDs en el documento
+      }
+      clone.classList.add('carousel-clone-chip');
+      track.appendChild(clone);
+    });
+  }
+
+  // Sincronizar dinámicamente visibilidad de admin-panel-btn si cambia su estado
+  const adminBtn = document.getElementById('admin-panel-btn');
+  if (adminBtn) {
+    const syncAdminClones = () => {
+      const clones = track.querySelectorAll<HTMLElement>('[data-target-id="admin-panel-btn"]');
+      clones.forEach(c => {
+        c.style.display = adminBtn.style.display;
+      });
+    };
+    const observer = new MutationObserver(syncAdminClones);
+    observer.observe(adminBtn, { attributes: true, attributeFilter: ['style', 'class'] });
+    syncAdminClones();
+  }
+
+  // 3. Medir el ancho de un set completo
+  let singleSetWidth = 0;
+  const updateMetrics = () => {
+    let widthSum = 0;
+    let visibleCount = 0;
+    originalChips.forEach(chip => {
+      if (chip.style.display !== 'none') {
+        widthSum += chip.offsetWidth;
+        visibleCount++;
+      }
+    });
+    const computedGap = parseFloat(window.getComputedStyle(track).gap) || 9;
+    singleSetWidth = widthSum + (computedGap * visibleCount);
+  };
+
+  setTimeout(updateMetrics, 100);
+  window.addEventListener('resize', updateMetrics);
+
+  // 4. Motor de desplazamiento continuo suave (Ticker a 60 FPS)
+  const SPEED = 0.55; // Pixeles por frame (~33 px/segundo)
+  let isPaused = false;
+  let isDragging = false;
+  let hasDragged = false;
+  let resumeTimer: number | null = null;
+
+  const scheduleResume = (delay = 2000) => {
+    if (resumeTimer) window.clearTimeout(resumeTimer);
+    resumeTimer = window.setTimeout(() => {
+      isPaused = false;
+    }, delay);
+  };
+
+  const tick = () => {
+    if (!isPaused && !isDragging && singleSetWidth > 0) {
+      viewport.scrollLeft += SPEED;
+      if (viewport.scrollLeft >= singleSetWidth) {
+        viewport.scrollLeft -= singleSetWidth;
+      }
+    }
+    requestAnimationFrame(tick);
+  };
+
+  requestAnimationFrame(tick);
+
+  // 5. Pausar suavemente al interactuar
+  viewport.addEventListener('mouseenter', () => {
+    isPaused = true;
+  });
+
+  viewport.addEventListener('mouseleave', () => {
+    if (!isDragging) {
+      isPaused = false;
+    }
+  });
+
+  // 6. Soporte de Arrastre / Swipe Unificado (Pointer Events para mouse y touch)
+  let startX = 0;
+  let startScrollLeft = 0;
+
+  const onPointerDown = (e: PointerEvent) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    isDragging = true;
+    isPaused = true;
+    hasDragged = false;
+    startX = e.clientX;
+    startScrollLeft = viewport.scrollLeft;
+    viewport.classList.add('is-dragging');
+    try {
+      viewport.setPointerCapture(e.pointerId);
+    } catch {}
+  };
+
+  const onPointerMove = (e: PointerEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - startX;
+    if (Math.abs(deltaX) > 6) {
+      hasDragged = true;
+    }
+    viewport.scrollLeft = startScrollLeft - deltaX;
+
+    // Loop wrapping durante arrastre manual
+    if (singleSetWidth > 0) {
+      if (viewport.scrollLeft >= singleSetWidth * 2) {
+        viewport.scrollLeft -= singleSetWidth;
+        startScrollLeft -= singleSetWidth;
+      } else if (viewport.scrollLeft <= 0) {
+        viewport.scrollLeft += singleSetWidth;
+        startScrollLeft += singleSetWidth;
+      }
+    }
+  };
+
+  const onPointerUp = (e: PointerEvent) => {
+    if (!isDragging) return;
+    isDragging = false;
+    viewport.classList.remove('is-dragging');
+    try {
+      viewport.releasePointerCapture(e.pointerId);
+    } catch {}
+    scheduleResume(2200);
+  };
+
+  viewport.addEventListener('pointerdown', onPointerDown);
+  viewport.addEventListener('pointermove', onPointerMove);
+  viewport.addEventListener('pointerup', onPointerUp);
+  viewport.addEventListener('pointercancel', onPointerUp);
+
+  // 7. Flechas de navegación rápida holográficas
+  const scrollStep = 240;
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      isPaused = true;
+      viewport.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+      scheduleResume(3000);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      isPaused = true;
+      viewport.scrollBy({ left: scrollStep, behavior: 'smooth' });
+      scheduleResume(3000);
+    });
+  }
+
+  // 8. Delegación de clics: Activar el botón original al pulsar un clon
+  track.addEventListener('click', (e) => {
+    if (hasDragged) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    const chip = (e.target as HTMLElement).closest<HTMLElement>('.sports-tool-chip');
+    if (!chip) return;
+
+    const targetId = chip.dataset.targetId;
+    if (targetId) {
+      e.preventDefault();
+      e.stopPropagation();
+      const originalEl = document.getElementById(targetId);
+      if (originalEl) {
+        if (originalEl.tagName === 'A' && (originalEl as HTMLAnchorElement).href) {
+          window.location.href = (originalEl as HTMLAnchorElement).href;
+        } else {
+          originalEl.click();
+        }
+      }
+    }
+  });
+}
+
 
 
 

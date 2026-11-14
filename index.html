@@ -121,52 +121,56 @@
       </div>
     </div>
 
-    <!-- Sports Tools Hub (Barra de Herramientas Deportivas Categorizada) -->
+    <!-- Sports Tools Hub (Barra de Herramientas Deportivas — Infinite Carousel VIP) -->
     <div class="sports-tools-hub" id="header-actions">
-      <div class="tools-scroll-row">
-        <!-- Operativa & Gestión -->
-        <button id="bankroll-btn" class="sports-tool-chip chip-bankroll" title="Abrir Registro de Operaciones y Control de Banca">
-          <span class="tool-icon">💼</span> Control de Banca
-        </button>
-        <button id="backtest-btn" class="sports-tool-chip chip-backtest" title="Ver Backtesting y Rendimiento Histórico">
-          <span class="tool-icon">📈</span> Backtesting
-        </button>
-        <button id="telegram-btn" class="sports-tool-chip chip-telegram" title="Ver simulador de alertas de Telegram">
-          <span class="tool-icon">🤖</span> Bot Telegram
-        </button>
-        <button id="daily-report-btn" class="sports-tool-chip chip-report" title="Ver Informe y Balance de Jornada por Día, Semana y Mes">
-          <span class="tool-icon">📊</span> Informe de Jornada
-        </button>
+      <button type="button" class="tools-carousel-arrow prev" id="tools-carousel-prev" aria-label="Desplazar hacia la izquierda" title="Desplazar izquierda">‹</button>
+      <div class="tools-carousel-viewport" id="tools-carousel-viewport">
+        <div class="tools-scroll-row tools-carousel-track" id="tools-carousel-track">
+          <!-- Operativa & Gestión -->
+          <button id="bankroll-btn" class="sports-tool-chip chip-bankroll" title="Abrir Registro de Operaciones y Control de Banca">
+            <span class="tool-icon">💼</span> Control de Banca
+          </button>
+          <button id="backtest-btn" class="sports-tool-chip chip-backtest" title="Ver Backtesting y Rendimiento Histórico">
+            <span class="tool-icon">📈</span> Backtesting
+          </button>
+          <button id="telegram-btn" class="sports-tool-chip chip-telegram" title="Ver simulador de alertas de Telegram">
+            <span class="tool-icon">🤖</span> Bot Telegram
+          </button>
+          <button id="daily-report-btn" class="sports-tool-chip chip-report" title="Ver Informe y Balance de Jornada por Día, Semana y Mes">
+            <span class="tool-icon">📊</span> Informe de Jornada
+          </button>
 
-        <!-- Estrategia & Auditoría -->
-        <button id="guide-btn" class="sports-tool-chip chip-guide" title="Ver Guía de Mercados a Operar">
-          <span class="tool-icon">📖</span> ¿Qué Mercado Operar?
-        </button>
-        <button id="audit-btn" class="sports-tool-chip chip-audit" title="Ver Auditoría Pública y Track Record">
-          <span class="tool-icon">🛡️</span> Auditoría
-        </button>
-        <button id="transparency-btn" class="sports-tool-chip chip-transparency" title="Ver Métricas Oficiales de Rendimiento y Transparencia">
-          <span class="tool-icon">🔍</span> Transparencia & Resultados
-        </button>
-        <button id="academy-btn" class="sports-tool-chip chip-academy" title="Aprender en la Academia Anti-Ruina">
-          <span class="tool-icon">🎓</span> Academia
-        </button>
+          <!-- Estrategia & Auditoría -->
+          <button id="guide-btn" class="sports-tool-chip chip-guide" title="Ver Guía de Mercados a Operar">
+            <span class="tool-icon">📖</span> ¿Qué Mercado Operar?
+          </button>
+          <button id="audit-btn" class="sports-tool-chip chip-audit" title="Ver Auditoría Pública y Track Record">
+            <span class="tool-icon">🛡️</span> Auditoría
+          </button>
+          <button id="transparency-btn" class="sports-tool-chip chip-transparency" title="Ver Métricas Oficiales de Rendimiento y Transparencia">
+            <span class="tool-icon">🔍</span> Transparencia & Resultados
+          </button>
+          <button id="academy-btn" class="sports-tool-chip chip-academy" title="Aprender en la Academia Anti-Ruina">
+            <span class="tool-icon">🎓</span> Academia
+          </button>
 
-        <!-- Configuración & Acceso -->
-        <button id="league-btn" class="sports-tool-chip chip-leagues" title="Gestionar Ligas">
-          <span class="tool-icon">⚙️</span> Gestionar Ligas
-        </button>
-        <button id="pricing-btn" class="sports-tool-chip chip-vip" title="Ver Planes">
-          <span class="tool-icon">💎</span> Ver Planes
-        </button>
-        <a href="/landing.html" id="portal-web-btn" class="sports-tool-chip chip-portal" title="Ver Landing Page informativa">
-          <span class="tool-icon">🌐</span> Portal Web
-        </a>
-        <button id="export-csv-btn" class="sports-tool-chip chip-report" title="Ver Informe Visual Consolidado de Rachas en Pantalla">
-          <span class="tool-icon">📋</span> Informe de Rachas
-        </button>
-        <button id="admin-panel-btn" class="btn" style="display: none;" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
+          <!-- Configuración & Acceso -->
+          <button id="league-btn" class="sports-tool-chip chip-leagues" title="Gestionar Ligas">
+            <span class="tool-icon">⚙️</span> Gestionar Ligas
+          </button>
+          <button id="pricing-btn" class="sports-tool-chip chip-vip" title="Ver Planes">
+            <span class="tool-icon">💎</span> Ver Planes
+          </button>
+          <a href="/landing.html" id="portal-web-btn" class="sports-tool-chip chip-portal" title="Ver Landing Page informativa">
+            <span class="tool-icon">🌐</span> Portal Web
+          </a>
+          <button id="export-csv-btn" class="sports-tool-chip chip-report" title="Ver Informe Visual Consolidado de Rachas en Pantalla">
+            <span class="tool-icon">📋</span> Informe de Rachas
+          </button>
+          <button id="admin-panel-btn" class="btn sports-tool-chip chip-admin" style="display: none;" title="Abrir Panel de Control y Administración">⚙️ Panel Admin</button>
+        </div>
       </div>
+      <button type="button" class="tools-carousel-arrow next" id="tools-carousel-next" aria-label="Desplazar hacia la derecha" title="Desplazar derecha">›</button>
     </div>
 
     <!-- Permanent Trial Countdown Banner (Dynamically Controlled) -->

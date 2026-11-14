@@ -2440,27 +2440,92 @@ button[id^="close-"]:hover,
 .val-cyan { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.6); }
 .val-green { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.6); }
 
-/* Sports Tools Hub (Horizontal Categorized Scrollable Bar) */
+/* Sports Tools Hub (Holographic Infinite Carousel VIP) */
 .sports-tools-hub {
-  margin-bottom: 1.25rem;
-}
-
-.tools-scroll-row {
+  position: relative;
   display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  padding: 0.4rem 0.2rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(56, 189, 248, 0.3) transparent;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  margin-bottom: 1.25rem;
+  padding: 0.35rem 0.4rem;
+  background: linear-gradient(135deg, rgba(8, 14, 28, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 9999px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(56, 189, 248, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
 }
 
-.tools-scroll-row::-webkit-scrollbar {
-  height: 4px;
+/* Viewport with subtle edge gradient fades */
+.tools-carousel-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: auto;
+  cursor: grab;
+  touch-action: pan-y;
+  mask-image: linear-gradient(to right, transparent 0%, black 28px, black calc(100% - 28px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 28px, black calc(100% - 28px), transparent 100%);
 }
 
-.tools-scroll-row::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.3);
-  border-radius: 4px;
+.tools-carousel-viewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.tools-carousel-viewport.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* Continuous track */
+.tools-scroll-row.tools-carousel-track {
+  display: flex;
+  gap: 0.55rem;
+  width: max-content;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+}
+
+/* Sleek Cyber Navigation Arrows */
+.tools-carousel-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  z-index: 5;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+  user-select: none;
+  line-height: 1;
+  padding: 0;
+}
+
+.tools-carousel-arrow:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+  transform: scale(1.1);
+}
+
+.tools-carousel-arrow:active {
+  transform: scale(0.92);
 }
 
 .sports-tool-chip {
@@ -2474,17 +2539,46 @@ button[id^="close-"]:hover,
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #cbd5e1;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .sports-tool-chip:hover {
   transform: translateY(-2px);
   color: #fff;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.chip-admin {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.3) 100%);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+.chip-admin:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+@media (max-width: 480px) {
+  .sports-tools-hub {
+    padding: 0.25rem 0.3rem;
+    gap: 0.2rem;
+  }
+  .tools-carousel-arrow {
+    width: 25px;
+    height: 25px;
+    font-size: 1rem;
+  }
+  .sports-tool-chip {
+    padding: 0.38rem 0.72rem;
+    font-size: 0.74rem;
+  }
 }
 
 .chip-bankroll { border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; }
